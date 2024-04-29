@@ -3,6 +3,8 @@ a (very) simple implementation of conways game of life as a "multiplayer" varian
 every 5 seconds a new generation is calculated and broadcasted to every client.
 during these 5 seconds everyone on the website can make changes, which will affect the next generation.
 
+![image](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/aa082836-23d1-405b-b3eb-0f0a65ffe16d)
+
 ## how to use:  
 - make sure to properly import the Systemge library to the SampleApp.  
 - locate /main and enter "go run ." which will start the system.  
