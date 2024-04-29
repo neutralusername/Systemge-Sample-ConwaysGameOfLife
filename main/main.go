@@ -24,16 +24,10 @@ func main() {
 	requestServerWebsocket := RequestServerTCP.Create("websocket", tcpServerWebsocket, logger)
 	requestServerWebsocket.Start()
 
-	/* requestServerWebsocket := RequestServerChannel.Create("websocket", logger)
-	requestServerWebsocket.Start() */
-
 	tcpServerGrid := TCPServer.Create(appGrid.ADDRESS, "grid")
 	tcpServerGrid.Start()
 	requestServerGrid := RequestServerTCP.Create("grid", tcpServerGrid, logger)
 	requestServerGrid.Start()
-
-	/* requestServerGrid := RequestServerChannel.Create("grid", logger)
-	requestServerGrid.Start() */
 
 	websocketServer := WebsocketServer.Create("websocket")
 	HTTPServerWebsocket := HTTPServer.Create(HTTPServer.WEBSOCKET_PORT, "websocket", false, "", "")
@@ -44,7 +38,7 @@ func main() {
 	websocketServer.Start(appWebsocket)
 
 	appServerGrid := ApplicationServer.Create("grid", logger, requestServerGrid)
-	appGrid := appGrid.Create(appServerGrid)
+	appGrid := appGrid.Create(appServerGrid, requestServerWebsocket.GetEndpoint())
 
 	appServerWebsocket.Start(appWebsocket)
 	appServerGrid.Start(appGrid)

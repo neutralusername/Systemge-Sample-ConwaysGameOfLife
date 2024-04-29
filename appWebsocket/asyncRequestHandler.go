@@ -19,7 +19,7 @@ func (app *App) AsyncRequestHandler(connection *WebsocketServer.Connection, mess
 		if err != nil {
 			return Error.Create(err.Error())
 		}
-		app.websocketServer.Broadcast(typeDefinitions.GET_GRID_WSPROPAGATE.Create([]string{reponse.Payload[0][0]}))
+		app.websocketServer.Broadcast(typeDefinitions.SET_GRID_WSPROPAGATE.Create([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}, []string{reponse.Payload[0][0]}))
 		return nil
 	default:
 		return Error.Create("Unknown message type: " + message.TypeName)

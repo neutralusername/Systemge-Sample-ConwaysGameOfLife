@@ -1,6 +1,10 @@
 const WS_CONNECTION = new WebSocket("ws://localhost:8443/ws")
 const DELIMITER1 = "\x02"
 const DELIMITER2 = "\x03"
+
+const GRIDSIZE = 75
+const SQUARESIZE = 12.5
+
 function constructMessage(type, ...args) {
     let msg = type + DELIMITER1
     for (let arg of args) {
@@ -38,6 +42,13 @@ WS_CONNECTION.onmessage = function(event) {
         case "get_grid_wspropagate":
             addOrReplace(getGridElement(message.payload[0][0]))
             break
+        case "set_grid_wspropagate":
+            let grid = document.getElementById("grid")
+            if (grid) {
+                let cell = grid.children[Number(message.payload[0][0])*GRIDSIZE + Number(message.payload[1][0])]
+                cell.style.backgroundColor = message.payload[2][0] === "true" ? "black" : "white"
+            }
+            break
         default:
             console.log("Unknown message type: " + message.type)
             break
@@ -57,10 +68,10 @@ function getGridElement(grid) {
     let gridElement = document.createElement("div")
     gridElement.id = "grid"
     gridElement.style.display = "grid"
-    gridElement.style.gridTemplateColumns = "repeat(10, 1fr)"
-    gridElement.style.gridTemplateRows = "repeat(10, 1fr)"
-    gridElement.style.width = "500px"
-    gridElement.style.height = "500px"
+    gridElement.style.gridTemplateColumns = "repeat("+GRIDSIZE+", 1fr)"
+    gridElement.style.gridTemplateRows = "repeat("+GRIDSIZE+", 1fr)"
+    gridElement.style.width = SQUARESIZE*GRIDSIZE+"px"
+    gridElement.style.height = SQUARESIZE*GRIDSIZE+"px"
     gridElement.style.border = "1px solid black"
     gridElement.style.margin = "auto"
     gridElement.style.marginTop = "10px"
@@ -71,16 +82,16 @@ function getGridElement(grid) {
     gridElement.style.position = "relative"
     gridElement.style.overflow = "hidden"
     gridElement.style.borderRadius = "5px"
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < GRIDSIZE*GRIDSIZE; i++) {
         let cell = document.createElement("div")
-        cell.style.width = "50px"
-        cell.style.height = "50px"
+        cell.style.width = SQUARESIZE+"px"
+        cell.style.height = SQUARESIZE+"px"
         cell.style.backgroundColor = grid[i] === "1" ? "black" : "white"
         cell.style.border = "1px solid black"
         cell.style.boxSizing = "border-box"
         gridElement.appendChild(cell)
         cell.onclick = function() {
-            WS_CONNECTION.send(constructMessage("set_grid_wsrequest", Math.floor(i/10), i%10))
+            WS_CONNECTION.send(constructMessage("set_grid_wsrequest", Math.floor(i/GRIDSIZE), i%GRIDSIZE))
         }
     }
     return gridElement
