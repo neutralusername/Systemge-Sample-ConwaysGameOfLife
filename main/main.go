@@ -13,32 +13,32 @@ import (
 )
 
 func main() {
-	HTTPServerServe := HTTPServer.Create(HTTPServer.HTTP_DEV_PORT, "frontend", false, "", "")
+	HTTPServerServe := HTTPServer.New(HTTPServer.HTTP_DEV_PORT, "frontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTPServer.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
 
-	logger := Utilities.CreateLogger("error_log.txt")
+	logger := Utilities.NewLogger("error_log.txt")
 
-	tcpServerWebsocket := TCPServer.Create(appWebsocket.ADDRESS, "websocket")
+	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
 	tcpServerWebsocket.Start()
-	requestServerWebsocket := RequestServerTCP.Create("websocket", tcpServerWebsocket, logger)
+	requestServerWebsocket := RequestServerTCP.New("websocket", tcpServerWebsocket, logger)
 	requestServerWebsocket.Start()
 
-	tcpServerGrid := TCPServer.Create(appGrid.ADDRESS, "grid")
+	tcpServerGrid := TCPServer.New(appGrid.ADDRESS, "grid")
 	tcpServerGrid.Start()
-	requestServerGrid := RequestServerTCP.Create("grid", tcpServerGrid, logger)
+	requestServerGrid := RequestServerTCP.New("grid", tcpServerGrid, logger)
 	requestServerGrid.Start()
 
-	websocketServer := WebsocketServer.Create("websocket")
-	HTTPServerWebsocket := HTTPServer.Create(HTTPServer.WEBSOCKET_PORT, "websocket", false, "", "")
+	websocketServer := WebsocketServer.New("websocket")
+	HTTPServerWebsocket := HTTPServer.New(HTTPServer.WEBSOCKET_PORT, "websocket", false, "", "")
 	HTTPServerWebsocket.RegisterPattern("/ws", HTTPServer.PromoteToWebsocket(websocketServer))
 	HTTPServerWebsocket.Start()
-	appServerWebsocket := ApplicationServer.Create("websocket", logger, requestServerWebsocket)
-	appWebsocket := appWebsocket.Create(appServerWebsocket, websocketServer, requestServerGrid.GetEndpoint())
+	appServerWebsocket := ApplicationServer.New("websocket", logger, requestServerWebsocket)
+	appWebsocket := appWebsocket.New(appServerWebsocket, websocketServer, requestServerGrid.GetEndpoint())
 	websocketServer.Start(appWebsocket)
 
-	appServerGrid := ApplicationServer.Create("grid", logger, requestServerGrid)
-	appGrid := appGrid.Create(appServerGrid, requestServerWebsocket.GetEndpoint())
+	appServerGrid := ApplicationServer.New("grid", logger, requestServerGrid)
+	appGrid := appGrid.New(appServerGrid, requestServerWebsocket.GetEndpoint())
 
 	appServerWebsocket.Start(appWebsocket)
 	appServerGrid.Start(appGrid)

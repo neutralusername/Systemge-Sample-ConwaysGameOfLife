@@ -18,7 +18,7 @@ type App struct {
 	websocketEndpoint RequestServer.Endpoint
 }
 
-func Create(appServer *ApplicationServer.Server, websocketEndpoint RequestServer.Endpoint) ApplicationServer.Application {
+func New(appServer *ApplicationServer.Server, websocketEndpoint RequestServer.Endpoint) ApplicationServer.Application {
 	app := &App{
 		grid:      [GRIDSIZE][GRIDSIZE]bool{},
 		appServer: appServer,
@@ -73,7 +73,7 @@ func (app *App) calcNextGeneration() {
 		}
 	}
 	app.grid = nextGrid
-	app.websocketEndpoint.Request(typeDefinitions.PROPAGATE_GRID_REQUEST.Create([]string{gridToString(app.grid)}))
+	app.websocketEndpoint.Request(typeDefinitions.PROPAGATE_GRID_REQUEST.New([]string{gridToString(app.grid)}))
 	time.Sleep(5 * time.Second)
 	app.calcNextGeneration()
 }

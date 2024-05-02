@@ -10,9 +10,9 @@ import (
 func (app *App) SyncRequestHandler(message *Message.Message) *Message.Message {
 	switch message.TypeName {
 	case typeDefinitions.PROPAGATE_GRID_REQUEST.Name:
-		app.websocketServer.Broadcast(typeDefinitions.GET_GRID_WSPROPAGATE.Create([]string{message.Payload[0][0]}))
-		return typeDefinitions.PROPAGATE_GRID_REQUEST.Response.Create()
+		app.websocketServer.Broadcast(typeDefinitions.GET_GRID_WSPROPAGATE.New([]string{message.Payload[0][0]}))
+		return typeDefinitions.PROPAGATE_GRID_REQUEST.Response.New()
 	default:
-		return TypeDefinition.CreateError(errors.New("Unknown message type: " + message.TypeName))
+		return TypeDefinition.NewErrorMessage(errors.New("Unknown message type: " + message.TypeName))
 	}
 }

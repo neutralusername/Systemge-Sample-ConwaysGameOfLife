@@ -13,15 +13,15 @@ func (app *App) AsyncRequestHandler(connection *WebsocketServer.Connection, mess
 		return nil
 	case typeDefinitions.SET_GRID_WSREQUEST.Name:
 		if !typeDefinitions.SET_GRID_WSREQUEST.Validate(message.Payload) {
-			return Error.Create("Invalid message payload")
+			return Error.New("Invalid message payload")
 		}
-		reponse, err := app.gridEndpoint.Request(typeDefinitions.SET_GRID_REQUEST.Create([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}))
+		reponse, err := app.gridEndpoint.Request(typeDefinitions.SET_GRID_REQUEST.New([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}))
 		if err != nil {
-			return Error.Create(err.Error())
+			return Error.New(err.Error())
 		}
-		app.websocketServer.Broadcast(typeDefinitions.SET_GRID_WSPROPAGATE.Create([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}, []string{reponse.Payload[0][0]}))
+		app.websocketServer.Broadcast(typeDefinitions.SET_GRID_WSPROPAGATE.New([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}, []string{reponse.Payload[0][0]}))
 		return nil
 	default:
-		return Error.Create("Unknown message type: " + message.TypeName)
+		return Error.New("Unknown message type: " + message.TypeName)
 	}
 }
