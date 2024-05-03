@@ -11,5 +11,5 @@ func (app *App) ConnectionHandler(connectionRequest *WebsocketServer.ConnectionR
 		return
 	}
 	connectionRequest.SendMessage(typeDefinitions.GET_GRID_WSPROPAGATE.New([]string{reponse.Payload[0][0]}).Serialize())
-	app.websocketServer.AcceptConnectionRequest(connectionRequest, "")
+	app.websocketServer.AcceptConnectionRequest(connectionRequest)
 }
