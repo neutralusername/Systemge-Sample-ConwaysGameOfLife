@@ -45,8 +45,8 @@ WS_CONNECTION.onmessage = function(event) {
         case "getGridChange":
             let grid = document.getElementById("grid")
             if (grid) {
-                let cell = grid.children[Number(message.payload[0][0])*GRIDSIZE + Number(message.payload[1][0])]
-                cell.style.backgroundColor = message.payload[2][0] === "true" ? "black" : "white"
+                let cell = grid.children[Number(message.payload[0][0])*GRIDSIZE + Number(message.payload[0][1])]
+                cell.style.backgroundColor = message.payload[0][2] === "true" ? "black" : "white"
             }
             break
         default:
@@ -92,7 +92,7 @@ function getGridElement(grid) {
         cell.style.boxSizing = "border-box"
         gridElement.appendChild(cell)
         cell.onclick = function() {
-            WS_CONNECTION.send(constructMessage("setGrid", Math.floor(i/GRIDSIZE), i%GRIDSIZE))
+            WS_CONNECTION.send(constructMessage("requestGridChange", Math.floor(i/GRIDSIZE), i%GRIDSIZE))
         }
     }
     return gridElement

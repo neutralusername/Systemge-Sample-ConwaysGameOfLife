@@ -1,0 +1,28 @@
+2024/05/09 16:49:03 Subscriber not found for message type: propagateMessage
+2024/05/09 16:49:06 Subscriber not found for message type: propagateMessage
+2024/05/09 16:49:08 Subscriber not found for message type: propagateMessage
+2024/05/09 16:49:13 Subscriber not found for message type: propagateMessage
+2024/05/09 16:49:18 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:34 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:35 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:39 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:44 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:49 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:54 Subscriber not found for message type: propagateMessage
+2024/05/09 16:50:59 Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:04 Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:09 Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:14 Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:19 Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:24 Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:28 MessageBroker/server.go:80 -> Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:29 MessageBroker/server.go:80 -> Subscriber not found for message type: propagateMessage
+2024/05/09 16:51:33 MessageBroker/server.go:80 -> Subscriber not found for message type: propagateMessage
+2024/05/09 17:57:45 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:57:46 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:57:46 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:57:47 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:57:47 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:57:52 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:57:59 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
+2024/05/09 17:58:04 MessageBroker/server.go:81 -> Subscriber not found for message type: setGrid
