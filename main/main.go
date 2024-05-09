@@ -6,6 +6,7 @@ import (
 	"Systemge/MessageBroker"
 	"Systemge/MessageServerTCP"
 	"Systemge/TCPServer"
+	"Systemge/TypeDefinition"
 	"Systemge/Utilities"
 	"Systemge/Websocket"
 	"SystemgeSampleApp/appGrid"
@@ -52,7 +53,7 @@ func main() {
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, "grid")
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, "grid")
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, "grid")
-	messageBroker.AddMessageType(&Websocket.PROPAGATE_MESSAGE_TYPE, "websocket")
+	messageBroker.AddMessageType(&TypeDefinition.PROPAGATE_MESSAGE_TYPE, "websocket")
 	messageBrokerServer.Start()
 
 	appWebsocket := websocketApp.New(websocketServer, messageServerMessageBroker.GetEndpoint())

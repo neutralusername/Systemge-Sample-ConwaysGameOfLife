@@ -4,8 +4,8 @@ import (
 	"Systemge/Application"
 	"Systemge/Error"
 	"Systemge/MessageServer"
+	"Systemge/TypeDefinition"
 	"Systemge/Utilities"
-	"Systemge/Websocket"
 	"sync"
 	"time"
 )
@@ -74,7 +74,7 @@ func (app *App) calcNextGeneration() {
 	}
 
 	app.grid = nextGrid
-	err := app.messageBroker.Send(Websocket.NewPropagateMessage([]string{}, "getGrid", []string{gridToString(app.grid)}))
+	err := app.messageBroker.Send(TypeDefinition.NewPropagateMessage([]string{}, "getGrid", []string{gridToString(app.grid)}))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
