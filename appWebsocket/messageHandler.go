@@ -1,4 +1,4 @@
-package websocketApp
+package appWebsocket
 
 import (
 	"Systemge/Error"

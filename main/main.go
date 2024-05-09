@@ -10,8 +10,8 @@ import (
 	"Systemge/Utilities"
 	"Systemge/Websocket"
 	"SystemgeSampleApp/appGrid"
+	"SystemgeSampleApp/appWebsocket"
 	"SystemgeSampleApp/typeDefinitions"
-	"SystemgeSampleApp/websocketApp"
 	"time"
 )
 
@@ -24,7 +24,7 @@ func main() {
 	HTTPServerServe.RegisterPattern("/", HTTPServer.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
 
-	tcpServerWebsocket := TCPServer.New(websocketApp.ADDRESS, "websocket")
+	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
 	tcpServerWebsocket.Start()
 	messageServerWebsocket := MessageServerTCP.New("websocket", tcpServerWebsocket, logger)
 	messageServerWebsocket.Start()
@@ -56,7 +56,7 @@ func main() {
 	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE_MESSAGE_TYPE, "websocket")
 	messageBrokerServer.Start()
 
-	appWebsocket := websocketApp.New(websocketServer, messageServerMessageBroker.GetEndpoint())
+	appWebsocket := appWebsocket.New(websocketServer, messageServerMessageBroker.GetEndpoint())
 	appGrid := appGrid.New(messageServerMessageBroker.GetEndpoint(), logger)
 
 	appServerGrid := Application.New("grid", logger, messageServerGrid)
