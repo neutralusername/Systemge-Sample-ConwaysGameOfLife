@@ -4,7 +4,7 @@ import (
 	"Systemge/Application"
 	"Systemge/HTTPServer"
 	"Systemge/MessageBroker"
-	"Systemge/RequestServerTCP"
+	"Systemge/MessageServerTCP"
 	"Systemge/TCPServer"
 	"Systemge/Utilities"
 	"Systemge/Websocket"
@@ -30,23 +30,23 @@ func main() {
 
 	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
 	tcpServerWebsocket.Start()
-	requestServerWebsocket := RequestServerTCP.New("websocket", tcpServerWebsocket, logger)
-	requestServerWebsocket.Start()
+	messageServerWebsocket := MessageServerTCP.New("websocket", tcpServerWebsocket, logger)
+	messageServerWebsocket.Start()
 
 	tcpServerGrid := TCPServer.New(appGrid.ADDRESS, "grid")
 	tcpServerGrid.Start()
-	requestServerGrid := RequestServerTCP.New("grid", tcpServerGrid, logger)
-	requestServerGrid.Start()
+	messageServerGrid := MessageServerTCP.New("grid", tcpServerGrid, logger)
+	messageServerGrid.Start()
 
 	tcpServerMessageBroker := TCPServer.New(MESSAGEBROKER_ADDRESS, "messageBroker")
 	tcpServerMessageBroker.Start()
-	requestServerMessageBroker := RequestServerTCP.New("messageBroker", tcpServerMessageBroker, logger)
-	requestServerMessageBroker.Start()
+	messageServerMessageBroker := MessageServerTCP.New("messageBroker", tcpServerMessageBroker, logger)
+	messageServerMessageBroker.Start()
 
 	messageBroker := MessageBroker.New()
-	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, requestServerMessageBroker, logger)
-	subscriberWebsocket := MessageBroker.NewSubscriber("websocket", requestServerWebsocket.GetEndpoint(), true)
-	subscriberGrid := MessageBroker.NewSubscriber("grid", requestServerGrid.GetEndpoint(), true)
+	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, messageServerMessageBroker, logger)
+	subscriberWebsocket := MessageBroker.NewSubscriber("websocket", messageServerWebsocket.GetEndpoint(), true)
+	subscriberGrid := MessageBroker.NewSubscriber("grid", messageServerGrid.GetEndpoint(), true)
 	messageBroker.AddSubscriber(subscriberWebsocket)
 	messageBroker.AddSubscriber(subscriberGrid)
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, "grid")
@@ -57,11 +57,11 @@ func main() {
 	messageBroker.AddMessageType(&typeDefinitions.UNICAST_GRID, "websocket")
 	messageBrokerServer.Start()
 
-	appWebsocket := appWebsocket.New(websocketServer, requestServerMessageBroker.GetEndpoint())
-	appGrid := appGrid.New(requestServerMessageBroker.GetEndpoint(), logger)
+	appWebsocket := appWebsocket.New(websocketServer, messageServerMessageBroker.GetEndpoint())
+	appGrid := appGrid.New(messageServerMessageBroker.GetEndpoint(), logger)
 
-	appServerWebsocket := Application.New("websocket", logger, requestServerWebsocket)
-	appServerGrid := Application.New("grid", logger, requestServerGrid)
+	appServerWebsocket := Application.New("websocket", logger, messageServerWebsocket)
+	appServerGrid := Application.New("grid", logger, messageServerGrid)
 
 	websocketServer.Start(appWebsocket)
 	appServerWebsocket.Start(appWebsocket)

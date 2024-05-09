@@ -7,7 +7,7 @@ import (
 	"SystemgeSampleApp/typeDefinitions"
 )
 
-func (app *App) WebsocketRequestHandler(connection *Websocket.Connection, message *Message.Message) error {
+func (app *App) WebsocketMessageHandler(connection *Websocket.Connection, message *Message.Message) error {
 	switch message.TypeName {
 	case typeDefinitions.HEARTBEAT_WSREQUEST.Name:
 		return nil

@@ -7,7 +7,7 @@ import (
 	"SystemgeSampleApp/typeDefinitions"
 )
 
-func (app *App) RequestHandler(message *Message.Message) error {
+func (app *App) MessageHandler(message *Message.Message) error {
 	switch message.TypeName {
 	case typeDefinitions.REQUEST_GRID_CHANGE.Name:
 		app.mutex.Lock()

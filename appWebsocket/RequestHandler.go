@@ -6,7 +6,7 @@ import (
 	"errors"
 )
 
-func (app *App) RequestHandler(message *Message.Message) error {
+func (app *App) MessageHandler(message *Message.Message) error {
 	switch message.TypeName {
 	case typeDefinitions.BROADCAST_GRID.Name:
 		app.websocketServer.Broadcast(typeDefinitions.GET_GRID.New([]string{message.Payload[0][0]}))

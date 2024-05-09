@@ -1,17 +1,17 @@
 package appWebsocket
 
 import (
-	"Systemge/RequestServer"
+	"Systemge/MessageServer"
 	"Systemge/Websocket"
 )
 
 type App struct {
 	websocketServer *Websocket.Server
 
-	messageBroker RequestServer.Endpoint
+	messageBroker MessageServer.Endpoint
 }
 
-func New(websocketServer *Websocket.Server, messageBroker RequestServer.Endpoint) Websocket.WebsocketApplication {
+func New(websocketServer *Websocket.Server, messageBroker MessageServer.Endpoint) Websocket.WebsocketApplication {
 	app := &App{
 		websocketServer: websocketServer,
 

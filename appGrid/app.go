@@ -3,7 +3,7 @@ package appGrid
 import (
 	"Systemge/Application"
 	"Systemge/Error"
-	"Systemge/RequestServer"
+	"Systemge/MessageServer"
 	"Systemge/Utilities"
 	"SystemgeSampleApp/typeDefinitions"
 	"sync"
@@ -16,10 +16,10 @@ type App struct {
 	grid          [GRIDSIZE][GRIDSIZE]bool
 	mutex         sync.Mutex
 	logger        *Utilities.Logger
-	messageBroker RequestServer.Endpoint
+	messageBroker MessageServer.Endpoint
 }
 
-func New(messageBroker RequestServer.Endpoint, logger *Utilities.Logger) Application.Application {
+func New(messageBroker MessageServer.Endpoint, logger *Utilities.Logger) Application.Application {
 	app := &App{
 		grid:          [GRIDSIZE][GRIDSIZE]bool{},
 		logger:        logger,
