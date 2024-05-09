@@ -1,23 +1,32 @@
 package main
 
 import (
-	"Systemge/ApplicationServer"
+	"Systemge/Application"
 	"Systemge/HTTPServer"
+	"Systemge/MessageBroker"
 	"Systemge/RequestServerTCP"
 	"Systemge/TCPServer"
 	"Systemge/Utilities"
-	"Systemge/WebsocketServer"
+	"Systemge/Websocket"
 	"SystemgeSampleApp/appGrid"
 	"SystemgeSampleApp/appWebsocket"
+	"SystemgeSampleApp/typeDefinitions"
 	"time"
 )
 
+const MESSAGEBROKER_ADDRESS = ":60003"
+
 func main() {
+	logger := Utilities.NewLogger("error_log.txt")
+
 	HTTPServerServe := HTTPServer.New(HTTPServer.HTTP_DEV_PORT, "frontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTPServer.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
 
-	logger := Utilities.NewLogger("error_log.txt")
+	websocketServer := Websocket.New("websocket")
+	HTTPServerWebsocket := HTTPServer.New(HTTPServer.WEBSOCKET_PORT, "websocket", false, "", "")
+	HTTPServerWebsocket.RegisterPattern("/ws", HTTPServer.PromoteToWebsocket(websocketServer))
+	HTTPServerWebsocket.Start()
 
 	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
 	tcpServerWebsocket.Start()
@@ -29,17 +38,32 @@ func main() {
 	requestServerGrid := RequestServerTCP.New("grid", tcpServerGrid, logger)
 	requestServerGrid.Start()
 
-	websocketServer := WebsocketServer.New("websocket")
-	HTTPServerWebsocket := HTTPServer.New(HTTPServer.WEBSOCKET_PORT, "websocket", false, "", "")
-	HTTPServerWebsocket.RegisterPattern("/ws", HTTPServer.PromoteToWebsocket(websocketServer))
-	HTTPServerWebsocket.Start()
-	appServerWebsocket := ApplicationServer.New("websocket", logger, requestServerWebsocket)
-	appWebsocket := appWebsocket.New(appServerWebsocket, websocketServer, requestServerGrid.GetEndpoint())
+	tcpServerMessageBroker := TCPServer.New(MESSAGEBROKER_ADDRESS, "messageBroker")
+	tcpServerMessageBroker.Start()
+	requestServerMessageBroker := RequestServerTCP.New("messageBroker", tcpServerMessageBroker, logger)
+	requestServerMessageBroker.Start()
+
+	messageBroker := MessageBroker.New()
+	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, requestServerMessageBroker, logger)
+	subscriberWebsocket := MessageBroker.NewSubscriber("websocket", requestServerWebsocket.GetEndpoint(), true)
+	subscriberGrid := MessageBroker.NewSubscriber("grid", requestServerGrid.GetEndpoint(), true)
+	messageBroker.AddSubscriber(subscriberWebsocket)
+	messageBroker.AddSubscriber(subscriberGrid)
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, "grid")
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, "grid")
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, "grid")
+	messageBroker.AddMessageType(&typeDefinitions.BROADCAST_GRID, "websocket")
+	messageBroker.AddMessageType(&typeDefinitions.BROADCAST_GRID_CHANGE, "websocket")
+	messageBroker.AddMessageType(&typeDefinitions.UNICAST_GRID, "websocket")
+	messageBrokerServer.Start()
+
+	appWebsocket := appWebsocket.New(websocketServer, requestServerMessageBroker.GetEndpoint())
+	appGrid := appGrid.New(requestServerMessageBroker.GetEndpoint(), logger)
+
+	appServerWebsocket := Application.New("websocket", logger, requestServerWebsocket)
+	appServerGrid := Application.New("grid", logger, requestServerGrid)
+
 	websocketServer.Start(appWebsocket)
-
-	appServerGrid := ApplicationServer.New("grid", logger, requestServerGrid)
-	appGrid := appGrid.New(appServerGrid, requestServerWebsocket.GetEndpoint())
-
 	appServerWebsocket.Start(appWebsocket)
 	appServerGrid.Start(appGrid)
 

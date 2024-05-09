@@ -1,8 +1,10 @@
 package appGrid
 
 import (
-	"Systemge/ApplicationServer"
+	"Systemge/Application"
+	"Systemge/Error"
 	"Systemge/RequestServer"
+	"Systemge/Utilities"
 	"SystemgeSampleApp/typeDefinitions"
 	"sync"
 	"time"
@@ -11,19 +13,17 @@ import (
 const GRIDSIZE = 75
 
 type App struct {
-	grid      [GRIDSIZE][GRIDSIZE]bool
-	mutex     sync.Mutex
-	appServer *ApplicationServer.Server
-
-	websocketEndpoint RequestServer.Endpoint
+	grid          [GRIDSIZE][GRIDSIZE]bool
+	mutex         sync.Mutex
+	logger        *Utilities.Logger
+	messageBroker RequestServer.Endpoint
 }
 
-func New(appServer *ApplicationServer.Server, websocketEndpoint RequestServer.Endpoint) ApplicationServer.Application {
+func New(messageBroker RequestServer.Endpoint, logger *Utilities.Logger) Application.Application {
 	app := &App{
-		grid:      [GRIDSIZE][GRIDSIZE]bool{},
-		appServer: appServer,
-
-		websocketEndpoint: websocketEndpoint,
+		grid:          [GRIDSIZE][GRIDSIZE]bool{},
+		logger:        logger,
+		messageBroker: messageBroker,
 	}
 	go app.calcNextGeneration()
 	return app
@@ -73,7 +73,10 @@ func (app *App) calcNextGeneration() {
 		}
 	}
 	app.grid = nextGrid
-	app.websocketEndpoint.Request(typeDefinitions.PROPAGATE_GRID_REQUEST.New([]string{gridToString(app.grid)}))
+	err := app.messageBroker.Message(typeDefinitions.BROADCAST_GRID.New([]string{gridToString(app.grid)}))
+	if err != nil {
+		app.logger.Log(Error.New(err.Error()).Error())
+	}
 	time.Sleep(5 * time.Second)
 	app.calcNextGeneration()
 }

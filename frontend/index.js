@@ -24,13 +24,13 @@ function parseMessage(message) {
 
 WS_CONNECTION.onclose = function() {
     setTimeout(function() {
-        if (WS_CONNECTION.readyState === WebSocket.CLOSED)
+        if (WS_CONNECTION.readyState === WebSocket.CLOSED) {}
             window.location.reload()
     }, 2000)
 }
 WS_CONNECTION.onopen = function() {
     let myLoop = function() {
-        WS_CONNECTION.send(constructMessage("hb"))
+        WS_CONNECTION.send(constructMessage("heartbeat"))
         setTimeout(myLoop, 15*1000)
     }
     setTimeout(myLoop, 15*1000)
@@ -39,10 +39,10 @@ WS_CONNECTION.onopen = function() {
 WS_CONNECTION.onmessage = function(event) {
     let message = parseMessage(event.data)
     switch (message.type) {
-        case "get_grid_wspropagate":
+        case "getGrid":
             addOrReplace(getGridElement(message.payload[0][0]))
             break
-        case "set_grid_wspropagate":
+        case "getGridChange":
             let grid = document.getElementById("grid")
             if (grid) {
                 let cell = grid.children[Number(message.payload[0][0])*GRIDSIZE + Number(message.payload[1][0])]
@@ -51,6 +51,7 @@ WS_CONNECTION.onmessage = function(event) {
             break
         default:
             console.log("Unknown message type: " + message.type)
+            console.log(message)    
             break
     }
 }
@@ -91,7 +92,7 @@ function getGridElement(grid) {
         cell.style.boxSizing = "border-box"
         gridElement.appendChild(cell)
         cell.onclick = function() {
-            WS_CONNECTION.send(constructMessage("set_grid_wsrequest", Math.floor(i/GRIDSIZE), i%GRIDSIZE))
+            WS_CONNECTION.send(constructMessage("setGrid", Math.floor(i/GRIDSIZE), i%GRIDSIZE))
         }
     }
     return gridElement

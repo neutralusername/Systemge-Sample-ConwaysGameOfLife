@@ -2,4 +2,6 @@ package typeDefinitions
 
 import "Systemge/TypeDefinition"
 
-var PROPAGATE_GRID_REQUEST = TypeDefinition.New("propagate_grid_request", []int{1}, []string{"grid"}, &TypeDefinition.SUCCESS)
+var BROADCAST_GRID = TypeDefinition.New("broadcastGrid", []int{1}, []string{"grid"})
+var BROADCAST_GRID_CHANGE = TypeDefinition.New("broadcastGridChange", []int{1, 1, 1}, []string{"row", "col", "state"})
+var UNICAST_GRID = TypeDefinition.New("unicastGrid", []int{1, 1}, []string{"connectionId", "grid"})
