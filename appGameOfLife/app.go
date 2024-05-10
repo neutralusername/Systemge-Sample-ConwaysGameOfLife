@@ -1,4 +1,4 @@
-package appGrid
+package appGameOfLife
 
 import (
 	"Systemge/Application"

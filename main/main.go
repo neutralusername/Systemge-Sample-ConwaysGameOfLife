@@ -9,7 +9,7 @@ import (
 	"Systemge/TypeDefinition"
 	"Systemge/Utilities"
 	"Systemge/Websocket"
-	"SystemgeSampleApp/appGrid"
+	"SystemgeSampleApp/appGameOfLife"
 	"SystemgeSampleApp/appWebsocket"
 	"SystemgeSampleApp/typeDefinitions"
 	"time"
@@ -32,33 +32,31 @@ func main() {
 	/* messageServerMessageBroker := MessageServerChannel.New("messageBroker", logger) */
 	messageServerMessageBroker.Start()
 
-	tcpServerGrid := TCPServer.New(appGrid.ADDRESS, "grid")
-	tcpServerGrid.Start()
-	messageServerGrid := MessageServerTCP.New("grid", tcpServerGrid, logger)
-	/* messageServerGrid := MessageServerChannel.New("grid", logger) */
-	messageServerGrid.Start()
+	tcpServerGameOfLife := TCPServer.New(appGameOfLife.ADDRESS, "gameOfLife")
+	tcpServerGameOfLife.Start()
+	messageServerGameOfLife := MessageServerTCP.New("gameOfLife", tcpServerGameOfLife, logger)
+	/* messageServerGameOfLife := MessageServerChannel.New("gameOfLife", logger) */
+	messageServerGameOfLife.Start()
 
 	messageBroker := MessageBroker.New()
-	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, messageServerMessageBroker, logger)
-	subscriberWebsocket := MessageBroker.NewSubscriber("websocket", messageServerWebsocket.GetEndpoint(), true)
-	subscriberGrid := MessageBroker.NewSubscriber("grid", messageServerGrid.GetEndpoint(), true)
-	messageBroker.AddSubscriber(subscriberWebsocket)
-	messageBroker.AddSubscriber(subscriberGrid)
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, "grid")
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, "grid")
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, "grid")
+	messageBroker.AddSubscriber(MessageBroker.NewSubscriber("websocket", messageServerWebsocket.GetEndpoint(), true))
+	messageBroker.AddSubscriber(MessageBroker.NewSubscriber("gameOfLife", messageServerGameOfLife.GetEndpoint(), true))
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, "gameOfLife")
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, "gameOfLife")
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, "gameOfLife")
 	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE_MESSAGE_TYPE, "websocket")
+	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, messageServerMessageBroker, logger)
 	messageBrokerServer.Start()
 
 	websocketServer := Websocket.New("websocket", messageServerWebsocket, messageServerMessageBroker.GetEndpoint())
 	appWebsocket := appWebsocket.New(websocketServer, messageServerMessageBroker.GetEndpoint())
-	appGrid := appGrid.New(messageServerMessageBroker.GetEndpoint(), logger)
-
-	appServerGrid := Application.New("grid", logger, messageServerGrid)
 	appServerWebsocket := Application.New("websocket", logger, messageServerWebsocket)
 
+	appGameOfLife := appGameOfLife.New(messageServerMessageBroker.GetEndpoint(), logger)
+	appServerGameOfLife := Application.New("gameOfLife", logger, messageServerGameOfLife)
+
 	appServerWebsocket.Start(appWebsocket)
-	appServerGrid.Start(appGrid)
+	appServerGameOfLife.Start(appGameOfLife)
 
 	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "frontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
