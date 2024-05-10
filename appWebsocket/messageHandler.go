@@ -3,12 +3,12 @@ package appWebsocket
 import (
 	"Systemge/Error"
 	"Systemge/Message"
-	"Systemge/TypeDefinition"
+	"SystemgeSampleApp/typeDefinitions"
 )
 
 func (app *WebsocketApp) MessageHandler(message *Message.Message) error {
 	switch message.TypeName {
-	case TypeDefinition.WSPROPAGATE_MESSAGE_TYPE.Name:
+	case typeDefinitions.WSPROPAGATE_MESSAGE_TYPE.Name:
 		msg := &Message.Message{
 			TypeName: message.Payload[1][0],
 			Payload:  [][]string{message.Payload[2]},
