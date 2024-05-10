@@ -2,7 +2,7 @@ package main
 
 import (
 	"Systemge/Application"
-	"Systemge/HTTPServer"
+	"Systemge/HTTP"
 	"Systemge/MessageBroker"
 	"Systemge/MessageServerTCP"
 	"Systemge/TCPServer"
@@ -20,8 +20,8 @@ const MESSAGEBROKER_ADDRESS = ":60003"
 func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
-	HTTPServerServe := HTTPServer.New(HTTPServer.HTTP_DEV_PORT, "frontend", false, "", "")
-	HTTPServerServe.RegisterPattern("/", HTTPServer.SendDirectory("../frontend"))
+	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "frontend", false, "", "")
+	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
 
 	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
@@ -40,8 +40,8 @@ func main() {
 	messageServerGrid.Start()
 
 	websocketServer := Websocket.New("websocket", messageServerWebsocket, messageServerMessageBroker.GetEndpoint())
-	HTTPServerWebsocket := HTTPServer.New(HTTPServer.WEBSOCKET_PORT, "websocket", false, "", "")
-	HTTPServerWebsocket.RegisterPattern("/ws", HTTPServer.PromoteToWebsocket(websocketServer))
+	HTTPServerWebsocket := HTTP.NewServer(HTTP.WEBSOCKET_PORT, "websocket", false, "", "")
+	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
 	HTTPServerWebsocket.Start()
 
 	messageBroker := MessageBroker.New()

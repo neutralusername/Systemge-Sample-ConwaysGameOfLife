@@ -10,7 +10,7 @@ type WebsocketApp struct {
 	messageBroker   MessageServer.Endpoint
 }
 
-func New(websocketServer *Websocket.Server, messageBroker MessageServer.Endpoint) Websocket.WebsocketApplication {
+func New(websocketServer *Websocket.Server, messageBroker MessageServer.Endpoint) *WebsocketApp {
 	app := &WebsocketApp{
 		websocketServer: websocketServer,
 		messageBroker:   messageBroker,
