@@ -4,8 +4,7 @@ import (
 	"Systemge/Application"
 	"Systemge/HTTP"
 	"Systemge/MessageBroker"
-	"Systemge/MessageServerTCP"
-	"Systemge/TCPServer"
+	"Systemge/MessageServerChannel"
 	"Systemge/TypeDefinition"
 	"Systemge/Utilities"
 	"Systemge/Websocket"
@@ -20,24 +19,27 @@ const MESSAGEBROKER_ADDRESS = ":60003"
 func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
+	/* tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
+	tcpServerWebsocket.Start()
+	messageServerWebsocket := MessageServerTCP.New("websocket", tcpServerWebsocket, logger) */
+	messageServerWebsocket := MessageServerChannel.New("websocket", logger)
+	messageServerWebsocket.Start()
+
+	/* tcpServerMessageBroker := TCPServer.New(MESSAGEBROKER_ADDRESS, "messageBroker")
+	tcpServerMessageBroker.Start()
+	messageServerMessageBroker := MessageServerTCP.New("messageBroker", tcpServerMessageBroker, logger) */
+	messageServerMessageBroker := MessageServerChannel.New("messageBroker", logger)
+	messageServerMessageBroker.Start()
+
+	/* tcpServerGrid := TCPServer.New(appGrid.ADDRESS, "grid")
+	tcpServerGrid.Start()
+	messageServerGrid := MessageServerTCP.New("grid", tcpServerGrid, logger) */
+	messageServerGrid := MessageServerChannel.New("grid", logger)
+	messageServerGrid.Start()
+
 	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "frontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
-
-	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
-	tcpServerWebsocket.Start()
-	messageServerWebsocket := MessageServerTCP.New("websocket", tcpServerWebsocket, logger)
-	messageServerWebsocket.Start()
-
-	tcpServerMessageBroker := TCPServer.New(MESSAGEBROKER_ADDRESS, "messageBroker")
-	tcpServerMessageBroker.Start()
-	messageServerMessageBroker := MessageServerTCP.New("messageBroker", tcpServerMessageBroker, logger)
-	messageServerMessageBroker.Start()
-
-	tcpServerGrid := TCPServer.New(appGrid.ADDRESS, "grid")
-	tcpServerGrid.Start()
-	messageServerGrid := MessageServerTCP.New("grid", tcpServerGrid, logger)
-	messageServerGrid.Start()
 
 	websocketServer := Websocket.New("websocket", messageServerWebsocket, messageServerMessageBroker.GetEndpoint())
 	HTTPServerWebsocket := HTTP.NewServer(HTTP.WEBSOCKET_PORT, "websocket", false, "", "")
@@ -63,8 +65,8 @@ func main() {
 	appServerWebsocket := Application.New("websocket", logger, messageServerWebsocket)
 
 	websocketServer.Start(appWebsocket)
-	appServerGrid.Start(appGrid)
 	appServerWebsocket.Start(appWebsocket)
+	appServerGrid.Start(appGrid)
 
 	time.Sleep(1000000 * time.Second)
 }
