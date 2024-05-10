@@ -20,50 +20,52 @@ const MESSAGEBROKER_ADDRESS = ":60003"
 func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
-	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "websocket")
+	tcpServerWebsocket := TCPServer.New(appWebsocket.ADDRESS, "tcpServerWebsocket")
 	tcpServerWebsocket.Start()
-	messageServerWebsocket := MessageServerTCP.New("websocket", tcpServerWebsocket, logger)
-	/* messageServerWebsocket := MessageServerChannel.New("websocket", logger) */
+	messageServerWebsocket := MessageServerTCP.New("messageServerWebsocket", tcpServerWebsocket, logger)
+	/* messageServerWebsocket := MessageServerChannel.New("messageServerWebsocket", logger) */
 	messageServerWebsocket.Start()
 
-	tcpServerMessageBroker := TCPServer.New(MESSAGEBROKER_ADDRESS, "messageBroker")
+	tcpServerMessageBroker := TCPServer.New(MESSAGEBROKER_ADDRESS, "tcpServerMessageBroker")
 	tcpServerMessageBroker.Start()
-	messageServerMessageBroker := MessageServerTCP.New("messageBroker", tcpServerMessageBroker, logger)
-	/* messageServerMessageBroker := MessageServerChannel.New("messageBroker", logger) */
+	messageServerMessageBroker := MessageServerTCP.New("messageServerMessageBroker", tcpServerMessageBroker, logger)
+	/* messageServerMessageBroker := MessageServerChannel.New("messageServerMessageBroker", logger) */
 	messageServerMessageBroker.Start()
 
-	tcpServerGameOfLife := TCPServer.New(appGameOfLife.ADDRESS, "gameOfLife")
+	tcpServerGameOfLife := TCPServer.New(appGameOfLife.ADDRESS, "tcpServerGameOfLife")
 	tcpServerGameOfLife.Start()
-	messageServerGameOfLife := MessageServerTCP.New("gameOfLife", tcpServerGameOfLife, logger)
-	/* messageServerGameOfLife := MessageServerChannel.New("gameOfLife", logger) */
+	messageServerGameOfLife := MessageServerTCP.New("messageServerGameOfLife", tcpServerGameOfLife, logger)
+	/* messageServerGameOfLife := MessageServerChannel.New("messageServerGameOfLife", logger) */
 	messageServerGameOfLife.Start()
 
 	messageBroker := MessageBroker.New()
-	messageBroker.AddSubscriber(MessageBroker.NewSubscriber("websocket", messageServerWebsocket.GetEndpoint(), true))
-	messageBroker.AddSubscriber(MessageBroker.NewSubscriber("gameOfLife", messageServerGameOfLife.GetEndpoint(), true))
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, "gameOfLife")
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, "gameOfLife")
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, "gameOfLife")
-	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE_MESSAGE_TYPE, "websocket")
+	subscriberWebsocket := MessageBroker.NewSubscriber(messageServerWebsocket.GetEndpoint(), true)
+	subscriberGameOfLife := MessageBroker.NewSubscriber(messageServerGameOfLife.GetEndpoint(), true)
+	messageBroker.AddSubscriber(subscriberWebsocket)
+	messageBroker.AddSubscriber(subscriberGameOfLife)
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, subscriberGameOfLife)
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, subscriberGameOfLife)
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, subscriberGameOfLife)
+	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE_MESSAGE_TYPE, subscriberWebsocket)
 
-	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, messageServerMessageBroker, logger)
+	messageBrokerServer := MessageBroker.NewServer("messageBrokerServer", messageBroker, messageServerMessageBroker, logger)
 	messageBrokerServer.Start()
 
-	websocketServer := Websocket.New("websocket", messageServerMessageBroker.GetEndpoint())
+	websocketServer := Websocket.New("websocketServer", messageServerMessageBroker.GetEndpoint())
 
 	appWebsocket := appWebsocket.New(websocketServer, messageServerMessageBroker.GetEndpoint())
-	appServerWebsocket := Application.New("websocket", logger, messageServerWebsocket)
+	appServerWebsocket := Application.New("appServerWebsocket", logger, messageServerWebsocket)
 	appServerWebsocket.Start(appWebsocket)
 
 	appGameOfLife := appGameOfLife.New(messageServerMessageBroker.GetEndpoint(), logger)
-	appServerGameOfLife := Application.New("gameOfLife", logger, messageServerGameOfLife)
+	appServerGameOfLife := Application.New("appServerGameOfLife", logger, messageServerGameOfLife)
 	appServerGameOfLife.Start(appGameOfLife)
 
-	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "frontend", false, "", "")
+	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
 
-	HTTPServerWebsocket := HTTP.NewServer(HTTP.WEBSOCKET_PORT, "websocket", false, "", "")
+	HTTPServerWebsocket := HTTP.NewServer(HTTP.WEBSOCKET_PORT, "HTTPwebsocket", false, "", "")
 	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
 	HTTPServerWebsocket.Start()
 
