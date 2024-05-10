@@ -45,17 +45,18 @@ func main() {
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, "gameOfLife")
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, "gameOfLife")
 	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE_MESSAGE_TYPE, "websocket")
+
 	messageBrokerServer := MessageBroker.NewServer("messageBroker", messageBroker, messageServerMessageBroker, logger)
 	messageBrokerServer.Start()
 
-	websocketServer := Websocket.New("websocket", messageServerWebsocket, messageServerMessageBroker.GetEndpoint())
+	websocketServer := Websocket.New("websocket", messageServerMessageBroker.GetEndpoint())
+
 	appWebsocket := appWebsocket.New(websocketServer, messageServerMessageBroker.GetEndpoint())
 	appServerWebsocket := Application.New("websocket", logger, messageServerWebsocket)
+	appServerWebsocket.Start(appWebsocket)
 
 	appGameOfLife := appGameOfLife.New(messageServerMessageBroker.GetEndpoint(), logger)
 	appServerGameOfLife := Application.New("gameOfLife", logger, messageServerGameOfLife)
-
-	appServerWebsocket.Start(appWebsocket)
 	appServerGameOfLife.Start(appGameOfLife)
 
 	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "frontend", false, "", "")
