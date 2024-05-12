@@ -43,9 +43,8 @@ func main() {
 	subscriberGameOfLife := MessageBroker.NewSubscriber(messageServerGameOfLife.GetEndpoint(), true)
 	messageBroker.AddSubscriber(subscriberWebsocket)
 	messageBroker.AddSubscriber(subscriberGameOfLife)
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, subscriberGameOfLife)
+	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID, subscriberGameOfLife)
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, subscriberGameOfLife)
-	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, subscriberGameOfLife)
 	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE, subscriberWebsocket)
 
 	messageBrokerServer := MessageBroker.NewServer("messageBrokerServer", messageBroker, messageServerMessageBroker, logger)
