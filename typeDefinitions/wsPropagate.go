@@ -3,10 +3,14 @@ package typeDefinitions
 import (
 	"Systemge/Message"
 	"Systemge/TypeDefinition"
+	"Systemge/Utilities"
 )
 
-var WSPROPAGATE_MESSAGE_TYPE = TypeDefinition.New("wsPropagate", []int{0, 1, 0}, []string{"connectionIds", "messageType", "paylods"})
+var WSPROPAGATE = TypeDefinition.New("wsPropagate", []int{0, 1}, []string{"connectionIds", "message"})
 
-func NewWebsocketMessage(connectionIds []string, messageType string, payloads []string) *Message.Message {
-	return WSPROPAGATE_MESSAGE_TYPE.New(connectionIds, []string{messageType}, payloads)
+func NewWebsocketMessage(connectionIds []string, message *Message.Message) *Message.Message {
+	return WSPROPAGATE.New(connectionIds, []string{Utilities.StringToHexString(string(message.Serialize()))})
 }
+
+var GET_GRID = TypeDefinition.New("getGrid", []int{1}, []string{"grid"})
+var GET_GRID_CHANGE = TypeDefinition.New("getGridChange", []int{1, 1, 1}, []string{"row", "col", "state"})

@@ -3,16 +3,14 @@ package appWebsocket
 import (
 	"Systemge/Error"
 	"Systemge/Message"
+	"Systemge/Utilities"
 	"SystemgeSampleApp/typeDefinitions"
 )
 
 func (app *WebsocketApp) MessageHandler(message *Message.Message) error {
 	switch message.TypeName {
-	case typeDefinitions.WSPROPAGATE_MESSAGE_TYPE.Name:
-		msg := &Message.Message{
-			TypeName: message.Payload[1][0],
-			Payload:  [][]string{message.Payload[2]},
-		}
+	case typeDefinitions.WSPROPAGATE.Name:
+		msg := Message.Deserialize(Utilities.HexStringToString(message.Payload[1][0]))
 		if len(message.Payload[0]) == 0 {
 			app.websocketServer.Broadcast(msg.Serialize())
 		} else {
