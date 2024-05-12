@@ -43,7 +43,6 @@ WS_CONNECTION.onmessage = function(event) {
             addOrReplace(getGridElement(message.payload[0][0]))
             break
         case "getGridChange":
-            console.log(message)
             let grid = document.getElementById("grid")
             if (grid) {
                 let cell = grid.children[Number(message.payload[0][0])*GRIDSIZE + Number(message.payload[1][0])]

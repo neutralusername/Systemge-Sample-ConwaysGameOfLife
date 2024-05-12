@@ -15,11 +15,13 @@ func (app *App) MessageHandler(message *Message.Message) error {
 		newGridState := !app.grid[Utilities.StringToInt(message.Payload[0][0])][Utilities.StringToInt(message.Payload[1][0])]
 		app.grid[Utilities.StringToInt(message.Payload[0][0])][Utilities.StringToInt(message.Payload[1][0])] = newGridState
 
-		app.messageBroker.Send(typeDefinitions.NewWebsocketMessage([]string{}, typeDefinitions.GET_GRID_CHANGE.New([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}, []string{Utilities.BoolToString(newGridState)})))
+		getGridChangeMsg := typeDefinitions.GET_GRID_CHANGE.New([]string{message.Payload[0][0]}, []string{message.Payload[1][0]}, []string{Utilities.BoolToString(newGridState)})
+		app.messageBroker.Send(typeDefinitions.WSPROPAGATE.New([]string{}, []string{Utilities.StringToHexString(getGridChangeMsg.Serialize())}))
 	case typeDefinitions.REQUEST_GRID_UNICAST.Name:
 		app.mutex.Lock()
 		defer app.mutex.Unlock()
-		app.messageBroker.Send(typeDefinitions.NewWebsocketMessage([]string{message.Payload[0][0]}, typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)})))
+		getGridMsg := typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)})
+		app.messageBroker.Send(typeDefinitions.WSPROPAGATE.New([]string{message.Payload[0][0]}, []string{Utilities.StringToHexString(getGridMsg.Serialize())}))
 	default:
 		return Error.New("Unknown message type: " + message.TypeName)
 	}
