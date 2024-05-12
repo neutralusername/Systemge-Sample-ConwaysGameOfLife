@@ -75,7 +75,8 @@ func (app *App) calcNextGeneration() {
 	}
 
 	app.grid = nextGrid
-	err := app.messageBroker.Send(TypeDefinition.WSPROPAGATE.New([]string{}, []string{Utilities.StringToHexString(string(typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)}).Serialize()))}))
+	getGridMsg := typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)})
+	err := app.messageBroker.Send(TypeDefinition.NewWSPropagateMessage([]string{}, getGridMsg))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
