@@ -6,6 +6,7 @@ import (
 	"Systemge/MessageBroker"
 	"Systemge/MessageServerTCP"
 	"Systemge/TCPServer"
+	"Systemge/TypeDefinition"
 	"Systemge/Utilities"
 	"Systemge/Websocket"
 	"SystemgeSampleApp/appGameOfLife"
@@ -45,7 +46,7 @@ func main() {
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_BROADCAST, subscriberGameOfLife)
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_CHANGE, subscriberGameOfLife)
 	messageBroker.AddMessageType(&typeDefinitions.REQUEST_GRID_UNICAST, subscriberGameOfLife)
-	messageBroker.AddMessageType(&typeDefinitions.WSPROPAGATE, subscriberWebsocket)
+	messageBroker.AddMessageType(&TypeDefinition.WSPROPAGATE, subscriberWebsocket)
 
 	messageBrokerServer := MessageBroker.NewServer("messageBrokerServer", messageBroker, messageServerMessageBroker, logger)
 	messageBrokerServer.Start()

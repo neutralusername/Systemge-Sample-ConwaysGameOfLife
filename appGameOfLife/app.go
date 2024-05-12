@@ -4,6 +4,7 @@ import (
 	"Systemge/Application"
 	"Systemge/Error"
 	"Systemge/MessageServer"
+	"Systemge/TypeDefinition"
 	"Systemge/Utilities"
 	"SystemgeSampleApp/typeDefinitions"
 	"sync"
@@ -74,7 +75,7 @@ func (app *App) calcNextGeneration() {
 	}
 
 	app.grid = nextGrid
-	err := app.messageBroker.Send(typeDefinitions.WSPROPAGATE.New([]string{}, []string{Utilities.StringToHexString(string(typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)}).Serialize()))}))
+	err := app.messageBroker.Send(TypeDefinition.WSPROPAGATE.New([]string{}, []string{Utilities.StringToHexString(string(typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)}).Serialize()))}))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
