@@ -15,6 +15,9 @@ func (app *App) MessageHandler(message *Message.Message) error {
 	case "getGrid":
 		app.websocketServer.Broadcast([]byte(message.Serialize()))
 		return nil
+	case "getGridChange":
+		app.websocketServer.Broadcast([]byte(message.Serialize()))
+		return nil
 	default:
 		return Error.New("Unknown message type")
 	}

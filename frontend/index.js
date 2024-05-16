@@ -5,12 +5,11 @@ const DELIMITER2 = "\x03"
 const GRIDSIZE = 75
 const SQUARESIZE = 12.5
 
-function constructMessage(type, ...args) {
-    let msg = type + DELIMITER1
-    for (let arg of args) {
-        msg += (arg + DELIMITER2 + DELIMITER1)
-    }
-    return msg
+function constructMessage(type, body) {
+   return JSON.stringify({
+         type: type,
+        body: body  
+   })
 }
 function parseMessage(message) {
     let data = message.split(DELIMITER1);
@@ -30,30 +29,29 @@ WS_CONNECTION.onclose = function() {
 }
 WS_CONNECTION.onopen = function() {
     let myLoop = function() {
-        WS_CONNECTION.send(constructMessage("heartbeat"))
+        WS_CONNECTION.send(constructMessage("heartbeat", ""))
         setTimeout(myLoop, 15*1000)
     }
     setTimeout(myLoop, 15*1000)
 }
 
 WS_CONNECTION.onmessage = function(event) {
-    let message = parseMessage(event.data)
+    let message = JSON.parse(event.data)
     console.log(message)
-    console.log(event.data)
     switch (message.type) {
         case "getGrid":
-            addOrReplace(getGridElement(message.payload[0][0]))
+            addOrReplace(getGridElement(message.body))
             break
         case "getGridChange":
             let grid = document.getElementById("grid")
             if (grid) {
-                let cell = grid.children[Number(message.payload[0][0])*GRIDSIZE + Number(message.payload[1][0])]
-                cell.style.backgroundColor = message.payload[2][0] === "true" ? "black" : "white"
+                let gridChange = JSON.parse(message.body)
+                let cell = grid.children[gridChange.row*GRIDSIZE + gridChange.column]
+                cell.style.backgroundColor = (gridChange.state ? "black" : "white")
             }
             break
         default:
-            console.log("Unknown message type: " + message.type)
-            console.log(message)    
+            console.log("Unknown message type: " + event.data)
             break
     }
 }
@@ -94,7 +92,7 @@ function getGridElement(grid) {
         cell.style.boxSizing = "border-box"
         gridElement.appendChild(cell)
         cell.onclick = function() {
-            WS_CONNECTION.send(constructMessage("requestGridChange", Math.floor(i/GRIDSIZE), i%GRIDSIZE))
+            WS_CONNECTION.send(constructMessage("gridChange", JSON.stringify({row:Math.floor(i/GRIDSIZE), column:i%GRIDSIZE, state:cell.style.backgroundColor === "black" ? false : true})))
         }
     }
     return gridElement

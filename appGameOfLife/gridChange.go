@@ -3,16 +3,16 @@ package appGameOfLife
 import "encoding/json"
 
 type GridChange struct {
-	row    int
-	column int
-	state  bool
+	Row    int  `json:"row"`
+	Column int  `json:"column"`
+	State  bool `json:"state"`
 }
 
 func NewGridChange(row int, column int, state bool) GridChange {
 	return GridChange{
-		row:    row,
-		column: column,
-		state:  state,
+		Row:    row,
+		Column: column,
+		State:  state,
 	}
 }
 

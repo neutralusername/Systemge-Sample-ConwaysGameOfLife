@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	messageBrokerServer.AddMessageType("gridChange")
 	messageBrokerServer.AddMessageType("getGridUnicast")
 	messageBrokerServer.AddMessageType("websocketUnicast")
 	messageBrokerServer.AddMessageType("getGridChange")
@@ -32,7 +33,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	messageBrokerClientGameOfLife.Subscribe("getGridChange")
+	messageBrokerClientGameOfLife.Subscribe("gridChange")
 	messageBrokerClientGameOfLife.Subscribe("getGridUnicast")
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket")
@@ -42,6 +43,7 @@ func main() {
 	}
 	messageBrokerClientWebsocket.Subscribe("websocketUnicast")
 	messageBrokerClientWebsocket.Subscribe("getGrid")
+	messageBrokerClientWebsocket.Subscribe("getGridChange")
 
 	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
 	websocketApp := WebsocketApp.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)

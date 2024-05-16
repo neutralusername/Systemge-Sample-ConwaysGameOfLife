@@ -10,9 +10,8 @@ func (app *App) MessageHandler(message *Message.Message) error {
 	case "gridChange":
 		app.mutex.Lock()
 		defer app.mutex.Unlock()
-
 		gridChange := UnmarshalGridChange(message.Body)
-		app.grid[gridChange.row][gridChange.column] = gridChange.state
+		app.grid[gridChange.Row][gridChange.Column] = gridChange.State
 
 		app.messageBrokerClient.Send(Message.New("getGridChange", app.name, gridChange.Marshal()))
 	case "getGridUnicast":
