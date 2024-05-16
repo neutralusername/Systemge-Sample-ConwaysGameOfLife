@@ -18,10 +18,8 @@ func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
 	messageBrokerServer := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKER_ADDRESS, logger)
-	err := messageBrokerServer.Start()
-	if err != nil {
-		panic(err)
-	}
+	messageBrokerServer.Start()
+
 	messageBrokerServer.AddMessageType("gridChange")
 	messageBrokerServer.AddMessageType("getGridUnicast")
 	messageBrokerServer.AddMessageType("websocketUnicast")
@@ -29,18 +27,12 @@ func main() {
 	messageBrokerServer.AddMessageType("getGrid")
 
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid")
-	err = messageBrokerClientGameOfLife.Connect(MESSAGEBROKER_ADDRESS)
-	if err != nil {
-		panic(err)
-	}
+	messageBrokerClientGameOfLife.Connect(MESSAGEBROKER_ADDRESS)
 	messageBrokerClientGameOfLife.Subscribe("gridChange")
 	messageBrokerClientGameOfLife.Subscribe("getGridUnicast")
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket")
-	err = messageBrokerClientWebsocket.Connect(MESSAGEBROKER_ADDRESS)
-	if err != nil {
-		panic(err)
-	}
+	messageBrokerClientWebsocket.Connect(MESSAGEBROKER_ADDRESS)
 	messageBrokerClientWebsocket.Subscribe("websocketUnicast")
 	messageBrokerClientWebsocket.Subscribe("getGrid")
 	messageBrokerClientWebsocket.Subscribe("getGridChange")
