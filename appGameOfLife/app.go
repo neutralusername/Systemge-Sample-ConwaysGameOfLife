@@ -3,10 +3,9 @@ package appGameOfLife
 import (
 	"Systemge/Application"
 	"Systemge/Error"
-	"Systemge/MessageServer"
-	"Systemge/TypeDefinition"
+	"Systemge/Message"
+	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
-	"SystemgeSampleApp/typeDefinitions"
 	"sync"
 	"time"
 )
@@ -14,17 +13,19 @@ import (
 const GRIDSIZE = 75
 
 type App struct {
-	grid          [GRIDSIZE][GRIDSIZE]bool
-	mutex         sync.Mutex
-	logger        *Utilities.Logger
-	messageBroker MessageServer.Endpoint
+	name                string
+	grid                [GRIDSIZE][GRIDSIZE]bool
+	mutex               sync.Mutex
+	logger              *Utilities.Logger
+	messageBrokerClient *MessageBrokerClient.Client
 }
 
-func New(messageBroker MessageServer.Endpoint, logger *Utilities.Logger) Application.Application {
+func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) Application.Application {
 	app := &App{
-		grid:          [GRIDSIZE][GRIDSIZE]bool{},
-		logger:        logger,
-		messageBroker: messageBroker,
+		name:                name,
+		grid:                [GRIDSIZE][GRIDSIZE]bool{},
+		logger:              logger,
+		messageBrokerClient: messageBrokerClient,
 	}
 	go app.calcNextGeneration()
 	return app
@@ -75,8 +76,7 @@ func (app *App) calcNextGeneration() {
 	}
 
 	app.grid = nextGrid
-	getGridMsg := typeDefinitions.GET_GRID.New([]string{gridToString(app.grid)})
-	err := app.messageBroker.Send(TypeDefinition.NewWSPropagateMessage([]string{}, getGridMsg))
+	err := app.messageBrokerClient.Send(Message.New("getGrid", app.name, gridToString(app.grid)))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}

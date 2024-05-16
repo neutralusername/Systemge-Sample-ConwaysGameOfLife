@@ -38,6 +38,8 @@ WS_CONNECTION.onopen = function() {
 
 WS_CONNECTION.onmessage = function(event) {
     let message = parseMessage(event.data)
+    console.log(message)
+    console.log(event.data)
     switch (message.type) {
         case "getGrid":
             addOrReplace(getGridElement(message.payload[0][0]))
