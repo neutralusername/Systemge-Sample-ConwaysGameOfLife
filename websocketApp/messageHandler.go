@@ -10,7 +10,7 @@ func (app *App) MessageHandler(message *Message.Message) error {
 	switch message.Type {
 	case "websocketUnicast":
 		segments := strings.Split(message.Body, "|")
-		app.websocketServer.Unicast(segments[0], []byte(Message.New("getGrid", app.name, segments[1]).Serialize()))
+		app.websocketServer.Unicast(segments[0], []byte(Message.New(segments[1], app.name, segments[2]).Serialize()))
 		return nil
 	case "getGrid":
 		app.websocketServer.Broadcast([]byte(message.Serialize()))

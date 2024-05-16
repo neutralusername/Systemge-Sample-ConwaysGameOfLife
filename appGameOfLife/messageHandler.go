@@ -17,7 +17,7 @@ func (app *App) MessageHandler(message *Message.Message) error {
 	case "getGridUnicast":
 		app.mutex.Lock()
 		defer app.mutex.Unlock()
-		app.messageBrokerClient.Send(Message.New("websocketUnicast", app.name, message.Body+"|"+gridToString(app.grid)))
+		app.messageBrokerClient.Send(Message.New("websocketUnicast", app.name, message.Body+"|"+"getGrid"+"|"+gridToString(app.grid)))
 	default:
 		return Error.New("Unknown message type: " + message.Type)
 	}
