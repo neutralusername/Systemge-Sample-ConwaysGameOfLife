@@ -1,3 +1,3 @@
 package appGameOfLife
 
-const ADDRESS = ":50002"
+const GRIDSIZE = 75

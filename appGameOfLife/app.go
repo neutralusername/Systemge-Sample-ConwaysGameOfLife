@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-const GRIDSIZE = 75
-
 type App struct {
 	name                string
 	grid                [GRIDSIZE][GRIDSIZE]bool

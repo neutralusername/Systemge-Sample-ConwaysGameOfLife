@@ -41,11 +41,11 @@ func main() {
 	websocketApp := WebsocketApp.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	websocketServer.Start(websocketApp)
 
-	applicationServerGameOfLife := Application.New("applicationServerGameOfLife", logger, messageBrokerClientGameOfLife)
-	applicationServerGameOfLife.Start(appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife))
-
 	applicationServerWebsocket := Application.New("applicationServerWebsocket", logger, messageBrokerClientWebsocket)
 	applicationServerWebsocket.Start(websocketApp)
+
+	applicationServerGameOfLife := Application.New("applicationServerGameOfLife", logger, messageBrokerClientGameOfLife)
+	applicationServerGameOfLife.Start(appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife))
 
 	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
