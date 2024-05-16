@@ -10,6 +10,7 @@ func (app *App) OnMessageHandler(connection *Websocket.Connection, message *Mess
 	case "heartbeat":
 		connection.ResetWatchdog()
 	default:
+		message.Origin = connection.Id
 		err := app.messageBrokerClient.Send(message)
 		if err != nil {
 			connection.SendMessage([]byte(Message.New("error", app.name, err.Error()).Serialize()))
