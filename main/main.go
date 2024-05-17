@@ -2,7 +2,6 @@ package main
 
 import (
 	"Systemge/HTTP"
-	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
 	"Systemge/MessageBrokerServer"
 	"Systemge/Utilities"
@@ -28,18 +27,15 @@ func main() {
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife)
 
-	messageHandlersGameOfLife := map[string]func(*Message.Message) error{
-		"gridChange":     appGameOfLife.GridChange,
-		"getGridUnicast": appGameOfLife.GetGridUnicast,
-	}
-	messageHandlersWebsocket := map[string]func(*Message.Message) error{
-		"websocketUnicast": appWebsocket.WebsocketUnicast,
-		"getGrid":          appWebsocket.GetGrid,
-		"getGridChange":    appWebsocket.GetGridChange,
-	}
+	messageBrokerClientGameOfLife.Subscribe("gridChange", appGameOfLife.GridChange)
+	messageBrokerClientGameOfLife.Subscribe("getGridUnicast", appGameOfLife.GetGridUnicast)
+	messageBrokerClientWebsocket.Subscribe("websocketUnicast", appWebsocket.WebsocketUnicast)
 
-	messageBrokerClientGameOfLife.Connect(MESSAGEBROKERSERVER_ADDRESS, messageHandlersGameOfLife)
-	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS, messageHandlersWebsocket)
+	messageBrokerClientWebsocket.Subscribe("getGrid", appWebsocket.GetGrid)
+	messageBrokerClientWebsocket.Subscribe("getGridChange", appWebsocket.GetGridChange)
+
+	messageBrokerClientGameOfLife.Connect(MESSAGEBROKERSERVER_ADDRESS)
+	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
 	websocketServer.Start(appWebsocket)
 
 	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
