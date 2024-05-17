@@ -37,7 +37,7 @@ func main() {
 	messageBrokerClientWebsocket.Subscribe("getGrid")
 	messageBrokerClientWebsocket.Subscribe("getGridChange")
 
-	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
+	websocketServer := Websocket.New("websocketServer")
 	websocketApp := WebsocketApp.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	websocketServer.Start(websocketApp)
 
