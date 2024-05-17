@@ -11,4 +11,5 @@ during these 5 seconds everyone on the website can make changes, which will affe
 - to see the grid open "localhost:8080" in your browser while the system is running.  
 - you can now click grids to change the square color. changes will be propagated to everyone else currently on this website and persist reloads.  
 
-![image](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/4f844dc6-6afe-4f05-9654-aef72f858bba)
+![image](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/a0e0f6d7-1239-4df2-b207-77c9833ccc0f)
+
