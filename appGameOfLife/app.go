@@ -1,7 +1,6 @@
 package appGameOfLife
 
 import (
-	"Systemge/Application"
 	"Systemge/Error"
 	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
@@ -18,7 +17,7 @@ type App struct {
 	messageBrokerClient *MessageBrokerClient.Client
 }
 
-func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) Application.Application {
+func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) *App {
 	app := &App{
 		name:                name,
 		grid:                [GRIDSIZE][GRIDSIZE]bool{},

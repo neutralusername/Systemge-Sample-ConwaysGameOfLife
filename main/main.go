@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Systemge/Application"
 	"Systemge/HTTP"
+	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
 	"Systemge/MessageBrokerServer"
 	"Systemge/Utilities"
@@ -20,32 +20,29 @@ func main() {
 	messageBrokerServer := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKER_ADDRESS, logger)
 	messageBrokerServer.Start()
 
-	messageBrokerServer.AddMessageType("gridChange")
-	messageBrokerServer.AddMessageType("getGridUnicast")
-	messageBrokerServer.AddMessageType("websocketUnicast")
-	messageBrokerServer.AddMessageType("getGridChange")
-	messageBrokerServer.AddMessageType("getGrid")
-
-	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid")
-	messageBrokerClientGameOfLife.Connect(MESSAGEBROKER_ADDRESS)
-	messageBrokerClientGameOfLife.Subscribe("gridChange")
-	messageBrokerClientGameOfLife.Subscribe("getGridUnicast")
-
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket")
-	messageBrokerClientWebsocket.Connect(MESSAGEBROKER_ADDRESS)
-	messageBrokerClientWebsocket.Subscribe("websocketUnicast")
-	messageBrokerClientWebsocket.Subscribe("getGrid")
-	messageBrokerClientWebsocket.Subscribe("getGridChange")
+	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid")
 
 	websocketServer := Websocket.New("websocketServer")
 	websocketApp := WebsocketApp.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
+
+	gameOfLifeApp := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife)
+
+	messageHandlersGameOfLife := map[string]func(*Message.Message) error{
+		"gridChange":     gameOfLifeApp.GridChange,
+		"getGridUnicast": gameOfLifeApp.GetGridUnicast,
+	}
+
+	messageHandlersWebsocket := map[string]func(*Message.Message) error{
+		"websocketUnicast": websocketApp.WebsocketUnicast,
+		"getGrid":          websocketApp.GetGrid,
+		"getGridChange":    websocketApp.GetGridChange,
+	}
+
+	messageBrokerClientGameOfLife.Connect(MESSAGEBROKER_ADDRESS, messageHandlersGameOfLife)
+	messageBrokerClientWebsocket.Connect(MESSAGEBROKER_ADDRESS, messageHandlersWebsocket)
+
 	websocketServer.Start(websocketApp)
-
-	applicationServerWebsocket := Application.New("applicationServerWebsocket", logger, messageBrokerClientWebsocket)
-	applicationServerWebsocket.Start(websocketApp)
-
-	applicationServerGameOfLife := Application.New("applicationServerGameOfLife", logger, messageBrokerClientGameOfLife)
-	applicationServerGameOfLife.Start(appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife))
 
 	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
