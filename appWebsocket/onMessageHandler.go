@@ -1,4 +1,4 @@
-package WebsocketApp
+package appWebsocket
 
 import (
 	"Systemge/Message"
