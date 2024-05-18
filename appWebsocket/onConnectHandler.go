@@ -12,5 +12,6 @@ func (app *App) OnConnectHandler(connection *Websocket.Connection) {
 	if err != nil {
 		app.logger.Log(Error.New("Failed to send getGrid message: " + err.Error()).Error())
 	}
+	response.Type = "getGrid"
 	connection.Send([]byte(response.Serialize()))
 }
