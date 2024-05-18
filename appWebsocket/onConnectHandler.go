@@ -7,7 +7,7 @@ import (
 )
 
 func (app *App) OnConnectHandler(connection *Websocket.Connection) {
-	err := app.messageBrokerClient.Send(Message.New("getGridUnicast", app.name, connection.Id))
+	err := app.messageBrokerClient.Send(Message.New("getGridUnicast", app.name, "", connection.Id))
 	if err != nil {
 		app.logger.Log(Error.New("Failed to send getGridUnicast message: " + err.Error()).Error())
 	}

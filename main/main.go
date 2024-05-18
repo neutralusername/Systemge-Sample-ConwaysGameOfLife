@@ -12,6 +12,8 @@ import (
 )
 
 const MESSAGEBROKERSERVER_ADDRESS = ":60003"
+const HTTP_DEV_PORT = ":8080"
+const WEBSOCKET_PORT = ":8443"
 
 func main() {
 	logger := Utilities.NewLogger("error_log.txt")
@@ -38,11 +40,11 @@ func main() {
 	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
 	websocketServer.Start(appWebsocket)
 
-	HTTPServerServe := HTTP.NewServer(HTTP.HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
+	HTTPServerServe := HTTP.New(HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
 	HTTPServerServe.Start()
 
-	HTTPServerWebsocket := HTTP.NewServer(HTTP.WEBSOCKET_PORT, "HTTPwebsocket", false, "", "")
+	HTTPServerWebsocket := HTTP.New(WEBSOCKET_PORT, "HTTPwebsocket", false, "", "")
 	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
 	HTTPServerWebsocket.Start()
 

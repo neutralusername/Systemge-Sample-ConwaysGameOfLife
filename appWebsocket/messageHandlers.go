@@ -7,7 +7,7 @@ import (
 
 func (app *App) WebsocketUnicast(message *Message.Message) error {
 	segments := strings.Split(message.Body, "|")
-	app.websocketServer.Unicast(segments[0], []byte(Message.New(segments[1], app.name, segments[2]).Serialize()))
+	app.websocketServer.Unicast(segments[0], []byte(Message.New(segments[1], app.name, "", segments[2]).Serialize()))
 	return nil
 }
 
