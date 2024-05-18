@@ -39,6 +39,7 @@ WS_CONNECTION.onmessage = function(event) {
     let message = JSON.parse(event.data)
     console.log(message)
     switch (message.type) {
+        case "getGridUnicast":
         case "getGrid":
             addOrReplace(getGridElement(message.body))
             break

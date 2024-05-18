@@ -13,7 +13,7 @@ func (app *App) GridChange(message *Message.Message) error {
 	return nil
 }
 
-func (app *App) GetGrid(message *Message.Message) error {
+func (app *App) GetGridUnicast(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.messageBrokerClient.AsyncMessage(message.NewResponse(app.name, gridToString(app.grid)))
