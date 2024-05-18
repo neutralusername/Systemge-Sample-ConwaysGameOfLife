@@ -3,12 +3,14 @@ package appWebsocket
 import (
 	"Systemge/Error"
 	"Systemge/Message"
+	"Systemge/Utilities"
 	"Systemge/Websocket"
 )
 
 func (app *App) OnConnectHandler(connection *Websocket.Connection) {
-	err := app.messageBrokerClient.Send(Message.New("getGridUnicast", app.name, "", connection.Id))
+	response, err := app.messageBrokerClient.SyncMessage(Message.New("getGrid", app.name, app.randoizer.GenerateRandomString(10, Utilities.ALPHA_NUMERIC), connection.Id))
 	if err != nil {
-		app.logger.Log(Error.New("Failed to send getGridUnicast message: " + err.Error()).Error())
+		app.logger.Log(Error.New("Failed to send getGrid message: " + err.Error()).Error())
 	}
+	connection.Send([]byte(response.Serialize()))
 }

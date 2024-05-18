@@ -30,7 +30,7 @@ func main() {
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife)
 
 	messageBrokerClientGameOfLife.Subscribe("gridChange", appGameOfLife.GridChange)
-	messageBrokerClientGameOfLife.Subscribe("getGridUnicast", appGameOfLife.GetGridUnicast)
+	messageBrokerClientGameOfLife.Subscribe("getGrid", appGameOfLife.GetGrid)
 	messageBrokerClientWebsocket.Subscribe("websocketUnicast", appWebsocket.WebsocketUnicast)
 
 	messageBrokerClientWebsocket.Subscribe("getGrid", appWebsocket.GetGrid)

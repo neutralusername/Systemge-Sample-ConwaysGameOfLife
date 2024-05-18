@@ -10,6 +10,7 @@ type App struct {
 	messageBrokerClient *MessageBrokerClient.Client
 	websocketServer     *Websocket.Server
 	name                string
+	randoizer           *Utilities.Randomizer
 	logger              *Utilities.Logger
 }
 
@@ -18,6 +19,7 @@ func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrok
 		name:                name,
 		messageBrokerClient: messageBrokerClient,
 		logger:              logger,
+		randoizer:           Utilities.CreateRandomizer(Utilities.GetSystemTime()),
 		websocketServer:     websocketServer,
 	}
 }

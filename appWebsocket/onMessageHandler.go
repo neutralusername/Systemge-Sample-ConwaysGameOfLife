@@ -11,8 +11,8 @@ func (app *App) OnMessageHandler(connection *Websocket.Connection, message *Mess
 		connection.ResetWatchdog()
 	default:
 		message.Origin = connection.Id
-		message.Target = ""
-		err := app.messageBrokerClient.Send(message)
+		message.SyncKey = ""
+		err := app.messageBrokerClient.AsyncMessage(message)
 		if err != nil {
 			connection.Send([]byte(Message.New("error", "", app.name, err.Error()).Serialize()))
 		}

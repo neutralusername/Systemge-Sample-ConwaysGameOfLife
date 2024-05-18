@@ -9,13 +9,13 @@ func (app *App) GridChange(message *Message.Message) error {
 	defer app.mutex.Unlock()
 	gridChange := UnmarshalGridChange(message.Body)
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	app.messageBrokerClient.Send(Message.New("getGridChange", app.name, "", gridChange.Marshal()))
+	app.messageBrokerClient.AsyncMessage(Message.New("getGridChange", app.name, "", gridChange.Marshal()))
 	return nil
 }
 
-func (app *App) GetGridUnicast(message *Message.Message) error {
+func (app *App) GetGrid(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
-	app.messageBrokerClient.Send(Message.New("websocketUnicast", app.name, "", message.Body+"|"+"getGrid"+"|"+gridToString(app.grid)))
+	app.messageBrokerClient.AsyncMessage(message.NewResponse(app.name, gridToString(app.grid)))
 	return nil
 }

@@ -73,7 +73,7 @@ func (app *App) calcNextGeneration() {
 	}
 
 	app.grid = nextGrid
-	err := app.messageBrokerClient.Send(Message.New("getGrid", app.name, "", gridToString(app.grid)))
+	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", gridToString(app.grid)))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
