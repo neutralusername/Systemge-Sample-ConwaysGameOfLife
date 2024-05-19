@@ -71,26 +71,6 @@ export class root extends React.Component {
                 onClick : () => this.state.WS_CONNECTION.send(this.constructMessage("gridChange", JSON.stringify({row:Math.floor(index/this.state.GRIDSIZE), column:index%this.state.GRIDSIZE, state:cell ? false : true}))),
             }))
         })
-
-        /* 
-        let button = document.createElement("button")
-        button.id = "nextGeneration"
-        button.style.position = "absolute"  
-        button.style.top = "10px"
-        button.style.left = "10px"
-        button.style.padding = "5px"
-        button.style.border = "1px solid black"
-        button.style.borderRadius = "5px"
-        button.style.backgroundColor = "white"
-        button.style.color = "black"
-        button.style.fontFamily = "Arial"
-        button.style.fontSize = "16px"
-        button.style.cursor = "pointer"
-        button.innerHTML = "Next Generation"
-        button.onclick = function() {
-            WS_CONNECTION.send(constructMessage("nextGeneration", ""))
-        }
-        */
 		return React.createElement('div', {
 				id : "root",
 				onContextMenu: e => {
