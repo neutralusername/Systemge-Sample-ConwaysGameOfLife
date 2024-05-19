@@ -7,7 +7,7 @@ export class root extends React.Component {
             SQUARESIZE : 12.5,
             grid : [],
 			WS_CONNECTION : new WebSocket("ws://localhost:8443/ws"),
-
+            nextGenerationLoop : null,
 		},
         this.state.WS_CONNECTION.onmessage = (event) => {
             let message = JSON.parse(event.data)
@@ -103,6 +103,35 @@ export class root extends React.Component {
                     innerHTML : "Next Generation"
                 },
                 "Next Generation"
+            ),
+            React.createElement('button', {
+                    id : "nextGenerationLoop",
+                    style : {
+                        position : "absolute",
+                        top : "50px",
+                        left : "10px",
+                        padding : "5px",
+                        border : "1px solid black",
+                        borderRadius : "5px",
+                        backgroundColor : "white",
+                        color : "black",
+                        fontFamily : "Arial",
+                        fontSize : "16px",
+                        cursor : "pointer",
+                    },
+                    onClick : () => {
+                        if (this.state.nextGenerationLoop === null) {
+                            this.state.nextGenerationLoop = setInterval(() => {
+                                this.state.WS_CONNECTION.send(this.constructMessage("nextGeneration", ""))
+                            }, 50)
+                        } else {
+                            clearInterval(this.state.nextGenerationLoop)
+                            this.state.nextGenerationLoop = null
+                            this.setState({}) // Force re-render to update button text
+                        }
+                    },
+                },
+                this.state.nextGenerationLoop === null ? "Start Loop" : "Stop Loop"
             ),
 			React.createElement('div', {
                     id : "grid",
