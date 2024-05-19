@@ -37,15 +37,15 @@ export class root extends React.Component {
                     break
             }
         }
-        this.state.WS_CONNECTION.onclose = function() {
+        this.state.WS_CONNECTION.onclose = () => {
             setTimeout(function() {
-                if (WS_CONNECTION.readyState === WebSocket.CLOSED) {}
+                if (this.state.WS_CONNECTION.readyState === WebSocket.CLOSED) {}
                     window.location.reload()
             }, 2000)
         }
-        this.state.WS_CONNECTION.onopen = function() {
+        this.state.WS_CONNECTION.onopen = () => {
             let myLoop = function() {
-                WS_CONNECTION.send(this.constructMessage("heartbeat", ""))
+                this.state.WS_CONNECTION.send(this.constructMessage("heartbeat", ""))
                 setTimeout(myLoop, 15*1000)
             }
             setTimeout(myLoop, 15*1000)
