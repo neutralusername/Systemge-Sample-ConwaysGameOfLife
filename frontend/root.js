@@ -69,6 +69,11 @@ export class root extends React.Component {
                     boxSizing : "border-box",
                 },
                 onClick : () => this.state.WS_CONNECTION.send(this.constructMessage("gridChange", JSON.stringify({row:Math.floor(index/this.state.GRIDSIZE), column:index%this.state.GRIDSIZE, state:cell ? false : true}))),
+                onMouseOver : (e) => {
+                    if (e.buttons === 1) {
+                        this.state.WS_CONNECTION.send(this.constructMessage("gridChange", JSON.stringify({row:Math.floor(index/this.state.GRIDSIZE), column:index%this.state.GRIDSIZE, state:cell ? false : true})))
+                    }
+                }
             }))
         })
 		return React.createElement('div', {
