@@ -129,13 +129,16 @@ export class root extends React.Component {
                     },
                     onClick : () => {
                         if (this.state.nextGenerationLoop === null) {
-                            this.state.nextGenerationLoop = setInterval(() => {
-                                this.state.WS_CONNECTION.send(this.constructMessage("nextGeneration", ""))
-                            },this.state.AUTONEXTGENERATIONTEMPO)
+                            this.setState({
+                                nextGenerationLoop : setInterval(() => {
+                                    this.state.WS_CONNECTION.send(this.constructMessage("nextGeneration", ""))
+                                }, this.state.AUTONEXTGENERATIONTEMPO)
+                            })
                         } else {
                             clearInterval(this.state.nextGenerationLoop)
-                            this.state.nextGenerationLoop = null
-                            this.setState({}) // Force re-render to update button text
+                            this.setState({
+                                nextGenerationLoop : null
+                            })
                         }
                     },
                 },
