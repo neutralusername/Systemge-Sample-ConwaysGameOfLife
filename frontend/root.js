@@ -38,13 +38,13 @@ export class root extends React.Component {
             }
         }
         this.state.WS_CONNECTION.onclose = () => {
-            setTimeout(function() {
+            setTimeout(() => {
                 if (this.state.WS_CONNECTION.readyState === WebSocket.CLOSED) {}
                     window.location.reload()
             }, 2000)
         }
         this.state.WS_CONNECTION.onopen = () => {
-            let myLoop = function() {
+            let myLoop = () => {
                 this.state.WS_CONNECTION.send(this.constructMessage("heartbeat", ""))
                 setTimeout(myLoop, 15*1000)
             }
