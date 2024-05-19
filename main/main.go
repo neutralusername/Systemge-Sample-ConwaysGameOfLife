@@ -32,7 +32,7 @@ func main() {
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife)
 
-	messageBrokerClientGameOfLife.SubscribeSync("getGridUnicast", appGameOfLife.GetGridUnicast)
+	messageBrokerClientGameOfLife.SubscribeSync("getGridSync", appGameOfLife.GetGridSync)
 	messageBrokerClientGameOfLife.SubscribeAsync("gridChange", appGameOfLife.GridChange)
 	messageBrokerClientGameOfLife.SubscribeAsync("nextGeneration", appGameOfLife.NextGeneration)
 

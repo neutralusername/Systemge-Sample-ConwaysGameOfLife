@@ -14,7 +14,7 @@ func (app *App) GridChange(message *Message.Message) error {
 	return nil
 }
 
-func (app *App) GetGridUnicast(message *Message.Message) (string, error) {
+func (app *App) GetGridSync(message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return gridToString(app.grid), nil
