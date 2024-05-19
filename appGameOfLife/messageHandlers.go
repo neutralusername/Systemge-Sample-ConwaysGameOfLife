@@ -1,6 +1,7 @@
 package appGameOfLife
 
 import (
+	"Systemge/Error"
 	"Systemge/Message"
 )
 
@@ -17,4 +18,15 @@ func (app *App) GetGridUnicast(message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return gridToString(app.grid), nil
+}
+
+func (app *App) NextGeneration(message *Message.Message) error {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	app.calcNextGeneration()
+	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", gridToString(app.grid)))
+	if err != nil {
+		app.logger.Log(Error.New(err.Error()).Error())
+	}
+	return nil
 }

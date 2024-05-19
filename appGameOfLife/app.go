@@ -1,12 +1,9 @@
 package appGameOfLife
 
 import (
-	"Systemge/Error"
-	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
 	"sync"
-	"time"
 )
 
 type App struct {
@@ -72,10 +69,4 @@ func (app *App) calcNextGeneration() {
 		}
 	}
 	app.grid = nextGrid
-	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", gridToString(app.grid)))
-	if err != nil {
-		app.logger.Log(Error.New(err.Error()).Error())
-	}
-	time.Sleep(5 * time.Second)
-	go app.calcNextGeneration()
 }

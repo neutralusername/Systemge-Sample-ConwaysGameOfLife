@@ -41,6 +41,7 @@ WS_CONNECTION.onmessage = function(event) {
     switch (message.type) {
         case "getGrid":
             addOrReplace(getGridElement(message.body))
+            addOrReplace(getNextGenerationElement())
             break
         case "getGridChange":
             let grid = document.getElementById("grid")
@@ -63,6 +64,27 @@ function addOrReplace(element) {
     } else {
         document.body.appendChild(element)
     }
+}
+
+function getNextGenerationElement() {
+    let button = document.createElement("button")
+    button.id = "nextGeneration"
+    button.style.position = "absolute"  
+    button.style.top = "10px"
+    button.style.left = "10px"
+    button.style.padding = "5px"
+    button.style.border = "1px solid black"
+    button.style.borderRadius = "5px"
+    button.style.backgroundColor = "white"
+    button.style.color = "black"
+    button.style.fontFamily = "Arial"
+    button.style.fontSize = "16px"
+    button.style.cursor = "pointer"
+    button.innerHTML = "Next Generation"
+    button.onclick = function() {
+        WS_CONNECTION.send(constructMessage("nextGeneration", ""))
+    }
+    return button
 }
 
 function getGridElement(grid) {
