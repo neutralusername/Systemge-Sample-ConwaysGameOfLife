@@ -7,7 +7,7 @@ export class root extends React.Component {
 
 			GRIDSIZE : 75,
             SQUARESIZE : 12.5,
-            AUTONEXTGENERATIONTEMPO : 100,
+            AUTONEXTGENERATIONDELAY_MS : 100,
 
             grid : [],
             nextGenerationLoop : null,
@@ -132,7 +132,7 @@ export class root extends React.Component {
                             this.setState({
                                 nextGenerationLoop : setInterval(() => {
                                     this.state.WS_CONNECTION.send(this.constructMessage("nextGeneration", ""))
-                                }, this.state.AUTONEXTGENERATIONTEMPO)
+                                }, this.state.AUTONEXTGENERATIONDELAY_MS)
                             })
                         } else {
                             clearInterval(this.state.nextGenerationLoop)
