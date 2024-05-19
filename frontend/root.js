@@ -3,10 +3,13 @@ export class root extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			WS_CONNECTION : new WebSocket("ws://localhost:8443/ws"),
+
 			GRIDSIZE : 75,
             SQUARESIZE : 12.5,
+            AUTONEXTGENERATIONTEMPO : 100,
+
             grid : [],
-			WS_CONNECTION : new WebSocket("ws://localhost:8443/ws"),
             nextGenerationLoop : null,
 		},
         this.state.WS_CONNECTION.onmessage = (event) => {
@@ -128,7 +131,7 @@ export class root extends React.Component {
                         if (this.state.nextGenerationLoop === null) {
                             this.state.nextGenerationLoop = setInterval(() => {
                                 this.state.WS_CONNECTION.send(this.constructMessage("nextGeneration", ""))
-                            }, 50)
+                            },this.state.AUTONEXTGENERATIONTEMPO)
                         } else {
                             clearInterval(this.state.nextGenerationLoop)
                             this.state.nextGenerationLoop = null
