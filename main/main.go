@@ -22,21 +22,22 @@ func main() {
 	messageBrokerServer.Start()
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", logger)
+	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
+
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", logger)
+	messageBrokerClientGameOfLife.Connect(MESSAGEBROKERSERVER_ADDRESS)
 
 	websocketServer := Websocket.New("websocketServer")
 
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife)
 
-	messageBrokerClientGameOfLife.Subscribe("gridChange", appGameOfLife.GridChange)
-	messageBrokerClientGameOfLife.Subscribe("getGridUnicast", appGameOfLife.GetGridUnicast)
+	messageBrokerClientGameOfLife.SubscribeSync("getGridUnicast", appGameOfLife.GetGridUnicast)
+	messageBrokerClientGameOfLife.SubscribeAsync("gridChange", appGameOfLife.GridChange)
 
-	messageBrokerClientWebsocket.Subscribe("getGrid", appWebsocket.GetGrid)
-	messageBrokerClientWebsocket.Subscribe("getGridChange", appWebsocket.GetGridChange)
+	messageBrokerClientWebsocket.SubscribeAsync("getGrid", appWebsocket.GetGrid)
+	messageBrokerClientWebsocket.SubscribeAsync("getGridChange", appWebsocket.GetGridChange)
 
-	messageBrokerClientGameOfLife.Connect(MESSAGEBROKERSERVER_ADDRESS)
-	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
 	websocketServer.Start(appWebsocket)
 
 	HTTPServerServe := HTTP.New(HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
