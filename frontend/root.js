@@ -14,7 +14,7 @@ export class root extends React.Component {
         (this.state.WS_CONNECTION.onmessage = (event) => {
             let message = JSON.parse(event.data);
             console.log(message);
-            switch (message.type) {
+            switch (message.topic) {
                 case "getGrid":
                     let grid = JSON.parse(message.body);
                     this.setState({
@@ -38,7 +38,7 @@ export class root extends React.Component {
                     });
                     break;
                 default:
-                    console.log("Unknown message type: " + event.data);
+                    console.log("Unknown message topic: " + event.data);
                     break;
             }
         });
@@ -57,9 +57,9 @@ export class root extends React.Component {
         };
     }
 
-    constructMessage = (type, body) => {
+    constructMessage = (topic, body) => {
         return JSON.stringify({
-            type: type,
+            topic: topic,
             body: body,
         });
     };
