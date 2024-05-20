@@ -5,6 +5,8 @@ changes to the grid are broadcasted.
 
 ![60QV4Ftw9N](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/2f5b2d0c-65b4-4045-99da-b73d5727f160)
 
+![chrome_i6yvUFMgJH](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/e220437f-a2c5-483f-a086-fb810827f419)
+
 
 ## how to use:  
 - make sure to properly import the Systemge library to the SampleApp.  
