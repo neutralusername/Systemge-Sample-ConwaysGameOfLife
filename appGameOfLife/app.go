@@ -7,19 +7,19 @@ import (
 )
 
 type App struct {
+	messageBrokerClient *MessageBrokerClient.Client
 	name                string
 	grid                [GRIDROWS][GRIDCOLS]int
 	mutex               sync.Mutex
 	logger              *Utilities.Logger
-	messageBrokerClient *MessageBrokerClient.Client
 }
 
 func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) *App {
 	app := &App{
+		messageBrokerClient: messageBrokerClient,
 		name:                name,
 		grid:                [GRIDROWS][GRIDCOLS]int{},
 		logger:              logger,
-		messageBrokerClient: messageBrokerClient,
 	}
 	go app.calcNextGeneration()
 	return app
