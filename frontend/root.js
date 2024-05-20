@@ -85,7 +85,7 @@ export class root extends React.Component {
                                         JSON.stringify({
                                             row :indexRow,
                                             column: indexCol,
-                                            state: cell+1%2,
+                                            state: (cell+1)%2,
                                         })
                                     )
                                 ),
@@ -97,7 +97,7 @@ export class root extends React.Component {
                                             JSON.stringify({
                                                 row: indexRow,
                                                 column: indexCol,
-                                                state: cell+1%2,
+                                                state: (cell+1)%2,
                                             })
                                         )
                                     );
