@@ -167,16 +167,18 @@ export class root extends React.Component {
                             cursor: "pointer",
                         },
                         onClick: () => {
-                            if (this.state.nextGenerationLoop === null) {
+                             let startLoop = () => {
+                                this.state.WS_CONNECTION.send(
+                                    this.constructMessage("nextGeneration", "")
+                                );
                                 this.setState({
-                                    nextGenerationLoop: setInterval(() => {
-                                        this.state.WS_CONNECTION.send(
-                                            this.constructMessage("nextGeneration", "")
-                                        );
-                                    }, this.state.autoNextGenDelay_ms),
+                                    nextGenerationLoop: setTimeout(startLoop, this.state.autoNextGenDelay_ms),
                                 });
+                            }
+                            if (this.state.nextGenerationLoop === null) {
+                                startLoop ()
                             } else {
-                                clearInterval(this.state.nextGenerationLoop);
+                                clearTimeout(this.state.nextGenerationLoop);
                                 this.setState({
                                     nextGenerationLoop: null,
                                 });
