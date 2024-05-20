@@ -4,11 +4,10 @@ export class root extends React.Component {
         (this.state = {
             WS_CONNECTION: new WebSocket("ws://localhost:8443/ws"),
 
-            GRIDSIZE: 75,
             SQUARESIZE: 12.5,
             autoNextGenDelay_ms: 100,
 
-            grid: [],
+            grid: null,
             nextGenerationLoop: null,
         }),
         (this.state.WS_CONNECTION.onmessage = (event) => {
@@ -16,19 +15,14 @@ export class root extends React.Component {
             console.log(message);
             switch (message.type) {
                 case "getGrid":
-                    let newGrid = [];
-                    message.body.split("").forEach((digit) => {
-                        newGrid.push(Number(digit));
-                    });
+                    let grid = JSON.parse(message.body);
                     this.setState({
-                        grid: newGrid,
+                        grid: grid,
                     });
                     break;
                 case "getGridChange":
                     let gridChange = JSON.parse(message.body);
-                    this.state.grid[
-                        gridChange.row * this.state.GRIDSIZE + gridChange.column
-                    ] = gridChange.state ? 1 : 0;
+                    this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
                     this.setState({
                         grid: this.state.grid,
                     });
@@ -71,45 +65,49 @@ export class root extends React.Component {
 
     render() {
         let gridElements = [];
-        this.state.grid.forEach((cell, index) => {
-            gridElements.push(
-                React.createElement("div", {
-                    key: index,
-                    style: {
-                        width: this.state.SQUARESIZE + "px",
-                        height: this.state.SQUARESIZE + "px",
-                        backgroundColor: cell ? "black" : "white",
-                        border: "1px solid black",
-                        boxSizing: "border-box",
-                    },
-                    onClick: () =>
-                        this.state.WS_CONNECTION.send(
-                            this.constructMessage(
-                                "gridChange",
-                                JSON.stringify({
-                                    row: Math.floor(index / this.state.GRIDSIZE),
-                                    column: index % this.state.GRIDSIZE,
-                                    state: cell ? false : true,
-                                })
-                            )
-                        ),
-                    onMouseOver: (e) => {
-                        if (e.buttons === 1) {
-                            this.state.WS_CONNECTION.send(
-                                this.constructMessage(
-                                    "gridChange",
-                                    JSON.stringify({
-                                        row: Math.floor(index / this.state.GRIDSIZE),
-                                        column: index % this.state.GRIDSIZE,
-                                        state: cell ? false : true,
-                                    })
-                                )
-                            );
-                        }
-                    },
+        if (this.state.grid) {
+            this.state.grid.grid.forEach((row, indexRow) => {
+                row.forEach((cell, indexCol) => {
+                    gridElements.push(
+                        React.createElement("div", {
+                            key: indexRow*this.state.grid.cols+indexCol,
+                            style: {
+                                width: this.state.SQUARESIZE + "px",
+                                height: this.state.SQUARESIZE + "px",
+                                backgroundColor: cell ? "black" : "white",
+                                border: "1px solid black",
+                                boxSizing: "border-box",
+                            },
+                            onClick: () =>
+                                this.state.WS_CONNECTION.send(
+                                    this.constructMessage(
+                                        "gridChange",
+                                        JSON.stringify({
+                                            row :indexRow,
+                                            column: indexCol,
+                                            state: cell ? 0 : 1,
+                                        })
+                                    )
+                                ),
+                            onMouseOver: (e) => {
+                                if (e.buttons === 1) {
+                                    this.state.WS_CONNECTION.send(
+                                        this.constructMessage(
+                                            "gridChange",
+                                            JSON.stringify({
+                                                row: indexRow,
+                                                column: indexCol,
+                                                state: cell ? 0 : 1,
+                                            })
+                                        )
+                                    );
+                                }
+                            },
+                        })
+                    );
                 })
-            );
-        });
+            });
+        }
         return React.createElement(
             "div", {
                 id: "root",
@@ -210,15 +208,15 @@ export class root extends React.Component {
                     },
                 }),
             ),
-            React.createElement(
+            this.state.grid ? React.createElement(
                 "div", {
                     id: "grid",
                     style: {
                         display: "grid",
-                        gridTemplateColumns: "repeat(" + this.state.GRIDSIZE + ", 1fr)",
-                        gridTemplateRows: "repeat(" + this.state.GRIDSIZE + ", 1fr)",
-                        width: this.state.SQUARESIZE * this.state.GRIDSIZE + "px",
-                        height: this.state.SQUARESIZE * this.state.GRIDSIZE + "px",
+                        gridTemplateColumns: "repeat(" + this.state.grid.cols + ", " + this.state.SQUARESIZE + "px)",
+                        gridTemplateRows: "repeat(" + this.state.grid.rows + ", " + this.state.SQUARESIZE + "px)",
+                        width: this.state.grid.cols * this.state.SQUARESIZE + "px",
+                        height: this.state.grid.rows * this.state.SQUARESIZE + "px",
                         border: "1px solid black",
                         margin: "auto",
                         marginTop: "10px",
@@ -232,7 +230,7 @@ export class root extends React.Component {
                     },
                 },
                 gridElements
-            )
+            ) : null
         );
     }
 }

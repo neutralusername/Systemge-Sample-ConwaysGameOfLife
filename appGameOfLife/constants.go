@@ -1,3 +1,4 @@
 package appGameOfLife
 
-const GRIDSIZE = 75
+const GRIDROWS = 75
+const GRIDCOLS = 115

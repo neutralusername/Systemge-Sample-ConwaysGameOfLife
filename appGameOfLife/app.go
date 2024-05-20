@@ -8,7 +8,7 @@ import (
 
 type App struct {
 	name                string
-	grid                [GRIDSIZE][GRIDSIZE]bool
+	grid                [GRIDROWS][GRIDCOLS]int
 	mutex               sync.Mutex
 	logger              *Utilities.Logger
 	messageBrokerClient *MessageBrokerClient.Client
@@ -17,7 +17,7 @@ type App struct {
 func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) *App {
 	app := &App{
 		name:                name,
-		grid:                [GRIDSIZE][GRIDSIZE]bool{},
+		grid:                [GRIDROWS][GRIDCOLS]int{},
 		logger:              logger,
 		messageBrokerClient: messageBrokerClient,
 	}
@@ -25,46 +25,25 @@ func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrok
 	return app
 }
 
-func gridToString(grid [GRIDSIZE][GRIDSIZE]bool) string {
-	gridString := ""
-	for row := 0; row < GRIDSIZE; row++ {
-		for col := 0; col < GRIDSIZE; col++ {
-			if grid[row][col] {
-				gridString += "1"
-			} else {
-				gridString += "0"
-			}
-		}
-	}
-	return gridString
-}
-
 func (app *App) calcNextGeneration() {
-	nextGrid := [GRIDSIZE][GRIDSIZE]bool{}
-	for row := 0; row < GRIDSIZE; row++ {
-		for col := 0; col < GRIDSIZE; col++ {
-			aliveNeighbors := 0
-			for i := -1; i <= 1; i++ {
-				for j := -1; j <= 1; j++ {
-					if app.grid[(row+i+GRIDSIZE)%GRIDSIZE][(col+j+GRIDSIZE)%GRIDSIZE] {
-						aliveNeighbors++
-					}
+	nextGrid := [GRIDROWS][GRIDCOLS]int{}
+	for row := 0; row < GRIDROWS; row++ {
+		for col := 0; col < GRIDCOLS; col++ {
+			aliveNeighbours := 0
+			for i := -1; i < 2; i++ {
+				for j := -1; j < 2; j++ {
+					neighbourRow := (row + i + GRIDROWS) % GRIDROWS
+					neighbourCol := (col + j + GRIDCOLS) % GRIDCOLS
+					aliveNeighbours += app.grid[neighbourRow][neighbourCol]
 				}
 			}
-			if app.grid[row][col] {
-				aliveNeighbors--
-			}
-			if app.grid[row][col] && aliveNeighbors < 2 {
-				nextGrid[row][col] = false
-			}
-			if app.grid[row][col] && (aliveNeighbors == 2 || aliveNeighbors == 3) {
-				nextGrid[row][col] = true
-			}
-			if app.grid[row][col] && aliveNeighbors > 3 {
-				nextGrid[row][col] = false
-			}
-			if !app.grid[row][col] && aliveNeighbors == 3 {
-				nextGrid[row][col] = true
+			aliveNeighbours -= app.grid[row][col]
+			if app.grid[row][col] == 1 && (aliveNeighbours < 2 || aliveNeighbours > 3) {
+				nextGrid[row][col] = 0
+			} else if app.grid[row][col] == 0 && aliveNeighbours == 3 {
+				nextGrid[row][col] = 1
+			} else {
+				nextGrid[row][col] = app.grid[row][col]
 			}
 		}
 	}

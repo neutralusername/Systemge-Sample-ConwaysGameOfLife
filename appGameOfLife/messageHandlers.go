@@ -17,14 +17,14 @@ func (app *App) GridChange(message *Message.Message) error {
 func (app *App) GetGridSync(message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
-	return gridToString(app.grid), nil
+	return NewGrid(app.grid).Marshal(), nil
 }
 
 func (app *App) NextGeneration(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", gridToString(app.grid)))
+	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", NewGrid(app.grid).Marshal()))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
