@@ -60,6 +60,15 @@ export class root extends React.Component {
         });
     };
 
+    startNextGenerationLoop = () => {
+        this.state.WS_CONNECTION.send(
+            this.constructMessage("nextGeneration", "")
+        );
+        this.setState({
+            nextGenerationLoop: setTimeout(this.startNextGenerationLoop, this.state.autoNextGenDelay_ms),
+        });
+    }
+
     render() {
         let gridElements = [];
         this.state.grid.forEach((cell, index) => {
@@ -167,16 +176,8 @@ export class root extends React.Component {
                             cursor: "pointer",
                         },
                         onClick: () => {
-                             let startLoop = () => {
-                                this.state.WS_CONNECTION.send(
-                                    this.constructMessage("nextGeneration", "")
-                                );
-                                this.setState({
-                                    nextGenerationLoop: setTimeout(startLoop, this.state.autoNextGenDelay_ms),
-                                });
-                            }
                             if (this.state.nextGenerationLoop === null) {
-                                startLoop ()
+                                this.startNextGenerationLoop ()
                             } else {
                                 clearTimeout(this.state.nextGenerationLoop);
                                 this.setState({
