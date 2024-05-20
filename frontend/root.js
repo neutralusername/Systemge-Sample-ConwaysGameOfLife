@@ -6,7 +6,7 @@ export class root extends React.Component {
 
             GRIDSIZE: 75,
             SQUARESIZE: 12.5,
-            AUTONEXTGENERATIONDELAY_MS: 100,
+            autoNextGenDelay_ms: 100,
 
             grid: [],
             nextGenerationLoop: null,
@@ -125,8 +125,6 @@ export class root extends React.Component {
                         top: "10px",
                         left: "10px",
                         padding: "5px",
-                        border: "1px solid black",
-                        borderRadius: "5px",
                         backgroundColor: "white",
                         color: "black",
                         fontFamily: "Arial",
@@ -141,11 +139,11 @@ export class root extends React.Component {
                 },
                 "Next Generation"
             ),
-            React.createElement(
-                "button", {
-                    id: "nextGenerationLoop",
+            React.createElement("div", {
                     style: {
                         position: "absolute",
+                        display: "flex",
+                        flexDirection: "row",
                         top: "50px",
                         left: "10px",
                         padding: "5px",
@@ -155,26 +153,59 @@ export class root extends React.Component {
                         color: "black",
                         fontFamily: "Arial",
                         fontSize: "16px",
-                        cursor: "pointer",
-                    },
-                    onClick: () => {
-                        if (this.state.nextGenerationLoop === null) {
-                            this.setState({
-                                nextGenerationLoop: setInterval(() => {
-                                    this.state.WS_CONNECTION.send(
-                                        this.constructMessage("nextGeneration", "")
-                                    );
-                                }, this.state.AUTONEXTGENERATIONDELAY_MS),
-                            });
-                        } else {
-                            clearInterval(this.state.nextGenerationLoop);
-                            this.setState({
-                                nextGenerationLoop: null,
-                            });
-                        }
+                        gap: "10px",    
                     },
                 },
-                this.state.nextGenerationLoop === null ? "Start Loop" : "Stop Loop"
+                React.createElement(
+                    "button", {
+                        id: "nextGenerationLoop",
+                        style: {
+                            backgroundColor: "white",
+                            color: "black",
+                            fontFamily: "Arial",
+                            fontSize: "16px",
+                            cursor: "pointer",
+                        },
+                        onClick: () => {
+                            if (this.state.nextGenerationLoop === null) {
+                                this.setState({
+                                    nextGenerationLoop: setInterval(() => {
+                                        this.state.WS_CONNECTION.send(
+                                            this.constructMessage("nextGeneration", "")
+                                        );
+                                    }, this.state.autoNextGenDelay_ms),
+                                });
+                            } else {
+                                clearInterval(this.state.nextGenerationLoop);
+                                this.setState({
+                                    nextGenerationLoop: null,
+                                });
+                            }
+                        },
+                    },
+                    this.state.nextGenerationLoop === null ? "Start Loop" : "Stop Loop"
+                ),
+                React.createElement("input", {
+                    id: "autoNextGenDelay",
+                    type: "number",
+                    style: {
+                        width: "65px",
+                        height: "20px",
+                        padding: "5px",
+                        border: "1px solid black",
+                        borderRadius: "5px",
+                        backgroundColor: "white",
+                        color: "black",
+                        fontFamily: "Arial",
+                        fontSize: "16px",
+                    },
+                    value: this.state.autoNextGenDelay_ms,
+                    onChange: (e) => {
+                        this.setState({
+                            autoNextGenDelay_ms: e.target.value,
+                        });
+                    },
+                }),
             ),
             React.createElement(
                 "div", {
