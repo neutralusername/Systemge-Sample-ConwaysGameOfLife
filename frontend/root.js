@@ -4,7 +4,7 @@ export class root extends React.Component {
         (this.state = {
             WS_CONNECTION: new WebSocket("ws://localhost:8443/ws"),
 
-            SQUARESIZE: 12.5,
+            SQUARESIZE: 10,
             autoNextGenDelay_ms: 100,
 
             grid: null,

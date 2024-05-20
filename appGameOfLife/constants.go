@@ -1,4 +1,4 @@
 package appGameOfLife
 
-const GRIDROWS = 75
-const GRIDCOLS = 115
+const GRIDROWS = 94
+const GRIDCOLS = 144
