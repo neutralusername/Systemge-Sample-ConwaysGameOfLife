@@ -237,7 +237,7 @@ export class root extends React.Component {
                 },
                 React.createElement("input", {
                         style : {
-                            width: "120px",
+                            width: "74px",
                             height: "20px",
                             border: "1px solid black",
                             borderRadius: "5px",
@@ -262,6 +262,23 @@ export class root extends React.Component {
                         }
                     },
                     "set"
+                ),
+                React.createElement("button", {
+                        onClick: () => {
+                            this.state.WS_CONNECTION.send(
+                                this.constructMessage("setGrid", (() => {
+                                    let str = ""
+                                    for (let i = 0; i < this.state.grid.rows; i++) {
+                                        for (let j = 0; j < this.state.grid.cols; j++) {
+                                            str += "0"
+                                        }
+                                    }
+                                    return str
+                                })())   
+                            )
+                        }
+                    },
+                    "reset"
                 )
             ),
             this.state.grid ? React.createElement(
