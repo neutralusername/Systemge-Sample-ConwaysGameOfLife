@@ -8,20 +8,12 @@ type GridChange struct {
 	State  int `json:"state"`
 }
 
-func NewGridChange(row int, column int, state int) GridChange {
-	return GridChange{
-		Row:    row,
-		Column: column,
-		State:  state,
-	}
-}
-
-func (gridChange *GridChange) Marshal() string {
+func (gridChange *GridChange) marshal() string {
 	json, _ := json.Marshal(gridChange)
 	return string(json)
 }
 
-func UnmarshalGridChange(jsonString string) GridChange {
+func unmarshalGridChange(jsonString string) GridChange {
 	var gridChange GridChange
 	json.Unmarshal([]byte(jsonString), &gridChange)
 	return gridChange

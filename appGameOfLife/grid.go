@@ -8,7 +8,7 @@ type Grid struct {
 	Cols int                     `json:"cols"`
 }
 
-func NewGrid(grid [GRIDROWS][GRIDCOLS]int) *Grid {
+func newGrid(grid [GRIDROWS][GRIDCOLS]int) *Grid {
 	return &Grid{
 		Grid: grid,
 		Rows: GRIDROWS,
@@ -16,13 +16,7 @@ func NewGrid(grid [GRIDROWS][GRIDCOLS]int) *Grid {
 	}
 }
 
-func (grid *Grid) Marshal() string {
+func (grid *Grid) marshal() string {
 	json, _ := json.Marshal(grid)
 	return string(json)
-}
-
-func UnmarshalGrid(jsonString string) Grid {
-	var grid Grid
-	json.Unmarshal([]byte(jsonString), &grid)
-	return grid
 }
