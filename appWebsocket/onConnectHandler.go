@@ -13,6 +13,6 @@ func (app *App) OnConnectHandler(connection *Websocket.Connection) {
 		app.logger.Log(Error.New("Failed to send getGrid message: " + err.Error()).Error())
 		return
 	}
-	response.Type = "getGrid"
+	response.Topic = "getGrid"
 	connection.Send([]byte(response.Serialize()))
 }
