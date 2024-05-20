@@ -21,7 +21,12 @@ func (app *App) OnMessageHandler(connection *Websocket.Connection, message *Mess
 		if err != nil {
 			connection.Send([]byte(Message.New("error", "", app.name, err.Error()).Serialize()))
 		}
+	case "setGrid":
+		err := app.messageBrokerClient.AsyncMessage(message)
+		if err != nil {
+			connection.Send([]byte(Message.New("error", "", app.name, err.Error()).Serialize()))
+		}
 	default:
-		connection.Send([]byte(Message.New("error", "", app.name, "Unknown message type").Serialize()))
+		connection.Send([]byte(Message.New("error", app.name, "", "Unknown message type").Serialize()))
 	}
 }

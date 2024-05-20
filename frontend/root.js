@@ -9,6 +9,7 @@ export class root extends React.Component {
 
             grid: null,
             nextGenerationLoop: null,
+            stateInput : "",
         }),
         (this.state.WS_CONNECTION.onmessage = (event) => {
             let message = JSON.parse(event.data);
@@ -18,6 +19,15 @@ export class root extends React.Component {
                     let grid = JSON.parse(message.body);
                     this.setState({
                         grid: grid,
+                        stateInput: (() => {
+                            let str = ""
+                            grid.grid.forEach((row) => {
+                                row.forEach((cell) => {
+                                    str+=cell
+                                })
+                            })
+                            return str
+                        })(),
                     });
                     break;
                 case "getGridChange":
@@ -207,6 +217,52 @@ export class root extends React.Component {
                         });
                     },
                 }),
+            ),
+            React.createElement("div", {
+                    style: {
+                        position: "absolute",
+                        display: "flex",
+                        flexDirection: "row",
+                        top: "101px",
+                        left: "10px",
+                        padding: "5px",
+                        border: "1px solid black",
+                        borderRadius: "5px",
+                        backgroundColor: "white",
+                        color: "black",
+                        fontFamily: "Arial",
+                        fontSize: "16px",
+                        gap: "10px",  
+                    }
+                },
+                React.createElement("input", {
+                        style : {
+                            width: "120px",
+                            height: "20px",
+                            border: "1px solid black",
+                            borderRadius: "5px",
+                            backgroundColor: "white",
+                            color: "black",
+                            fontFamily: "Arial",
+                            fontSize: "16px",
+                        },
+                        onChange : (e) => {
+                            this.setState({
+                                stateInput : e.target.value,
+                            })
+                        },
+                        value : this.state.stateInput,
+                    }
+                ),
+                React.createElement("button", {
+                        onClick: () => {
+                            this.state.WS_CONNECTION.send(
+                                this.constructMessage("setGrid", this.state.stateInput)
+                            )
+                        }
+                    },
+                    "set"
+                )
             ),
             this.state.grid ? React.createElement(
                 "div", {

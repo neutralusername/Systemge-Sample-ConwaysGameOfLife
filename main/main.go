@@ -35,6 +35,7 @@ func main() {
 	messageBrokerClientGameOfLife.SubscribeSync("getGridSync", appGameOfLife.GetGridSync)
 	messageBrokerClientGameOfLife.SubscribeAsync("gridChange", appGameOfLife.GridChange)
 	messageBrokerClientGameOfLife.SubscribeAsync("nextGeneration", appGameOfLife.NextGeneration)
+	messageBrokerClientGameOfLife.SubscribeAsync("setGrid", appGameOfLife.SetGrid)
 
 	messageBrokerClientWebsocket.SubscribeAsync("getGrid", appWebsocket.GetGrid)
 	messageBrokerClientWebsocket.SubscribeAsync("getGridChange", appWebsocket.GetGridChange)
