@@ -68,7 +68,7 @@ export class root extends React.Component {
         };
         this.state.WS_CONNECTION.onopen = () => {
             let myLoop = () => {
-                this.state.WS_CONNECTION.send(this.constructMessage("heartbeat", ""));
+                this.state.WS_CONNECTION.send(this.state.constructMessage("heartbeat", ""));
                 setTimeout(myLoop, 15 * 1000);
             };
             setTimeout(myLoop, 15 * 1000);
