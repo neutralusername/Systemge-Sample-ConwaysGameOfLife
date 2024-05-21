@@ -1,7 +1,12 @@
+import {
+    Grid
+} from "./grid.js";
+import { Menu } from "./menu.js";
+
 export class root extends React.Component {
     constructor(props) {
         super(props);
-        (this.state = {
+        this.state = {
             WS_CONNECTION: new WebSocket("ws://localhost:8443/ws"),
 
             SQUARESIZE: 10,
@@ -10,7 +15,11 @@ export class root extends React.Component {
             grid: null,
             nextGenerationLoop: null,
             stateInput : "",
-        }),
+            constructMessage : this.constructMessage,
+            setStateRoot : (state) => {
+                this.setState(state)
+            }
+        },
         (this.state.WS_CONNECTION.onmessage = (event) => {
             let message = JSON.parse(event.data);
             console.log(message);
@@ -66,60 +75,7 @@ export class root extends React.Component {
         });
     };
 
-    startNextGenerationLoop = () => {
-        this.state.WS_CONNECTION.send(
-            this.constructMessage("nextGeneration", "")
-        );
-        this.setState({
-            nextGenerationLoop: setTimeout(this.startNextGenerationLoop, this.state.autoNextGenDelay_ms),
-        });
-    }
-
     render() {
-        let gridElements = [];
-        if (this.state.grid) {
-            this.state.grid.grid.forEach((row, indexRow) => {
-                row.forEach((cell, indexCol) => {
-                    gridElements.push(
-                        React.createElement("div", {
-                            key: indexRow*this.state.grid.cols+indexCol,
-                            style: {
-                                width: this.state.SQUARESIZE + "px",
-                                height: this.state.SQUARESIZE + "px",
-                                backgroundColor: cell ? "black" : "white",
-                                border: "1px solid black",
-                                boxSizing: "border-box",
-                            },
-                            onClick: () =>
-                                this.state.WS_CONNECTION.send(
-                                    this.constructMessage(
-                                        "gridChange",
-                                        JSON.stringify({
-                                            row :indexRow,
-                                            column: indexCol,
-                                            state: (cell+1)%2,
-                                        })
-                                    )
-                                ),
-                            onMouseOver: (e) => {
-                                if (e.buttons === 1) {
-                                    this.state.WS_CONNECTION.send(
-                                        this.constructMessage(
-                                            "gridChange",
-                                            JSON.stringify({
-                                                row: indexRow,
-                                                column: indexCol,
-                                                state: (cell+1)%2,
-                                            })
-                                        )
-                                    );
-                                }
-                            },
-                        })
-                    );
-                })
-            });
-        }
         return React.createElement(
             "div", {
                 id: "root",
@@ -136,176 +92,8 @@ export class root extends React.Component {
 					userSelect : "none",
                 },
             },
-            React.createElement(
-                "button", {
-                    id: "nextGeneration",
-                    style: {
-                        position: "absolute",
-                        top: "10px",
-                        left: "10px",
-                        padding: "5px",
-                        backgroundColor: "white",
-                        color: "black",
-                        fontFamily: "Arial",
-                        fontSize: "16px",
-                        cursor: "pointer",
-                    },
-                    onClick: () =>
-                        this.state.WS_CONNECTION.send(
-                            this.constructMessage("nextGeneration", "")
-                        ),
-                    innerHTML: "Next Generation",
-                },
-                "Next Generation"
-            ),
-            React.createElement("div", {
-                    style: {
-                        position: "absolute",
-                        display: "flex",
-                        flexDirection: "row",
-                        top: "50px",
-                        left: "10px",
-                        padding: "5px",
-                        border: "1px solid black",
-                        borderRadius: "5px",
-                        backgroundColor: "white",
-                        color: "black",
-                        fontFamily: "Arial",
-                        fontSize: "16px",
-                        gap: "10px",    
-                    },
-                },
-                React.createElement(
-                    "button", {
-                        id: "nextGenerationLoop",
-                        style: {
-                            backgroundColor: "white",
-                            color: "black",
-                            fontFamily: "Arial",
-                            fontSize: "16px",
-                            cursor: "pointer",
-                        },
-                        onClick: () => {
-                            if (this.state.nextGenerationLoop === null) {
-                                this.startNextGenerationLoop ()
-                            } else {
-                                clearTimeout(this.state.nextGenerationLoop);
-                                this.setState({
-                                    nextGenerationLoop: null,
-                                });
-                            }
-                        },
-                    },
-                    this.state.nextGenerationLoop === null ? "Start Loop" : "Stop Loop"
-                ),
-                React.createElement("input", {
-                    id: "autoNextGenDelay",
-                    type: "number",
-                    style: {
-                        width: "65px",
-                        height: "20px",
-                        padding: "5px",
-                        border: "1px solid black",
-                        borderRadius: "5px",
-                        backgroundColor: "white",
-                        color: "black",
-                        fontFamily: "Arial",
-                        fontSize: "16px",
-                    },
-                    value: this.state.autoNextGenDelay_ms,
-                    onChange: (e) => {
-                        this.setState({
-                            autoNextGenDelay_ms: e.target.value,
-                        });
-                    },
-                }),
-            ),
-            React.createElement("div", {
-                    style: {
-                        position: "absolute",
-                        display: "flex",
-                        flexDirection: "row",
-                        top: "101px",
-                        left: "10px",
-                        padding: "5px",
-                        border: "1px solid black",
-                        borderRadius: "5px",
-                        backgroundColor: "white",
-                        color: "black",
-                        fontFamily: "Arial",
-                        fontSize: "16px",
-                        gap: "10px",  
-                    }
-                },
-                React.createElement("input", {
-                        style : {
-                            width: "74px",
-                            height: "20px",
-                            border: "1px solid black",
-                            borderRadius: "5px",
-                            backgroundColor: "white",
-                            color: "black",
-                            fontFamily: "Arial",
-                            fontSize: "16px",
-                        },
-                        onChange : (e) => {
-                            this.setState({
-                                stateInput : e.target.value,
-                            })
-                        },
-                        value : this.state.stateInput,
-                    }
-                ),
-                React.createElement("button", {
-                        onClick: () => {
-                            this.state.WS_CONNECTION.send(
-                                this.constructMessage("setGrid", this.state.stateInput)
-                            )
-                        }
-                    },
-                    "set"
-                ),
-                React.createElement("button", {
-                        onClick: () => {
-                            this.state.WS_CONNECTION.send(
-                                this.constructMessage("setGrid", (() => {
-                                    let str = ""
-                                    for (let i = 0; i < this.state.grid.rows; i++) {
-                                        for (let j = 0; j < this.state.grid.cols; j++) {
-                                            str += "0"
-                                        }
-                                    }
-                                    return str
-                                })())   
-                            )
-                        }
-                    },
-                    "reset"
-                )
-            ),
-            this.state.grid ? React.createElement(
-                "div", {
-                    id: "grid",
-                    style: {
-                        display: "grid",
-                        gridTemplateColumns: "repeat(" + this.state.grid.cols + ", " + this.state.SQUARESIZE + "px)",
-                        gridTemplateRows: "repeat(" + this.state.grid.rows + ", " + this.state.SQUARESIZE + "px)",
-                        width: this.state.grid.cols * this.state.SQUARESIZE + "px",
-                        height: this.state.grid.rows * this.state.SQUARESIZE + "px",
-                        border: "1px solid black",
-                        margin: "auto",
-                        marginTop: "10px",
-                        marginBottom: "10px",
-                        backgroundColor: "white",
-                        padding: "0px",
-                        boxSizing: "border-box",
-                        position: "relative",
-                        overflow: "hidden",
-                        borderRadius: "5px",
-                    },
-                },
-                gridElements
-            ) : null
+            React.createElement(Menu, this.state),
+            React.createElement(Grid, this.state) 
         );
     }
 }
