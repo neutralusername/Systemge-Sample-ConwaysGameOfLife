@@ -1,3 +1,6 @@
+import { 
+    Cell 
+} from "./cell.js";
 
 export class Grid extends React.Component {
     constructor(props) {
@@ -7,51 +10,22 @@ export class Grid extends React.Component {
 
 
     render() {
-        let gridElements = [];
-        if (this.props.grid) {
-            this.props.grid.grid.forEach((row, indexRow) => {
-                row.forEach((cell, indexCol) => {
-                    gridElements.push(
-                        React.createElement("div", {
-                            key: indexRow*this.props.grid.cols+indexCol,
-                            style: {
-                                width: this.props.SQUARESIZE + "px",
-                                height: this.props.SQUARESIZE + "px",
-                                backgroundColor: cell ? "black" : "white",
-                                border: "1px solid black",
-                                boxSizing: "border-box",
-                            },
-                            onClick: () =>
-                                this.props.WS_CONNECTION.send(
-                                    this.props.constructMessage(
-                                        "gridChange",
-                                        JSON.stringify({
-                                            row :indexRow,
-                                            column: indexCol,
-                                            state: (cell+1)%2,
-                                        })
-                                    )
-                                ),
-                            onMouseOver: (e) => {
-                                if (e.buttons === 1) {
-                                    this.props.WS_CONNECTION.send(
-                                        this.props.constructMessage(
-                                            "gridChange",
-                                            JSON.stringify({
-                                                row: indexRow,
-                                                column: indexCol,
-                                                state: (cell+1)%2,
-                                            })
-                                        )
-                                    );
-                                }
-                            },
-                        })
-                    );
-                })
-            });
-        }
-        return  this.props.grid ? React.createElement(
+        let cells = [];
+        this.props.grid.grid.forEach((row, indexRow) => {
+            row.forEach((cell, indexCol) => {
+                cells.push(
+                   React.createElement(Cell, {
+                        cellState : cell,
+                        indexRow : indexRow,
+                        indexCol : indexCol,
+                        cols : this.props.grid.cols,
+                        WS_CONNECTION : this.props.WS_CONNECTION,
+                        constructMessage : this.props.constructMessage,
+                    })
+                );
+            })
+        });
+        return React.createElement(
             "div", {
                 id: "grid",
                 style: {
@@ -72,7 +46,7 @@ export class Grid extends React.Component {
                     borderRadius: "5px",
                 },
             },
-            gridElements
-        ) : null;
+            cells
+        );
     }
 }

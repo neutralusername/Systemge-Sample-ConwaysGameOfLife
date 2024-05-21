@@ -92,8 +92,8 @@ export class root extends React.Component {
 					userSelect : "none",
                 },
             },
-            React.createElement(Menu, this.state),
-            React.createElement(Grid, this.state) 
+            this.state.grid ? React.createElement(Menu, this.state) : null,
+            this.state.grid ? React.createElement(Grid, this.state) : null
         );
     }
 }
