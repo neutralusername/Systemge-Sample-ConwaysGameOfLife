@@ -29,7 +29,6 @@ func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrok
 		gridCols:            gridCols,
 		logger:              logger,
 	}
-	go app.calcNextGeneration()
 	return app
 }
 
