@@ -17,26 +17,28 @@ export class root extends React.Component {
             switch (message.topic) {
                 case "getGrid":
                     let grid = JSON.parse(message.body);
+                    let newStateInput = ""
+                    grid.grid.forEach((row) => {
+                        row.forEach((cell) => {
+                            newStateInput += cell
+                        })
+                    })
                     this.setState({
                         grid: grid,
-                        stateInput: (() => {
-                            let str = ""
-                            grid.grid.forEach((row) => {
-                                row.forEach((cell) => {
-                                    str+=cell
-                                })
-                            })
-                            return str
-                        })(),
+                        stateInput: newStateInput,
                     });
                     break;
-                case "getGridChange":
+                case "getGridChange": {
                     let gridChange = JSON.parse(message.body);
                     this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
+                    let newStateInput = this.state.stateInput
+                    newStateInput = newStateInput.substring(0, gridChange.row*this.state.grid.cols+gridChange.column) + gridChange.state + newStateInput.substring(gridChange.row*this.state.grid.cols+gridChange.column+1)
                     this.setState({
                         grid: this.state.grid,
+                        stateInput: newStateInput,
                     });
                     break;
+                }
                 default:
                     console.log("Unknown message topic: " + event.data);
                     break;
