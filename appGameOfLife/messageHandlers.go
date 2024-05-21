@@ -9,7 +9,7 @@ import (
 func (app *App) GetGridSync(message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
-	return newGrid(app.grid, app.gridRows, app.gridCols).marshal(), Error.New("test")
+	return newGrid(app.grid, app.gridRows, app.gridCols).marshal(), nil
 }
 
 func (app *App) GridChange(message *Message.Message) error {
