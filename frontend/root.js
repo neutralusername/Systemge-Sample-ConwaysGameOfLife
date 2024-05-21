@@ -1,7 +1,9 @@
 import {
     Grid
 } from "./grid.js";
-import { Menu } from "./menu.js";
+import { 
+    Menu 
+} from "./menu.js";
 
 export class root extends React.Component {
     constructor(props) {
@@ -22,7 +24,6 @@ export class root extends React.Component {
         },
         (this.state.WS_CONNECTION.onmessage = (event) => {
             let message = JSON.parse(event.data);
-            console.log(message);
             switch (message.topic) {
                 case "getGrid":
                     let grid = JSON.parse(message.body);

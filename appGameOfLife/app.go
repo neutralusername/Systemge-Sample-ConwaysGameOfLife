@@ -9,16 +9,24 @@ import (
 type App struct {
 	messageBrokerClient *MessageBrokerClient.Client
 	name                string
-	grid                [GRIDROWS][GRIDCOLS]int
+	grid                [][]int
 	mutex               sync.Mutex
+	gridRows            int
+	gridCols            int
 	logger              *Utilities.Logger
 }
 
-func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) *App {
+func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client, gridRows, gridCols int) *App {
+	grid := make([][]int, gridRows)
+	for i := range grid {
+		grid[i] = make([]int, gridCols)
+	}
 	app := &App{
 		messageBrokerClient: messageBrokerClient,
 		name:                name,
-		grid:                [GRIDROWS][GRIDCOLS]int{},
+		grid:                grid,
+		gridRows:            gridRows,
+		gridCols:            gridCols,
 		logger:              logger,
 	}
 	go app.calcNextGeneration()
@@ -26,14 +34,17 @@ func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrok
 }
 
 func (app *App) calcNextGeneration() {
-	nextGrid := [GRIDROWS][GRIDCOLS]int{}
-	for row := 0; row < GRIDROWS; row++ {
-		for col := 0; col < GRIDCOLS; col++ {
+	nextGrid := make([][]int, app.gridRows)
+	for i := range nextGrid {
+		nextGrid[i] = make([]int, app.gridCols)
+	}
+	for row := 0; row < app.gridRows; row++ {
+		for col := 0; col < app.gridCols; col++ {
 			aliveNeighbours := 0
 			for i := -1; i < 2; i++ {
 				for j := -1; j < 2; j++ {
-					neighbourRow := (row + i + GRIDROWS) % GRIDROWS
-					neighbourCol := (col + j + GRIDCOLS) % GRIDCOLS
+					neighbourRow := (row + i + app.gridRows) % app.gridRows
+					neighbourCol := (col + j + app.gridCols) % app.gridCols
 					aliveNeighbours += app.grid[neighbourRow][neighbourCol]
 				}
 			}

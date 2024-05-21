@@ -26,7 +26,7 @@ func main() {
 
 	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
-	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife)
+	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 100, 140)
 
 	messageBrokerClientGameOfLife.Connect(appGameOfLife)
 	messageBrokerClientWebsocket.Connect(appWebsocket)

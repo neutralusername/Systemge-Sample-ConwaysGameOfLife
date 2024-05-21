@@ -3,16 +3,16 @@ package appGameOfLife
 import "encoding/json"
 
 type Grid struct {
-	Grid [GRIDROWS][GRIDCOLS]int `json:"grid"`
-	Rows int                     `json:"rows"`
-	Cols int                     `json:"cols"`
+	Grid [][]int `json:"grid"`
+	Rows int     `json:"rows"`
+	Cols int     `json:"cols"`
 }
 
-func newGrid(grid [GRIDROWS][GRIDCOLS]int) *Grid {
+func newGrid(grid [][]int, rows, cols int) *Grid {
 	return &Grid{
 		Grid: grid,
-		Rows: GRIDROWS,
-		Cols: GRIDCOLS,
+		Rows: rows,
+		Cols: cols,
 	}
 }
 
