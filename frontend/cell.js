@@ -1,4 +1,3 @@
-
 export class Cell extends React.Component {
     constructor(props) {
         super(props);
@@ -6,10 +5,10 @@ export class Cell extends React.Component {
     }
 
     render() {
-        return  React.createElement(
+        return React.createElement(
             "div", {
                 id: "cell",
-                key: this.props.indexRow*this.props.cols+this.props.indexCol,
+                key: this.props.indexRow * this.props.cols + this.props.indexCol,
                 style: {
                     width: this.props.SQUARESIZE + "px",
                     height: this.props.SQUARESIZE + "px",
@@ -22,9 +21,9 @@ export class Cell extends React.Component {
                         this.props.constructMessage(
                             "gridChange",
                             JSON.stringify({
-                                row : this.props.indexRow,
+                                row: this.props.indexRow,
                                 column: this.props.indexCol,
-                                state: (this.props.cellState+1)%2,
+                                state: (this.props.cellState + 1) % 2,
                             })
                         )
                     ),
@@ -36,7 +35,7 @@ export class Cell extends React.Component {
                                 JSON.stringify({
                                     row: this.props.indexRow,
                                     column: this.props.indexCol,
-                                    state: (this.props.cellState+1)%2,
+                                    state: (this.props.cellState + 1) % 2,
                                 })
                             )
                         );

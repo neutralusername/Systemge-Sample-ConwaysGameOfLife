@@ -1,5 +1,5 @@
-import { 
-    Cell 
+import {
+    Cell
 } from "./cell.js";
 
 export class Grid extends React.Component {
@@ -14,13 +14,13 @@ export class Grid extends React.Component {
         this.props.grid.grid.forEach((row, indexRow) => {
             row.forEach((cell, indexCol) => {
                 cells.push(
-                   React.createElement(Cell, {
-                        cellState : cell,
-                        indexRow : indexRow,
-                        indexCol : indexCol,
-                        cols : this.props.grid.cols,
-                        WS_CONNECTION : this.props.WS_CONNECTION,
-                        constructMessage : this.props.constructMessage,
+                    React.createElement(Cell, {
+                        cellState: cell,
+                        indexRow: indexRow,
+                        indexCol: indexCol,
+                        cols: this.props.grid.cols,
+                        WS_CONNECTION: this.props.WS_CONNECTION,
+                        constructMessage: this.props.constructMessage,
                     })
                 );
             })

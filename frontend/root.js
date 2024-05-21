@@ -1,65 +1,65 @@
 import {
     Grid
 } from "./grid.js";
-import { 
-    Menu 
+import {
+    Menu
 } from "./menu.js";
 
 export class root extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            WS_CONNECTION: new WebSocket("ws://localhost:8443/ws"),
+                WS_CONNECTION: new WebSocket("ws://localhost:8443/ws"),
 
-            SQUARESIZE: 10,
-            autoNextGenDelay_ms: 100,
+                SQUARESIZE: 10,
+                autoNextGenDelay_ms: 100,
 
-            grid: null,
-            nextGenerationLoop: null,
-            stateInput : "",
-            constructMessage : (topic, body) => {
-                return JSON.stringify({
-                    topic: topic,
-                    body: body,
-                });
-            },
-            setStateRoot : (state) => {
-                this.setState(state)
-            }
-        },
-        (this.state.WS_CONNECTION.onmessage = (event) => {
-            let message = JSON.parse(event.data);
-            switch (message.topic) {
-                case "getGrid":
-                    console.log(event.data)
-                    let grid = JSON.parse(message.body);
-                    let newStateInput = ""
-                    grid.grid.forEach((row) => {
-                        row.forEach((cell) => {
-                            newStateInput += cell
-                        })
-                    })
-                    this.setState({
-                        grid: grid,
-                        stateInput: newStateInput,
+                grid: null,
+                nextGenerationLoop: null,
+                stateInput: "",
+                constructMessage: (topic, body) => {
+                    return JSON.stringify({
+                        topic: topic,
+                        body: body,
                     });
-                    break;
-                case "getGridChange": {
-                    let gridChange = JSON.parse(message.body);
-                    this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
-                    let newStateInput = this.state.stateInput
-                    newStateInput = newStateInput.substring(0, gridChange.row*this.state.grid.cols+gridChange.column) + gridChange.state + newStateInput.substring(gridChange.row*this.state.grid.cols+gridChange.column+1)
-                    this.setState({
-                        grid: this.state.grid,
-                        stateInput: newStateInput,
-                    });
-                    break;
+                },
+                setStateRoot: (state) => {
+                    this.setState(state)
                 }
-                default:
-                    console.log("Unknown message topic: " + event.data);
-                    break;
-            }
-        });
+            },
+            (this.state.WS_CONNECTION.onmessage = (event) => {
+                let message = JSON.parse(event.data);
+                switch (message.topic) {
+                    case "getGrid":
+                        console.log(event.data)
+                        let grid = JSON.parse(message.body);
+                        let newStateInput = ""
+                        grid.grid.forEach((row) => {
+                            row.forEach((cell) => {
+                                newStateInput += cell
+                            })
+                        })
+                        this.setState({
+                            grid: grid,
+                            stateInput: newStateInput,
+                        });
+                        break;
+                    case "getGridChange": {
+                        let gridChange = JSON.parse(message.body);
+                        this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
+                        let newStateInput = this.state.stateInput
+                        newStateInput = newStateInput.substring(0, gridChange.row * this.state.grid.cols + gridChange.column) + gridChange.state + newStateInput.substring(gridChange.row * this.state.grid.cols + gridChange.column + 1)
+                        this.setState({
+                            grid: this.state.grid,
+                            stateInput: newStateInput,
+                        });
+                        break;
+                    }
+                    default:
+                        console.log("Unknown message topic: " + event.data);
+                        break;
+                }
+            });
         this.state.WS_CONNECTION.onclose = () => {
             setTimeout(() => {
                 if (this.state.WS_CONNECTION.readyState === WebSocket.CLOSED) {}
@@ -88,8 +88,8 @@ export class root extends React.Component {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    touchAction : "none",
-					userSelect : "none",
+                    touchAction: "none",
+                    userSelect: "none",
                 },
             },
             this.state.grid ? React.createElement(Menu, this.state) : null,

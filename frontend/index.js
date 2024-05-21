@@ -1,5 +1,5 @@
 import {
-	root,
+    root,
 } from "./root.js"
 
 ReactDOM.render(

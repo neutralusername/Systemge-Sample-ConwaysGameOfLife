@@ -1,4 +1,3 @@
-
 export class Menu extends React.Component {
     constructor(props) {
         super(props);
@@ -15,7 +14,7 @@ export class Menu extends React.Component {
     }
 
     render() {
-        return  React.createElement(
+        return React.createElement(
             "div", {
                 id: "menu",
             },
@@ -55,7 +54,7 @@ export class Menu extends React.Component {
                         color: "black",
                         fontFamily: "Arial",
                         fontSize: "16px",
-                        gap: "10px",    
+                        gap: "10px",
                     },
                 },
                 React.createElement(
@@ -70,7 +69,7 @@ export class Menu extends React.Component {
                         },
                         onClick: () => {
                             if (this.props.nextGenerationLoop === null) {
-                                this.nextGeneratioLoop ()
+                                this.nextGeneratioLoop()
                             } else {
                                 clearTimeout(this.props.nextGenerationLoop);
                                 this.props.setStateRoot({
@@ -117,28 +116,27 @@ export class Menu extends React.Component {
                         color: "black",
                         fontFamily: "Arial",
                         fontSize: "16px",
-                        gap: "10px",  
+                        gap: "10px",
                     }
                 },
                 React.createElement("input", {
-                        style : {
-                            width: "74px",
-                            height: "20px",
-                            border: "1px solid black",
-                            borderRadius: "5px",
-                            backgroundColor: "white",
-                            color: "black",
-                            fontFamily: "Arial",
-                            fontSize: "16px",
-                        },
-                        onChange : (e) => {
-                            this.props.setStateRoot({
-                                stateInput : e.target.value,
-                            })
-                        },
-                        value : this.props.stateInput,
-                    }
-                ),
+                    style: {
+                        width: "74px",
+                        height: "20px",
+                        border: "1px solid black",
+                        borderRadius: "5px",
+                        backgroundColor: "white",
+                        color: "black",
+                        fontFamily: "Arial",
+                        fontSize: "16px",
+                    },
+                    onChange: (e) => {
+                        this.props.setStateRoot({
+                            stateInput: e.target.value,
+                        })
+                    },
+                    value: this.props.stateInput,
+                }),
                 React.createElement("button", {
                         onClick: () => {
                             this.props.WS_CONNECTION.send(
@@ -159,13 +157,13 @@ export class Menu extends React.Component {
                                         }
                                     }
                                     return str
-                                })())   
+                                })())
                             )
                         }
                     },
                     "reset"
                 )
             ),
-        ) 
+        )
     }
 }
