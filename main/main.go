@@ -22,10 +22,10 @@ func main() {
 	messageBrokerServer.Start()
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", logger, MESSAGEBROKERSERVER_ADDRESS)
-	messageBrokerClientWebsocket.Connect()
+	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
 
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", logger, MESSAGEBROKERSERVER_ADDRESS)
-	messageBrokerClientGameOfLife.Connect()
+	messageBrokerClientGameOfLife.Connect(MESSAGEBROKERSERVER_ADDRESS)
 
 	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
