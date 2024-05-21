@@ -17,7 +17,12 @@ export class root extends React.Component {
             grid: null,
             nextGenerationLoop: null,
             stateInput : "",
-            constructMessage : this.constructMessage,
+            constructMessage : (topic, body) => {
+                return JSON.stringify({
+                    topic: topic,
+                    body: body,
+                });
+            },
             setStateRoot : (state) => {
                 this.setState(state)
             }
@@ -69,13 +74,6 @@ export class root extends React.Component {
             setTimeout(myLoop, 15 * 1000);
         };
     }
-
-    constructMessage = (topic, body) => {
-        return JSON.stringify({
-            topic: topic,
-            body: body,
-        });
-    };
 
     render() {
         return React.createElement(
