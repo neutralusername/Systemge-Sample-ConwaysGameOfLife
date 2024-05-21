@@ -28,8 +28,16 @@ func main() {
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 90, 140)
 
-	messageBrokerClientGameOfLife.Connect(appGameOfLife)
-	messageBrokerClientWebsocket.Connect(appWebsocket)
+	messageBrokerClientGameOfLife.Connect()
+	messageBrokerClientWebsocket.Connect()
+
+	messageBrokerClientGameOfLife.SubscribeSync("getGridSync", appGameOfLife.GetGridSync)
+	messageBrokerClientGameOfLife.SubscribeAsync("gridChange", appGameOfLife.GridChange)
+	messageBrokerClientGameOfLife.SubscribeAsync("nextGeneration", appGameOfLife.NextGeneration)
+	messageBrokerClientGameOfLife.SubscribeAsync("setGrid", appGameOfLife.SetGrid)
+
+	messageBrokerClientWebsocket.SubscribeAsync("getGrid", appWebsocket.GetGrid)
+	messageBrokerClientWebsocket.SubscribeAsync("getGridChange", appWebsocket.GetGridChange)
 
 	websocketServer.Start(appWebsocket)
 
