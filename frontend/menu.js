@@ -5,12 +5,12 @@ export class Menu extends React.Component {
         this.state = {}
     }
 
-    startNextGenerationLoop = () => {
+    nextGeneratioLoop = () => {
         this.props.WS_CONNECTION.send(
             this.props.constructMessage("nextGeneration", "")
         );
         this.props.setStateRoot({
-            nextGenerationLoop: setTimeout(this.startNextGenerationLoop, this.props.autoNextGenDelay_ms),
+            nextGenerationLoop: setTimeout(this.nextGeneratioLoop, this.props.autoNextGenDelay_ms),
         });
     }
 
@@ -70,7 +70,7 @@ export class Menu extends React.Component {
                         },
                         onClick: () => {
                             if (this.props.nextGenerationLoop === null) {
-                                this.startNextGenerationLoop ()
+                                this.nextGeneratioLoop ()
                             } else {
                                 clearTimeout(this.props.nextGenerationLoop);
                                 this.props.setStateRoot({
