@@ -1,0 +1,2 @@
+2024/05/21 22:19:59 appWebsocket/onConnectHandler.go:13 -> MessageBrokerClient/messaging.go:31 -> appGameOfLife/messageHandlers.go:12 -> test
+2024/05/21 22:20:21 appWebsocket/onConnectHandler.go:13 -> MessageBrokerClient/messaging.go:31 -> appGameOfLife/messageHandlers.go:12 -> test

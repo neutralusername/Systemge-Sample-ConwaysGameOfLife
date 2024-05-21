@@ -26,6 +26,7 @@ export class root extends React.Component {
             let message = JSON.parse(event.data);
             switch (message.topic) {
                 case "getGrid":
+                    console.log(event.data)
                     let grid = JSON.parse(message.body);
                     let newStateInput = ""
                     grid.grid.forEach((row) => {
