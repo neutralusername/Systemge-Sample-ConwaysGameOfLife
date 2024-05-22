@@ -39,7 +39,10 @@ func main() {
 	messageBrokerClientWebsocket.SubscribeAsync("getGrid", appWebsocket.GetGrid)
 	messageBrokerClientWebsocket.SubscribeAsync("getGridChange", appWebsocket.GetGridChange)
 
-	websocketServer.Start(appWebsocket)
+	websocketServer.SetOnMessageHandler(appWebsocket.OnMessageHandler)
+	websocketServer.SetOnConnectHandler(appWebsocket.OnConnectHandler)
+
+	websocketServer.Start()
 
 	HTTPServerServe := HTTP.New(HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
