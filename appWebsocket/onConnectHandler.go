@@ -13,6 +13,5 @@ func (app *App) OnConnectHandler(connection *Websocket.Connection) {
 		app.logger.Log(Error.New(err.Error()).Error())
 		return
 	}
-	response.Topic = "getGrid"
 	connection.Send([]byte(response.Serialize()))
 }

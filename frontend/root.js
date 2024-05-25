@@ -30,6 +30,7 @@ export class root extends React.Component {
             (this.state.WS_CONNECTION.onmessage = (event) => {
                 let message = JSON.parse(event.data);
                 switch (message.topic) {
+                    case "getGridSync":
                     case "getGrid":
                         console.log(event.data)
                         let grid = JSON.parse(message.body);
