@@ -12,7 +12,8 @@ import (
 	"time"
 )
 
-const MESSAGEBROKERSERVER_ADDRESS = ":60003"
+const MESSAGEBROKERSERVER_A_ADDRESS = ":60003"
+const MESSAGEBROKERSERVER_B_ADDRESS = ":60004"
 const TOPICRESOLUTIONSERVER_ADDRESS = ":60002"
 const HTTP_DEV_PORT = ":8080"
 const WEBSOCKET_PORT = ":8443"
@@ -20,29 +21,32 @@ const WEBSOCKET_PORT = ":8443"
 func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
-	messageBrokerServer := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_ADDRESS, logger)
-	messageBrokerServer.Start()
-	messageBrokerServer.AddTopic("getGridSync")
-	messageBrokerServer.AddTopic("gridChange")
-	messageBrokerServer.AddTopic("nextGeneration")
-	messageBrokerServer.AddTopic("setGrid")
-	messageBrokerServer.AddTopic("getGrid")
-	messageBrokerServer.AddTopic("getGridChange")
+	messageBrokerServerA := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_A_ADDRESS, logger)
+	messageBrokerServerA.Start()
+	messageBrokerServerA.AddTopic("getGridSync")
+	messageBrokerServerA.AddTopic("gridChange")
+	messageBrokerServerA.AddTopic("nextGeneration")
+	messageBrokerServerA.AddTopic("setGrid")
+
+	messageBrokerServerB := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_B_ADDRESS, logger)
+	messageBrokerServerB.Start()
+	messageBrokerServerB.AddTopic("getGrid")
+	messageBrokerServerB.AddTopic("getGridChange")
 
 	topicResolutionServer := TopicResolutionServer.New("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 	topicResolutionServer.Start()
-	topicResolutionServer.RegisterTopic("getGridSync", MESSAGEBROKERSERVER_ADDRESS)
-	topicResolutionServer.RegisterTopic("gridChange", MESSAGEBROKERSERVER_ADDRESS)
-	topicResolutionServer.RegisterTopic("nextGeneration", MESSAGEBROKERSERVER_ADDRESS)
-	topicResolutionServer.RegisterTopic("setGrid", MESSAGEBROKERSERVER_ADDRESS)
-	topicResolutionServer.RegisterTopic("getGrid", MESSAGEBROKERSERVER_ADDRESS)
-	topicResolutionServer.RegisterTopic("getGridChange", MESSAGEBROKERSERVER_ADDRESS)
+	topicResolutionServer.RegisterTopic("getGridSync", MESSAGEBROKERSERVER_A_ADDRESS)
+	topicResolutionServer.RegisterTopic("gridChange", MESSAGEBROKERSERVER_A_ADDRESS)
+	topicResolutionServer.RegisterTopic("nextGeneration", MESSAGEBROKERSERVER_A_ADDRESS)
+	topicResolutionServer.RegisterTopic("setGrid", MESSAGEBROKERSERVER_A_ADDRESS)
+	topicResolutionServer.RegisterTopic("getGrid", MESSAGEBROKERSERVER_B_ADDRESS)
+	topicResolutionServer.RegisterTopic("getGridChange", MESSAGEBROKERSERVER_B_ADDRESS)
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
+	messageBrokerClientWebsocket.Connect()
 
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-	messageBrokerClientGameOfLife.Connect(MESSAGEBROKERSERVER_ADDRESS)
+	messageBrokerClientGameOfLife.Connect()
 
 	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
