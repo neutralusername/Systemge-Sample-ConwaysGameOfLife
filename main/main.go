@@ -20,6 +20,15 @@ const WEBSOCKET_PORT = ":8443"
 func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
+	messageBrokerServer := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_ADDRESS, logger)
+	messageBrokerServer.Start()
+	messageBrokerServer.AddTopic("getGridSync")
+	messageBrokerServer.AddTopic("gridChange")
+	messageBrokerServer.AddTopic("nextGeneration")
+	messageBrokerServer.AddTopic("setGrid")
+	messageBrokerServer.AddTopic("getGrid")
+	messageBrokerServer.AddTopic("getGridChange")
+
 	topicResolutionServer := TopicResolutionServer.New("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 	topicResolutionServer.Start()
 	topicResolutionServer.RegisterTopic("getGridSync", MESSAGEBROKERSERVER_ADDRESS)
@@ -28,15 +37,6 @@ func main() {
 	topicResolutionServer.RegisterTopic("setGrid", MESSAGEBROKERSERVER_ADDRESS)
 	topicResolutionServer.RegisterTopic("getGrid", MESSAGEBROKERSERVER_ADDRESS)
 	topicResolutionServer.RegisterTopic("getGridChange", MESSAGEBROKERSERVER_ADDRESS)
-
-	messageBrokerServer := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_ADDRESS, logger)
-	messageBrokerServer.AddTopic("getGridSync")
-	messageBrokerServer.AddTopic("gridChange")
-	messageBrokerServer.AddTopic("nextGeneration")
-	messageBrokerServer.AddTopic("setGrid")
-	messageBrokerServer.AddTopic("getGrid")
-	messageBrokerServer.AddTopic("getGridChange")
-	messageBrokerServer.Start()
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 	messageBrokerClientWebsocket.Connect(MESSAGEBROKERSERVER_ADDRESS)
