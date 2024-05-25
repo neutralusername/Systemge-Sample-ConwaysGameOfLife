@@ -23,24 +23,16 @@ func main() {
 
 	messageBrokerServerA := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_A_ADDRESS, logger)
 	messageBrokerServerA.Start()
-	messageBrokerServerA.AddTopic("getGridSync")
-	messageBrokerServerA.AddTopic("gridChange")
-	messageBrokerServerA.AddTopic("nextGeneration")
-	messageBrokerServerA.AddTopic("setGrid")
+	messageBrokerServerA.AddTopics("getGridSync", "gridChange", "nextGeneration", "setGrid")
 
 	messageBrokerServerB := MessageBrokerServer.New("messageBrokerServer", MESSAGEBROKERSERVER_B_ADDRESS, logger)
 	messageBrokerServerB.Start()
-	messageBrokerServerB.AddTopic("getGrid")
-	messageBrokerServerB.AddTopic("getGridChange")
+	messageBrokerServerB.AddTopics("getGrid", "getGridChange")
 
 	topicResolutionServer := TopicResolutionServer.New("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 	topicResolutionServer.Start()
-	topicResolutionServer.RegisterTopic("getGridSync", MESSAGEBROKERSERVER_A_ADDRESS)
-	topicResolutionServer.RegisterTopic("gridChange", MESSAGEBROKERSERVER_A_ADDRESS)
-	topicResolutionServer.RegisterTopic("nextGeneration", MESSAGEBROKERSERVER_A_ADDRESS)
-	topicResolutionServer.RegisterTopic("setGrid", MESSAGEBROKERSERVER_A_ADDRESS)
-	topicResolutionServer.RegisterTopic("getGrid", MESSAGEBROKERSERVER_B_ADDRESS)
-	topicResolutionServer.RegisterTopic("getGridChange", MESSAGEBROKERSERVER_B_ADDRESS)
+	topicResolutionServer.RegisterTopics(MESSAGEBROKERSERVER_A_ADDRESS, "getGridSync", "gridChange", "nextGeneration", "setGrid")
+	topicResolutionServer.RegisterTopics(MESSAGEBROKERSERVER_B_ADDRESS, "getGrid", "getGridChange")
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 	messageBrokerClientWebsocket.Connect()
@@ -49,6 +41,8 @@ func main() {
 	messageBrokerClientGameOfLife.Connect()
 
 	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
+	websocketServer.Start()
+
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 90, 140)
 
@@ -62,8 +56,6 @@ func main() {
 
 	websocketServer.SetOnMessageHandler(appWebsocket.OnMessageHandler)
 	websocketServer.SetOnConnectHandler(appWebsocket.OnConnectHandler)
-
-	websocketServer.Start()
 
 	HTTPServerServe := HTTP.New(HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
