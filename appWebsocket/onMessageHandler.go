@@ -7,7 +7,8 @@ import (
 
 func (app *App) OnMessageHandler(connection *Websocket.Connection, message *Message.Message) {
 	message.Origin = connection.Id
-	message.SyncKey = ""
+	message.SyncRequestToken = ""
+	message.SyncResponseToken = ""
 	switch message.Topic {
 	case "heartbeat":
 		connection.ResetWatchdog()
