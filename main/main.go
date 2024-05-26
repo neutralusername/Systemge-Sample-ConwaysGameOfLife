@@ -9,7 +9,8 @@ import (
 	"Systemge/Websocket"
 	"SystemgeSampleApp/appGameOfLife"
 	"SystemgeSampleApp/appWebsocket"
-	"time"
+	"bufio"
+	"os"
 )
 
 const MESSAGEBROKERSERVER_A_ADDRESS = ":60003"
@@ -72,5 +73,19 @@ func main() {
 	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
 	HTTPServerWebsocket.Start()
 
-	time.Sleep(1000000 * time.Second)
+	reader := bufio.NewReader(os.Stdin)
+	println("enter command (exit to quit)")
+	for {
+		print(">")
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			continue
+		}
+		switch input {
+		case "exit":
+			return
+		default:
+			println("unknown command")
+		}
+	}
 }
