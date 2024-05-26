@@ -13,5 +13,6 @@ func (app *App) OnConnectHandler(connection *Websocket.Connection) {
 		app.logger.Log(Error.New(err.Error()).Error())
 		return
 	}
+	println("test123")
 	connection.Send([]byte(response.Serialize()))
 }

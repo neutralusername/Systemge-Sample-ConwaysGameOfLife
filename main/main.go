@@ -30,26 +30,20 @@ func main() {
 	logger := Utilities.NewLogger("error_log.txt")
 
 	messageBrokerServerA := MessageBrokerServer.New("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, logger)
-	messageBrokerServerA.Start()
 	messageBrokerServerA.AddTopics(GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC)
 
 	messageBrokerServerB := MessageBrokerServer.New("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, logger)
-	messageBrokerServerB.Start()
 	messageBrokerServerB.AddTopics(GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC)
 
 	topicResolutionServer := TopicResolutionServer.New("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-	topicResolutionServer.Start()
 	topicResolutionServer.RegisterTopics(MESSAGEBROKERSERVER_A_ADDRESS, GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC)
 	topicResolutionServer.RegisterTopics(MESSAGEBROKERSERVER_B_ADDRESS, GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC)
 
 	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-	messageBrokerClientWebsocket.Connect()
 
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-	messageBrokerClientGameOfLife.Connect()
 
 	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
-	websocketServer.Start()
 
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 90, 140)
@@ -67,11 +61,9 @@ func main() {
 
 	HTTPServerServe := HTTP.New(HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
 	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
-	HTTPServerServe.Start()
 
 	HTTPServerWebsocket := HTTP.New(WEBSOCKET_PORT, "HTTPwebsocket", false, "", "")
 	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
-	HTTPServerWebsocket.Start()
 
 	reader := bufio.NewReader(os.Stdin)
 	println("enter command (exit to quit)")
@@ -81,11 +73,38 @@ func main() {
 		if err != nil {
 			continue
 		}
+		input = input[:len(input)-1]
 		switch input {
 		case "exit":
 			return
+		case "start":
+			err := messageBrokerServerA.Start()
+			if err != nil {
+				panic(err)
+			}
+			err = messageBrokerServerB.Start()
+			if err != nil {
+				panic(err)
+			}
+			err = topicResolutionServer.Start()
+			if err != nil {
+				panic(err)
+			}
+			err = messageBrokerClientWebsocket.Connect()
+			if err != nil {
+				panic(err)
+			}
+			err = messageBrokerClientGameOfLife.Connect()
+			if err != nil {
+				panic(err)
+			}
+			websocketServer.Start()
+			HTTPServerServe.Start()
+			HTTPServerWebsocket.Start()
+		case "stop":
+
 		default:
-			println("unknown command")
+			println("unknown command \"" + input + "\"")
 		}
 	}
 }
