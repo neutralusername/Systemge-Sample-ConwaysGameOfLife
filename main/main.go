@@ -43,7 +43,7 @@ func main() {
 
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 
-	websocketServer := Websocket.New("websocketServer", logger, messageBrokerClientWebsocket)
+	websocketServer := Websocket.New("websocketServer", logger)
 
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 90, 140)
