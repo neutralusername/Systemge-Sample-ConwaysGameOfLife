@@ -75,8 +75,6 @@ func main() {
 		}
 		input = input[:len(input)-1]
 		switch input {
-		case "exit":
-			return
 		case "start":
 			err := messageBrokerServerA.Start()
 			if err != nil {
@@ -98,11 +96,16 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			websocketServer.Start()
+			err = websocketServer.Start()
+			if err != nil {
+				panic(err)
+			}
 			HTTPServerServe.Start()
 			HTTPServerWebsocket.Start()
 		case "stop":
 
+		case "exit":
+			return
 		default:
 			println("unknown command \"" + input + "\"")
 		}
