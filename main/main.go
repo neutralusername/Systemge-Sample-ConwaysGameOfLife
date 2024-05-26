@@ -43,7 +43,7 @@ func main() {
 
 	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", TOPICRESOLUTIONSERVER_ADDRESS, logger)
 
-	websocketServer := Websocket.New("websocketServer", messageBrokerClientWebsocket)
+	websocketServer := Websocket.New("websocketServer", logger, messageBrokerClientWebsocket)
 
 	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
 	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 90, 140)
@@ -103,7 +103,32 @@ func main() {
 			HTTPServerServe.Start()
 			HTTPServerWebsocket.Start()
 		case "stop":
-
+			err = websocketServer.Stop()
+			if err != nil {
+				panic(err)
+			}
+			err = messageBrokerClientWebsocket.Disconnect()
+			if err != nil {
+				panic(err)
+			}
+			err = messageBrokerClientGameOfLife.Disconnect()
+			if err != nil {
+				panic(err)
+			}
+			err := messageBrokerServerA.Stop()
+			if err != nil {
+				panic(err)
+			}
+			err = messageBrokerServerB.Stop()
+			if err != nil {
+				panic(err)
+			}
+			err = topicResolutionServer.Stop()
+			if err != nil {
+				panic(err)
+			}
+			HTTPServerServe.Stop()
+			HTTPServerWebsocket.Stop()
 		case "exit":
 			return
 		default:
