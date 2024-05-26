@@ -66,6 +66,7 @@ func main() {
 	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
 
 	reader := bufio.NewReader(os.Stdin)
+	started := false
 	println("enter command (exit to quit)")
 	for {
 		print(">")
@@ -75,7 +76,24 @@ func main() {
 		}
 		input = input[:len(input)-1]
 		switch input {
+		case "invert":
+			if started {
+				appGameOfLife.InvertGrid()
+			} else {
+				println("not started")
+			}
+		case "randomize":
+			if started {
+				appGameOfLife.RandomizeGrid()
+			} else {
+				println("not started")
+			}
 		case "start":
+			if started {
+				println("already started")
+				continue
+			}
+			started = true
 			err := messageBrokerServerA.Start()
 			if err != nil {
 				panic(err)
@@ -103,6 +121,10 @@ func main() {
 			HTTPServerServe.Start()
 			HTTPServerWebsocket.Start()
 		case "stop":
+			if !started {
+				println("not started")
+				continue
+			}
 			err = websocketServer.Stop()
 			if err != nil {
 				panic(err)
