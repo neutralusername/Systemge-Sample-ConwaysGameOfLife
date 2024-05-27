@@ -53,8 +53,8 @@ func main() {
 	messageBrokerClientGameOfLife.RegisterIncomingAsyncTopic(NEXT_GENERATION_TOPIC, appGameOfLife.NextGeneration)
 	messageBrokerClientGameOfLife.RegisterIncomingAsyncTopic(SET_GRID_TOPIC, appGameOfLife.SetGrid)
 
-	messageBrokerClientWebsocket.RegisterIncomingAsyncTopic(GET_GRID_TOPIC, appWebsocket.GetGrid)
-	messageBrokerClientWebsocket.RegisterIncomingAsyncTopic(GET_GRID_CHANGE_TOPIC, appWebsocket.GetGridChange)
+	messageBrokerClientWebsocket.RegisterIncomingAsyncTopic(GET_GRID_TOPIC, appWebsocket.WebsocketPropagate)
+	messageBrokerClientWebsocket.RegisterIncomingAsyncTopic(GET_GRID_CHANGE_TOPIC, appWebsocket.WebsocketPropagate)
 
 	websocketServer.SetOnMessageHandler(appWebsocket.OnMessageHandler)
 	websocketServer.SetOnConnectHandler(appWebsocket.OnConnectHandler)
