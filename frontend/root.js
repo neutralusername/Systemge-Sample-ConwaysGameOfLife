@@ -17,10 +17,10 @@ export class root extends React.Component {
                 grid: null,
                 nextGenerationLoop: null,
                 stateInput: "",
-                constructMessage: (topic, body) => {
+                constructMessage: (topic, payload) => {
                     return JSON.stringify({
                         topic: topic,
-                        body: body,
+                        payload: payload,
                     });
                 },
                 setStateRoot: (state) => {
@@ -32,8 +32,7 @@ export class root extends React.Component {
                 switch (message.topic) {
                     case "getGridSync":
                     case "getGrid":
-                        console.log(event.data)
-                        let grid = JSON.parse(message.body);
+                        let grid = JSON.parse(message.payload);
                         let newStateInput = ""
                         grid.grid.forEach((row) => {
                             row.forEach((cell) => {
@@ -46,7 +45,7 @@ export class root extends React.Component {
                         });
                         break;
                     case "getGridChange": {
-                        let gridChange = JSON.parse(message.body);
+                        let gridChange = JSON.parse(message.payload);
                         this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
                         let newStateInput = this.state.stateInput
                         newStateInput = newStateInput.substring(0, gridChange.row * this.state.grid.cols + gridChange.column) + gridChange.state + newStateInput.substring(gridChange.row * this.state.grid.cols + gridChange.column + 1)

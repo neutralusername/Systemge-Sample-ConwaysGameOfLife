@@ -8,7 +8,7 @@ import (
 )
 
 func (app *App) OnConnectHandler(connection *Websocket.Connection) {
-	response, err := app.messageBrokerClient.SyncMessage(Message.New("getGridSync", app.name, app.randomizer.GenerateRandomString(10, Utilities.ALPHA_NUMERIC), connection.Id))
+	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync("getGridSync", app.name, app.randomizer.GenerateRandomString(10, Utilities.ALPHA_NUMERIC), connection.Id))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 		return

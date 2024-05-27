@@ -16,7 +16,7 @@ export class Cell extends React.Component {
                     border: "1px solid black",
                     boxSizing: "border-box",
                 },
-                onClick: () =>
+                onClick: () => {
                     this.props.WS_CONNECTION.send(
                         this.props.constructMessage(
                             "gridChange",
@@ -26,7 +26,8 @@ export class Cell extends React.Component {
                                 state: (this.props.cellState + 1) % 2,
                             })
                         )
-                    ),
+                    )
+                },
                 onMouseOver: (e) => {
                     if (e.buttons === 1) {
                         this.props.WS_CONNECTION.send(

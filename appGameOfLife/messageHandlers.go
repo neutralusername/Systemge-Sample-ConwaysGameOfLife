@@ -17,7 +17,7 @@ func (app *App) GridChange(message *Message.Message) error {
 	defer app.mutex.Unlock()
 	gridChange := unmarshalGridChange(message.Payload)
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	app.messageBrokerClient.AsyncMessage(Message.New("getGridChange", app.name, "", gridChange.marshal()))
+	app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGridChange", app.name, gridChange.marshal()))
 	return nil
 }
 
@@ -25,7 +25,7 @@ func (app *App) NextGeneration(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
@@ -43,7 +43,7 @@ func (app *App) SetGrid(message *Message.Message) error {
 			app.grid[row][col] = Utilities.StringToInt(string(message.Payload[row*app.gridCols+col]))
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(Message.New("getGrid", app.name, "", newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
