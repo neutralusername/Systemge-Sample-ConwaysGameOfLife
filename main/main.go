@@ -125,6 +125,9 @@ func main() {
 				println("not started")
 				continue
 			}
+			started = false
+			HTTPServerServe.Stop()
+			HTTPServerWebsocket.Stop()
 			err = websocketServer.Stop()
 			if err != nil {
 				panic(err)
@@ -149,8 +152,6 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			HTTPServerServe.Stop()
-			HTTPServerWebsocket.Stop()
 		case "exit":
 			return
 		default:
