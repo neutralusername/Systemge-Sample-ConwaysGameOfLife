@@ -19,7 +19,6 @@ func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrok
 		messageBrokerClient: messageBrokerClient,
 		websocketServer:     websocketServer,
 		name:                name,
-		randomizer:          Utilities.CreateRandomizer(Utilities.GetSystemTime()),
 		logger:              logger,
 	}
 }

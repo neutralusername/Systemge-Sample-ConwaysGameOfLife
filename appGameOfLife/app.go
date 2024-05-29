@@ -15,6 +15,7 @@ type App struct {
 	gridRows            int
 	gridCols            int
 	logger              *Utilities.Logger
+	randomizer          *Utilities.Randomizer
 }
 
 func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client, gridRows, gridCols int) *App {
@@ -29,6 +30,7 @@ func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrok
 		gridRows:            gridRows,
 		gridCols:            gridCols,
 		logger:              logger,
+		randomizer:          Utilities.NewRandomizer(Utilities.GetSystemTime()),
 	}
 	return app
 }
@@ -64,10 +66,9 @@ func (app *App) calcNextGeneration() {
 func (app *App) RandomizeGrid() {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
-	randomizer := Utilities.CreateRandomizer(Utilities.GetSystemTime())
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = randomizer.GenerateRandomNumber(0, 1)
+			app.grid[row][col] = app.randomizer.GenerateRandomNumber(0, 1)
 		}
 	}
 	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
