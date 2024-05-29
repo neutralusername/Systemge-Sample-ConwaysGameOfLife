@@ -4,6 +4,7 @@ import (
 	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
+	"SystemgeSampleApp/dto"
 	"sync"
 )
 
@@ -71,7 +72,7 @@ func (app *App) RandomizeGrid() {
 			app.grid[row][col] = app.randomizer.GenerateRandomNumber(0, 1)
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
 		app.logger.Log(err.Error())
 	}
@@ -85,7 +86,7 @@ func (app *App) InvertGrid() {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, newGrid(app.grid, app.gridRows, app.gridCols).marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.name, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
 		app.logger.Log(err.Error())
 	}

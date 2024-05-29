@@ -1,4 +1,4 @@
-package appGameOfLife
+package dto
 
 import "encoding/json"
 
@@ -8,7 +8,7 @@ type Grid struct {
 	Cols int     `json:"cols"`
 }
 
-func newGrid(grid [][]int, rows, cols int) *Grid {
+func NewGrid(grid [][]int, rows, cols int) *Grid {
 	return &Grid{
 		Grid: grid,
 		Rows: rows,
@@ -16,7 +16,7 @@ func newGrid(grid [][]int, rows, cols int) *Grid {
 	}
 }
 
-func (grid *Grid) marshal() string {
+func (grid *Grid) Marshal() string {
 	json, _ := json.Marshal(grid)
 	return string(json)
 }
