@@ -12,13 +12,13 @@ const gridCols = 140
 
 type App struct {
 	logger              *Utilities.Logger
-	randomizer          *Utilities.Randomizer
 	messageBrokerClient *MessageBrokerClient.Client
 
-	grid     [][]int
-	mutex    sync.Mutex
-	gridRows int
-	gridCols int
+	randomizer *Utilities.Randomizer
+	grid       [][]int
+	mutex      sync.Mutex
+	gridRows   int
+	gridCols   int
 }
 
 func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) MessageBrokerClient.Application {
