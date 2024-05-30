@@ -49,5 +49,5 @@ func main() {
 		httpServe,
 		messageBrokerClientGameOfLife,
 		messageBrokerClientWebsocket,
-	), nil)
+	))
 }
