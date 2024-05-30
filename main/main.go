@@ -21,14 +21,16 @@ const SET_GRID_TOPIC = "setGrid"
 const GET_GRID_TOPIC = "getGrid"
 const GET_GRID_CHANGE_TOPIC = "getGridChange"
 
+const ERROR_LOG_FILE = "error_log.txt"
+
 func main() {
-	messageBrokerServerA := Module.NewMessageBrokerServerModule("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, "error_log.txt",
+	messageBrokerServerA := Module.NewMessageBrokerServerModule("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, ERROR_LOG_FILE,
 		GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC,
 	)
-	messageBrokerServerB := Module.NewMessageBrokerServerModule("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, "error_log.txt",
+	messageBrokerServerB := Module.NewMessageBrokerServerModule("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, ERROR_LOG_FILE,
 		GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC,
 	)
-	topicResolutionServer := Module.NewTopicResolutionModule("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", map[string]string{
+	topicResolutionServer := Module.NewTopicResolutionModule("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, map[string]string{
 		GET_GRID_SYNC_TOPIC:   MESSAGEBROKERSERVER_A_ADDRESS,
 		GRID_CHANGE_TOPIC:     MESSAGEBROKERSERVER_A_ADDRESS,
 		NEXT_GENERATION_TOPIC: MESSAGEBROKERSERVER_A_ADDRESS,
@@ -39,8 +41,8 @@ func main() {
 	httpServe := Module.NewHTTPModule("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
 		"/": HTTP.SendDirectory("../frontend"),
 	})
-	messageBrokerClientGameOfLife := Module.NewMessageBrokerClientModule("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", appGameOfLife.New)
-	messageBrokerClientWebsocket := Module.NewWebsocketClientModule("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", "/ws", WEBSOCKET_PORT, "", "", appWebsocket.New)
+	messageBrokerClientGameOfLife := Module.NewMessageBrokerClientModule("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, appGameOfLife.New)
+	messageBrokerClientWebsocket := Module.NewWebsocketClientModule("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, "/ws", WEBSOCKET_PORT, "", "", appWebsocket.New)
 
 	Module.CommandLoop(Module.NewMultiModule(
 		messageBrokerServerA,
