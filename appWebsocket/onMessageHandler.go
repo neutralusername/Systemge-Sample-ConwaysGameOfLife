@@ -6,7 +6,7 @@ import (
 )
 
 func (app *App) GetOnMessageHandler() MessageBrokerClient.OnMessageHandler {
-	return func(connection *MessageBrokerClient.WebsocketConnection, message *Message.Message) {
+	return func(connection *MessageBrokerClient.WebsocketClient, message *Message.Message) {
 		message.Origin = connection.Id
 		message.SyncRequestToken = ""
 		message.SyncResponseToken = ""
