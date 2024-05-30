@@ -7,18 +7,26 @@ import (
 )
 
 type App struct {
+	logger              *Utilities.Logger
 	messageBrokerClient *MessageBrokerClient.Client
 	websocketServer     *Websocket.Server
-	name                string
-	randomizer          *Utilities.Randomizer
-	logger              *Utilities.Logger
 }
 
-func New(name string, logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client, websocketServer *Websocket.Server) *App {
+func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client, websocketServer *Websocket.Server) MessageBrokerClient.WebsocketApplication {
 	return &App{
+		logger:              logger,
 		messageBrokerClient: messageBrokerClient,
 		websocketServer:     websocketServer,
-		name:                name,
-		logger:              logger,
 	}
+}
+
+func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
+	return map[string]MessageBrokerClient.AsyncMessageHandler{
+		"getGrid":       app.WebsocketPropagate,
+		"getGridChange": app.WebsocketPropagate,
+	}
+}
+
+func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
+	return map[string]MessageBrokerClient.SyncMessageHandler{}
 }

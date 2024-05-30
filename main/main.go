@@ -2,15 +2,10 @@ package main
 
 import (
 	"Systemge/HTTP"
-	"Systemge/MessageBrokerClient"
-	"Systemge/MessageBrokerServer"
-	"Systemge/TopicResolutionServer"
-	"Systemge/Utilities"
-	"Systemge/Websocket"
+	"Systemge/Module"
 	"SystemgeSampleApp/appGameOfLife"
 	"SystemgeSampleApp/appWebsocket"
-	"bufio"
-	"os"
+	"net/http"
 )
 
 const MESSAGEBROKERSERVER_A_ADDRESS = ":60003"
@@ -27,135 +22,32 @@ const GET_GRID_TOPIC = "getGrid"
 const GET_GRID_CHANGE_TOPIC = "getGridChange"
 
 func main() {
-	logger := Utilities.NewLogger("error_log.txt")
+	messageBrokerServerA := Module.NewServerModule("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, "error_log.txt",
+		GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC,
+	)
+	messageBrokerServerB := Module.NewServerModule("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, "error_log.txt",
+		GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC,
+	)
+	topicResolutionServer := Module.NewResolutionModule("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", map[string]string{
+		GET_GRID_SYNC_TOPIC:   MESSAGEBROKERSERVER_A_ADDRESS,
+		GRID_CHANGE_TOPIC:     MESSAGEBROKERSERVER_A_ADDRESS,
+		NEXT_GENERATION_TOPIC: MESSAGEBROKERSERVER_A_ADDRESS,
+		SET_GRID_TOPIC:        MESSAGEBROKERSERVER_A_ADDRESS,
+		GET_GRID_TOPIC:        MESSAGEBROKERSERVER_B_ADDRESS,
+		GET_GRID_CHANGE_TOPIC: MESSAGEBROKERSERVER_B_ADDRESS,
+	})
+	httpServe := Module.NewHTTPModule("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
+		"/": HTTP.SendDirectory("../frontend"),
+	})
+	messageBrokerClientGameOfLife := Module.NewClientModule("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", appGameOfLife.New)
+	messageBrokerClientWebsocket := Module.NewWebsocketClientModule("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", "/ws", WEBSOCKET_PORT, "", "", appWebsocket.New)
 
-	messageBrokerServerA := MessageBrokerServer.New("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, logger)
-	messageBrokerServerA.AddTopics(GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC)
-
-	messageBrokerServerB := MessageBrokerServer.New("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, logger)
-	messageBrokerServerB.AddTopics(GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC)
-
-	topicResolutionServer := TopicResolutionServer.New("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-	topicResolutionServer.RegisterTopics(MESSAGEBROKERSERVER_A_ADDRESS, GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC)
-	topicResolutionServer.RegisterTopics(MESSAGEBROKERSERVER_B_ADDRESS, GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC)
-
-	messageBrokerClientWebsocket := MessageBrokerClient.New("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-
-	messageBrokerClientGameOfLife := MessageBrokerClient.New("messageBrokerClientGrid", TOPICRESOLUTIONSERVER_ADDRESS, logger)
-
-	websocketServer := Websocket.New("websocketServer", logger)
-
-	appWebsocket := appWebsocket.New("websocketApp", logger, messageBrokerClientWebsocket, websocketServer)
-	appGameOfLife := appGameOfLife.New("gameOfLifeApp", logger, messageBrokerClientGameOfLife, 90, 140)
-
-	messageBrokerClientGameOfLife.RegisterIncomingSyncTopic(GET_GRID_SYNC_TOPIC, appGameOfLife.GetGridSync)
-	messageBrokerClientGameOfLife.RegisterIncomingAsyncTopic(GRID_CHANGE_TOPIC, appGameOfLife.GridChange)
-	messageBrokerClientGameOfLife.RegisterIncomingAsyncTopic(NEXT_GENERATION_TOPIC, appGameOfLife.NextGeneration)
-	messageBrokerClientGameOfLife.RegisterIncomingAsyncTopic(SET_GRID_TOPIC, appGameOfLife.SetGrid)
-
-	messageBrokerClientWebsocket.RegisterIncomingAsyncTopic(GET_GRID_TOPIC, appWebsocket.WebsocketPropagate)
-	messageBrokerClientWebsocket.RegisterIncomingAsyncTopic(GET_GRID_CHANGE_TOPIC, appWebsocket.WebsocketPropagate)
-
-	websocketServer.SetOnMessageHandler(appWebsocket.OnMessageHandler)
-	websocketServer.SetOnConnectHandler(appWebsocket.OnConnectHandler)
-
-	HTTPServerServe := HTTP.New(HTTP_DEV_PORT, "HTTPfrontend", false, "", "")
-	HTTPServerServe.RegisterPattern("/", HTTP.SendDirectory("../frontend"))
-
-	HTTPServerWebsocket := HTTP.New(WEBSOCKET_PORT, "HTTPwebsocket", false, "", "")
-	HTTPServerWebsocket.RegisterPattern("/ws", HTTP.PromoteToWebsocket(websocketServer))
-
-	reader := bufio.NewReader(os.Stdin)
-	started := false
-	println("enter command (exit to quit)")
-	for {
-		print(">")
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			continue
-		}
-		input = input[:len(input)-1]
-		switch input {
-		case "invert":
-			if started {
-				appGameOfLife.InvertGrid()
-			} else {
-				println("not started")
-			}
-		case "randomize":
-			if started {
-				appGameOfLife.RandomizeGrid()
-			} else {
-				println("not started")
-			}
-		case "start":
-			if started {
-				println("already started")
-				continue
-			}
-			started = true
-			err := messageBrokerServerA.Start()
-			if err != nil {
-				panic(err)
-			}
-			err = messageBrokerServerB.Start()
-			if err != nil {
-				panic(err)
-			}
-			err = topicResolutionServer.Start()
-			if err != nil {
-				panic(err)
-			}
-			err = messageBrokerClientWebsocket.Connect()
-			if err != nil {
-				panic(err)
-			}
-			err = messageBrokerClientGameOfLife.Connect()
-			if err != nil {
-				panic(err)
-			}
-			err = websocketServer.Start()
-			if err != nil {
-				panic(err)
-			}
-			HTTPServerServe.Start()
-			HTTPServerWebsocket.Start()
-		case "stop":
-			if !started {
-				println("not started")
-				continue
-			}
-			started = false
-			HTTPServerServe.Stop()
-			HTTPServerWebsocket.Stop()
-			err = websocketServer.Stop()
-			if err != nil {
-				panic(err)
-			}
-			err = messageBrokerClientWebsocket.Disconnect()
-			if err != nil {
-				panic(err)
-			}
-			err = messageBrokerClientGameOfLife.Disconnect()
-			if err != nil {
-				panic(err)
-			}
-			err := messageBrokerServerA.Stop()
-			if err != nil {
-				panic(err)
-			}
-			err = messageBrokerServerB.Stop()
-			if err != nil {
-				panic(err)
-			}
-			err = topicResolutionServer.Stop()
-			if err != nil {
-				panic(err)
-			}
-		case "exit":
-			return
-		default:
-			println("unknown command \"" + input + "\"")
-		}
-	}
+	Module.CommandLoop(Module.NewMultiModule(
+		messageBrokerServerA,
+		messageBrokerServerB,
+		topicResolutionServer,
+		httpServe,
+		messageBrokerClientGameOfLife,
+		messageBrokerClientWebsocket,
+	), nil)
 }
