@@ -3,6 +3,7 @@ package appWebsocket
 import (
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
+	"SystemgeSampleApp/topics"
 )
 
 type App struct {
@@ -19,8 +20,8 @@ func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Clie
 
 func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
 	return map[string]MessageBrokerClient.AsyncMessageHandler{
-		"getGrid":       app.WebsocketPropagate,
-		"getGridChange": app.WebsocketPropagate,
+		topics.GET_GRID:        app.WebsocketPropagate,
+		topics.GET_GRID_CHANGE: app.WebsocketPropagate,
 	}
 }
 

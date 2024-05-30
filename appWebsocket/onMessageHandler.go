@@ -3,6 +3,7 @@ package appWebsocket
 import (
 	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
+	"SystemgeSampleApp/topics"
 )
 
 func (app *App) GetOnMessageHandler() MessageBrokerClient.OnMessageHandler {
@@ -11,25 +12,23 @@ func (app *App) GetOnMessageHandler() MessageBrokerClient.OnMessageHandler {
 		message.SyncRequestToken = ""
 		message.SyncResponseToken = ""
 		switch message.Topic {
-		case "heartbeat":
-			connection.ResetWatchdog()
-		case "gridChange":
+		case topics.GRID_CHANGE:
 			err := app.messageBrokerClient.AsyncMessage(message)
 			if err != nil {
 				connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), err.Error()).Serialize()))
 			}
-		case "nextGeneration":
+		case topics.NEXT_GENERATION:
 			err := app.messageBrokerClient.AsyncMessage(message)
 			if err != nil {
 				connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), err.Error()).Serialize()))
 			}
-		case "setGrid":
+		case topics.SET_GRID:
 			err := app.messageBrokerClient.AsyncMessage(message)
 			if err != nil {
 				connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), err.Error()).Serialize()))
 			}
 		default:
-			connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), "Unknown message type").Serialize()))
+			connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), "Unknown message topic \""+message.Topic+"\"").Serialize()))
 		}
 	}
 }

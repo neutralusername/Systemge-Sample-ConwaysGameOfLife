@@ -3,6 +3,7 @@ package appGameOfLife
 import (
 	"Systemge/Message"
 	"SystemgeSampleApp/dto"
+	"SystemgeSampleApp/topics"
 )
 
 func (app *App) calcNextGeneration() {
@@ -41,7 +42,7 @@ func (app *App) RandomizeGrid() error {
 			app.grid[row][col] = app.randomizer.GenerateRandomNumber(0, 1)
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topics.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
 		app.logger.Log(err.Error())
 	}
@@ -56,7 +57,7 @@ func (app *App) InvertGrid() error {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync("getGrid", app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topics.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
 		app.logger.Log(err.Error())
 	}
