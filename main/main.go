@@ -25,10 +25,14 @@ const ERROR_LOG_FILE = "error_log.txt"
 
 func main() {
 	messageBrokerServerA := Module.NewMessageBrokerServerModule("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, ERROR_LOG_FILE,
-		GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC,
+		GET_GRID_SYNC_TOPIC,
+		GRID_CHANGE_TOPIC,
+		NEXT_GENERATION_TOPIC,
+		SET_GRID_TOPIC,
 	)
 	messageBrokerServerB := Module.NewMessageBrokerServerModule("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, ERROR_LOG_FILE,
-		GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC,
+		GET_GRID_TOPIC,
+		GET_GRID_CHANGE_TOPIC,
 	)
 	topicResolutionServer := Module.NewTopicResolutionModule("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, map[string]string{
 		GET_GRID_SYNC_TOPIC:   MESSAGEBROKERSERVER_A_ADDRESS,
