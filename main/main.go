@@ -22,13 +22,13 @@ const GET_GRID_TOPIC = "getGrid"
 const GET_GRID_CHANGE_TOPIC = "getGridChange"
 
 func main() {
-	messageBrokerServerA := Module.NewServerModule("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, "error_log.txt",
+	messageBrokerServerA := Module.NewMessageBrokerServerModule("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, "error_log.txt",
 		GET_GRID_SYNC_TOPIC, GRID_CHANGE_TOPIC, NEXT_GENERATION_TOPIC, SET_GRID_TOPIC,
 	)
-	messageBrokerServerB := Module.NewServerModule("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, "error_log.txt",
+	messageBrokerServerB := Module.NewMessageBrokerServerModule("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, "error_log.txt",
 		GET_GRID_TOPIC, GET_GRID_CHANGE_TOPIC,
 	)
-	topicResolutionServer := Module.NewResolutionModule("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", map[string]string{
+	topicResolutionServer := Module.NewTopicResolutionModule("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", map[string]string{
 		GET_GRID_SYNC_TOPIC:   MESSAGEBROKERSERVER_A_ADDRESS,
 		GRID_CHANGE_TOPIC:     MESSAGEBROKERSERVER_A_ADDRESS,
 		NEXT_GENERATION_TOPIC: MESSAGEBROKERSERVER_A_ADDRESS,
@@ -39,7 +39,7 @@ func main() {
 	httpServe := Module.NewHTTPModule("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
 		"/": HTTP.SendDirectory("../frontend"),
 	})
-	messageBrokerClientGameOfLife := Module.NewClientModule("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", appGameOfLife.New)
+	messageBrokerClientGameOfLife := Module.NewMessageBrokerClientModule("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", appGameOfLife.New)
 	messageBrokerClientWebsocket := Module.NewWebsocketClientModule("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, "error_log.txt", "/ws", WEBSOCKET_PORT, "", "", appWebsocket.New)
 
 	Module.CommandLoop(Module.NewMultiModule(
