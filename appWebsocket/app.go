@@ -3,20 +3,17 @@ package appWebsocket
 import (
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
-	"Systemge/Websocket"
 )
 
 type App struct {
 	logger              *Utilities.Logger
 	messageBrokerClient *MessageBrokerClient.Client
-	websocketServer     *Websocket.Server
 }
 
-func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client, websocketServer *Websocket.Server) MessageBrokerClient.WebsocketApplication {
+func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) MessageBrokerClient.WebsocketApplication {
 	return &App{
 		logger:              logger,
 		messageBrokerClient: messageBrokerClient,
-		websocketServer:     websocketServer,
 	}
 }
 
@@ -29,4 +26,8 @@ func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMe
 
 func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
 	return map[string]MessageBrokerClient.SyncMessageHandler{}
+}
+
+func (app *App) GetCustomCommandHandlers() map[string]func() error {
+	return map[string]func() error{}
 }

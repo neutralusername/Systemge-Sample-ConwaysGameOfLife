@@ -5,6 +5,6 @@ import (
 )
 
 func (app *App) WebsocketPropagate(message *Message.Message) error {
-	app.websocketServer.Broadcast([]byte(message.Serialize()))
+	app.messageBrokerClient.WebsocketBroadcast([]byte(message.Serialize()))
 	return nil
 }

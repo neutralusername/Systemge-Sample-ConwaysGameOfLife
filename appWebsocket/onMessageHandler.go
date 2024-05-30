@@ -3,11 +3,10 @@ package appWebsocket
 import (
 	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
-	"Systemge/Websocket"
 )
 
 func (app *App) GetOnMessageHandler() MessageBrokerClient.OnMessageHandler {
-	return func(connection *Websocket.Connection, message *Message.Message) {
+	return func(connection *MessageBrokerClient.WebsocketConnection, message *Message.Message) {
 		message.Origin = connection.Id
 		message.SyncRequestToken = ""
 		message.SyncResponseToken = ""

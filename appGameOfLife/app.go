@@ -11,13 +11,13 @@ const gridCols = 140
 
 type App struct {
 	logger              *Utilities.Logger
+	randomizer          *Utilities.Randomizer
 	messageBrokerClient *MessageBrokerClient.Client
 
-	grid       [][]int
-	mutex      sync.Mutex
-	gridRows   int
-	gridCols   int
-	randomizer *Utilities.Randomizer
+	grid     [][]int
+	mutex    sync.Mutex
+	gridRows int
+	gridCols int
 }
 
 func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) MessageBrokerClient.Application {
@@ -27,12 +27,12 @@ func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Clie
 	}
 	app := &App{
 		logger:              logger,
+		randomizer:          Utilities.NewRandomizer(Utilities.GetSystemTime()),
 		messageBrokerClient: messageBrokerClient,
 
-		grid:       grid,
-		gridRows:   gridRows,
-		gridCols:   gridCols,
-		randomizer: Utilities.NewRandomizer(Utilities.GetSystemTime()),
+		grid:     grid,
+		gridRows: gridRows,
+		gridCols: gridCols,
 	}
 	return app
 }
@@ -49,4 +49,8 @@ func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMess
 	return map[string]MessageBrokerClient.SyncMessageHandler{
 		"getGridSync": app.GetGridSync,
 	}
+}
+
+func (app *App) GetCustomCommandHandlers() map[string]func() error {
+	return nil
 }
