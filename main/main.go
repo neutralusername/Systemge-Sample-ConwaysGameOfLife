@@ -28,7 +28,7 @@ func main() {
 		topics.GET_GRID,
 		topics.GET_GRID_CHANGE,
 	)
-	topicResolutionServer := Module.NewTopicResolution("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, map[string]string{
+	topicResolutionServer := Module.NewTopicResolutionServer("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, map[string]string{
 		topics.GET_GRID_SYNC:   MESSAGEBROKERSERVER_A_ADDRESS,
 		topics.GRID_CHANGE:     MESSAGEBROKERSERVER_A_ADDRESS,
 		topics.NEXT_GENERATION: MESSAGEBROKERSERVER_A_ADDRESS,
@@ -36,7 +36,7 @@ func main() {
 		topics.GET_GRID:        MESSAGEBROKERSERVER_B_ADDRESS,
 		topics.GET_GRID_CHANGE: MESSAGEBROKERSERVER_B_ADDRESS,
 	})
-	httpServe := Module.NewHTTPModule("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
+	httpServe := Module.NewHTTPServer("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
 		"/": HTTP.SendDirectory("../frontend"),
 	})
 	messageBrokerClientGameOfLife := Module.NewMessageBrokerClient("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, appGameOfLife.New)
