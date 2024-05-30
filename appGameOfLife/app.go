@@ -52,5 +52,8 @@ func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMess
 }
 
 func (app *App) GetCustomCommandHandlers() map[string]func() error {
-	return nil
+	return map[string]func() error{
+		"randomize": app.RandomizeGrid,
+		"invert":    app.InvertGrid,
+	}
 }

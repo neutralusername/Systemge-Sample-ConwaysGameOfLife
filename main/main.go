@@ -55,5 +55,5 @@ func main() {
 		httpServe,
 		messageBrokerClientGameOfLife,
 		messageBrokerClientWebsocket,
-	))
+	), messageBrokerClientGameOfLife.GetApplication().GetCustomCommandHandlers())
 }
