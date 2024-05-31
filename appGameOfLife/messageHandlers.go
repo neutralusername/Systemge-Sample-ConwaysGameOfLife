@@ -5,7 +5,7 @@ import (
 	"Systemge/Message"
 	"Systemge/Utilities"
 	"SystemgeSampleApp/dto"
-	"SystemgeSampleApp/topics"
+	"SystemgeSampleApp/topic"
 )
 
 func (app *App) GetGridSync(message *Message.Message) (string, error) {
@@ -19,7 +19,7 @@ func (app *App) GridChange(message *Message.Message) error {
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.Payload)
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	app.messageBrokerClient.AsyncMessage(Message.NewAsync(topics.GET_GRID_CHANGE, app.messageBrokerClient.GetName(), gridChange.Marshal()))
+	app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID_CHANGE, app.messageBrokerClient.GetName(), gridChange.Marshal()))
 	return nil
 }
 
@@ -27,7 +27,7 @@ func (app *App) NextGeneration(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topics.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}
@@ -45,7 +45,7 @@ func (app *App) SetGrid(message *Message.Message) error {
 			app.grid[row][col] = Utilities.StringToInt(string(message.Payload[row*app.gridCols+col]))
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topics.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
+	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
 		app.logger.Log(Error.New(err.Error()).Error())
 	}

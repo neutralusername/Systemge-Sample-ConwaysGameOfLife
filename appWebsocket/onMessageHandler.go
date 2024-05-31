@@ -3,7 +3,7 @@ package appWebsocket
 import (
 	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
-	"SystemgeSampleApp/topics"
+	"SystemgeSampleApp/topic"
 )
 
 func (app *App) GetOnMessageHandler() MessageBrokerClient.OnMessageHandler {
@@ -12,17 +12,17 @@ func (app *App) GetOnMessageHandler() MessageBrokerClient.OnMessageHandler {
 		message.SyncRequestToken = ""
 		message.SyncResponseToken = ""
 		switch message.Topic {
-		case topics.GRID_CHANGE:
+		case topic.GRID_CHANGE:
 			err := app.messageBrokerClient.AsyncMessage(message)
 			if err != nil {
 				connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), err.Error()).Serialize()))
 			}
-		case topics.NEXT_GENERATION:
+		case topic.NEXT_GENERATION:
 			err := app.messageBrokerClient.AsyncMessage(message)
 			if err != nil {
 				connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), err.Error()).Serialize()))
 			}
-		case topics.SET_GRID:
+		case topic.SET_GRID:
 			err := app.messageBrokerClient.AsyncMessage(message)
 			if err != nil {
 				connection.Send([]byte(Message.NewAsync("error", app.messageBrokerClient.GetName(), err.Error()).Serialize()))

@@ -1,4 +1,4 @@
-package topics
+package topic
 
 const GET_GRID_SYNC = "getGridSync"
 const GRID_CHANGE = "gridChange"

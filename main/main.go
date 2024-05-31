@@ -5,7 +5,7 @@ import (
 	"Systemge/Module"
 	"SystemgeSampleApp/appGameOfLife"
 	"SystemgeSampleApp/appWebsocket"
-	"SystemgeSampleApp/topics"
+	"SystemgeSampleApp/topic"
 	"net/http"
 )
 
@@ -19,22 +19,22 @@ const ERROR_LOG_FILE = "error_log.txt"
 
 func main() {
 	messageBrokerServerA := Module.NewMessageBrokerServer("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, ERROR_LOG_FILE,
-		topics.GET_GRID_SYNC,
-		topics.GRID_CHANGE,
-		topics.NEXT_GENERATION,
-		topics.SET_GRID,
+		topic.GET_GRID_SYNC,
+		topic.GRID_CHANGE,
+		topic.NEXT_GENERATION,
+		topic.SET_GRID,
 	)
 	messageBrokerServerB := Module.NewMessageBrokerServer("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, ERROR_LOG_FILE,
-		topics.GET_GRID,
-		topics.GET_GRID_CHANGE,
+		topic.GET_GRID,
+		topic.GET_GRID_CHANGE,
 	)
 	topicResolutionServer := Module.NewTopicResolutionServer("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE, map[string]string{
-		topics.GET_GRID_SYNC:   MESSAGEBROKERSERVER_A_ADDRESS,
-		topics.GRID_CHANGE:     MESSAGEBROKERSERVER_A_ADDRESS,
-		topics.NEXT_GENERATION: MESSAGEBROKERSERVER_A_ADDRESS,
-		topics.SET_GRID:        MESSAGEBROKERSERVER_A_ADDRESS,
-		topics.GET_GRID:        MESSAGEBROKERSERVER_B_ADDRESS,
-		topics.GET_GRID_CHANGE: MESSAGEBROKERSERVER_B_ADDRESS,
+		topic.GET_GRID_SYNC:   MESSAGEBROKERSERVER_A_ADDRESS,
+		topic.GRID_CHANGE:     MESSAGEBROKERSERVER_A_ADDRESS,
+		topic.NEXT_GENERATION: MESSAGEBROKERSERVER_A_ADDRESS,
+		topic.SET_GRID:        MESSAGEBROKERSERVER_A_ADDRESS,
+		topic.GET_GRID:        MESSAGEBROKERSERVER_B_ADDRESS,
+		topic.GET_GRID_CHANGE: MESSAGEBROKERSERVER_B_ADDRESS,
 	})
 	httpServe := Module.NewHTTPServer("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
 		"/": HTTP.SendDirectory("../frontend"),

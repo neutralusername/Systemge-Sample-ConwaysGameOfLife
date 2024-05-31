@@ -3,7 +3,7 @@ package appGameOfLife
 import (
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
-	"SystemgeSampleApp/topics"
+	"SystemgeSampleApp/topic"
 	"sync"
 )
 
@@ -40,15 +40,15 @@ func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Clie
 
 func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
 	return map[string]MessageBrokerClient.AsyncMessageHandler{
-		topics.GRID_CHANGE:     app.GridChange,
-		topics.NEXT_GENERATION: app.NextGeneration,
-		topics.SET_GRID:        app.SetGrid,
+		topic.GRID_CHANGE:     app.GridChange,
+		topic.NEXT_GENERATION: app.NextGeneration,
+		topic.SET_GRID:        app.SetGrid,
 	}
 }
 
 func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
 	return map[string]MessageBrokerClient.SyncMessageHandler{
-		topics.GET_GRID_SYNC: app.GetGridSync,
+		topic.GET_GRID_SYNC: app.GetGridSync,
 	}
 }
 
