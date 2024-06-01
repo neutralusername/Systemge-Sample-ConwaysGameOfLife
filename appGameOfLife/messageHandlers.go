@@ -29,7 +29,7 @@ func (app *App) NextGeneration(message *Message.Message) error {
 	app.calcNextGeneration()
 	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
-		app.logger.Log(Error.New(err.Error()).Error())
+		app.logger.Log(Error.New("", err).Error())
 	}
 	return nil
 }
@@ -38,7 +38,7 @@ func (app *App) SetGrid(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.Payload) != app.gridCols*app.gridRows {
-		return Error.New("Invalid grid size")
+		return Error.New("Invalid grid size", nil)
 	}
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
@@ -47,7 +47,7 @@ func (app *App) SetGrid(message *Message.Message) error {
 	}
 	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
 	if err != nil {
-		app.logger.Log(Error.New(err.Error()).Error())
+		app.logger.Log(Error.New("", err).Error())
 	}
 	return nil
 }
