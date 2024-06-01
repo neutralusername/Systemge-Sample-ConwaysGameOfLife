@@ -1,7 +1,6 @@
 package appWebsocket
 
 import (
-	"Systemge/Error"
 	"Systemge/Message"
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
@@ -50,19 +49,16 @@ func (app *App) PropagateWebsocketAsyncMessage(connection *MessageBrokerClient.W
 	return app.messageBrokerClient.AsyncMessage(message)
 }
 
-func (app *App) GetOnConnectHandler() MessageBrokerClient.OnConnectHandler {
-	return func(connection *MessageBrokerClient.WebsocketClient) {
-		response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.Id))
-		if err != nil {
-			app.logger.Log(Error.New(err.Error()).Error())
-			return
-		}
-		connection.Send([]byte(response.Serialize()))
+func (app *App) OnConnectHandler(connection *MessageBrokerClient.WebsocketClient) error {
+	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.Id))
+	if err != nil {
+		return err
 	}
+	connection.Send([]byte(response.Serialize()))
+	return nil
 }
 
-func (app *App) GetOnDisconnectHandler() MessageBrokerClient.OnDisconnectHandler {
-	return func(connection *MessageBrokerClient.WebsocketClient) {
-		app.logger.Log("Connection closed")
-	}
+func (app *App) OnDisconnectHandler(connection *MessageBrokerClient.WebsocketClient) error {
+	app.logger.Log("Connection closed")
+	return nil
 }
