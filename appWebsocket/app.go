@@ -50,7 +50,7 @@ func (app *App) PropagateWebsocketAsyncMessage(connection *MessageBrokerClient.W
 }
 
 func (app *App) OnConnectHandler(connection *MessageBrokerClient.WebsocketClient) error {
-	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.Id))
+	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.GetId()))
 	if err != nil {
 		return err
 	}
