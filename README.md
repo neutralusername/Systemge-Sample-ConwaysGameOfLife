@@ -9,7 +9,7 @@ changes to the grid are broadcasted.
 
 
 ## how to use:  
-- make sure to properly import the Systemge library to the SampleApp.  
+- make sure to import the Systemge library to the SampleApp.  
 - locate /main and enter "go run ." which will start the system.  
 - to see the grid open "localhost:8080" in your browser while the system is running.  
 - you can now click grids to change the square color. changes will be propagated to everyone else currently on this website and persist reloads.  
