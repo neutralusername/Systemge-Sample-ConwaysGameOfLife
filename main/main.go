@@ -37,11 +37,11 @@ func main() {
 	messageBrokerClientGameOfLife := Module.NewMessageBrokerClient("messageBrokerClientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, appGameOfLife.New)
 	messageBrokerClientWebsocket := Module.NewWebsocketClient("messageBrokerClientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, "/ws", WEBSOCKET_PORT, "", "", appWebsocket.New)
 	Module.CommandLoop(Module.NewMultiModule(
+		topicResolutionServer,
 		messageBrokerServerA,
 		messageBrokerServerB,
-		topicResolutionServer,
-		httpServe,
 		messageBrokerClientGameOfLife,
 		messageBrokerClientWebsocket,
+		httpServe,
 	), messageBrokerClientGameOfLife.GetApplication().GetCustomCommandHandlers())
 }
