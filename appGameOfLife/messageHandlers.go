@@ -8,13 +8,13 @@ import (
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) GetGridSync(message *Message.Message) (string, error) {
+func (app *App) getGridSync(message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
 }
 
-func (app *App) GridChange(message *Message.Message) error {
+func (app *App) gridChange(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.Payload)
@@ -23,7 +23,7 @@ func (app *App) GridChange(message *Message.Message) error {
 	return nil
 }
 
-func (app *App) NextGeneration(message *Message.Message) error {
+func (app *App) nextGeneration(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
@@ -34,7 +34,7 @@ func (app *App) NextGeneration(message *Message.Message) error {
 	return nil
 }
 
-func (app *App) SetGrid(message *Message.Message) error {
+func (app *App) setGrid(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.Payload) != app.gridCols*app.gridRows {

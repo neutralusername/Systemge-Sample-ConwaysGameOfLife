@@ -40,21 +40,21 @@ func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Clie
 
 func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
 	return map[string]MessageBrokerClient.AsyncMessageHandler{
-		topic.GRID_CHANGE:     app.GridChange,
-		topic.NEXT_GENERATION: app.NextGeneration,
-		topic.SET_GRID:        app.SetGrid,
+		topic.GRID_CHANGE:     app.gridChange,
+		topic.NEXT_GENERATION: app.nextGeneration,
+		topic.SET_GRID:        app.setGrid,
 	}
 }
 
 func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
 	return map[string]MessageBrokerClient.SyncMessageHandler{
-		topic.GET_GRID_SYNC: app.GetGridSync,
+		topic.GET_GRID_SYNC: app.getGridSync,
 	}
 }
 
 func (app *App) GetCustomCommandHandlers() map[string]func([]string) error {
 	return map[string]func([]string) error{
-		"randomize": app.RandomizeGrid,
-		"invert":    app.InvertGrid,
+		"randomize": app.randomizeGrid,
+		"invert":    app.invertGrid,
 	}
 }

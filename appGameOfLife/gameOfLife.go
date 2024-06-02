@@ -34,7 +34,7 @@ func (app *App) calcNextGeneration() {
 	app.grid = nextGrid
 }
 
-func (app *App) RandomizeGrid(args []string) error {
+func (app *App) randomizeGrid(args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -49,7 +49,7 @@ func (app *App) RandomizeGrid(args []string) error {
 	return nil
 }
 
-func (app *App) InvertGrid(args []string) error {
+func (app *App) invertGrid(args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {

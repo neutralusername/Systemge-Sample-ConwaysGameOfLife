@@ -40,12 +40,12 @@ func (app *App) GetCustomCommandHandlers() map[string]func([]string) error {
 
 func (app *App) GetWebsocketMessageHandlers() map[string]MessageBrokerClient.WebsocketMessageHandler {
 	return map[string]MessageBrokerClient.WebsocketMessageHandler{
-		topic.GRID_CHANGE:     app.PropagateWebsocketAsyncMessage,
-		topic.NEXT_GENERATION: app.PropagateWebsocketAsyncMessage,
-		topic.SET_GRID:        app.PropagateWebsocketAsyncMessage,
+		topic.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
+		topic.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
+		topic.SET_GRID:        app.propagateWebsocketAsyncMessage,
 	}
 }
-func (app *App) PropagateWebsocketAsyncMessage(connection *MessageBrokerClient.WebsocketClient, message *Message.Message) error {
+func (app *App) propagateWebsocketAsyncMessage(connection *MessageBrokerClient.WebsocketClient, message *Message.Message) error {
 	return app.messageBrokerClient.AsyncMessage(message)
 }
 
