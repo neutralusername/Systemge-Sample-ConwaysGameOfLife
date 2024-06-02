@@ -34,8 +34,8 @@ func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMess
 	return map[string]MessageBrokerClient.SyncMessageHandler{}
 }
 
-func (app *App) GetCustomCommandHandlers() map[string]func([]string) error {
-	return map[string]func([]string) error{}
+func (app *App) GetCustomCommandHandlers() map[string]MessageBrokerClient.CustomCommandHandler {
+	return map[string]MessageBrokerClient.CustomCommandHandler{}
 }
 
 func (app *App) GetWebsocketMessageHandlers() map[string]MessageBrokerClient.WebsocketMessageHandler {

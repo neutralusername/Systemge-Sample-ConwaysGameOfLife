@@ -52,8 +52,8 @@ func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMess
 	}
 }
 
-func (app *App) GetCustomCommandHandlers() map[string]func([]string) error {
-	return map[string]func([]string) error{
+func (app *App) GetCustomCommandHandlers() map[string]MessageBrokerClient.CustomCommandHandler {
+	return map[string]MessageBrokerClient.CustomCommandHandler{
 		"randomize": app.randomizeGrid,
 		"invert":    app.invertGrid,
 	}
