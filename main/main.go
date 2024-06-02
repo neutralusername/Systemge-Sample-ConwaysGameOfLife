@@ -18,7 +18,7 @@ const WEBSOCKET_PORT = ":8443"
 
 const ERROR_LOG_FILE_PATH = "error.log"
 
-var topics = Topics.TopicRegistry{
+var topics = Topics.Registry{
 	topic.GET_GRID_SYNC:   MESSAGEBROKERSERVER_A_ADDRESS,
 	topic.GRID_CHANGE:     MESSAGEBROKERSERVER_A_ADDRESS,
 	topic.NEXT_GENERATION: MESSAGEBROKERSERVER_A_ADDRESS,
