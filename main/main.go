@@ -7,7 +7,6 @@ import (
 	"SystemgeSampleApp/appGameOfLife"
 	"SystemgeSampleApp/appWebsocket"
 	"SystemgeSampleApp/topic"
-	"net/http"
 )
 
 const MESSAGEBROKERSERVER_A_ADDRESS = ":60003"
@@ -26,11 +25,12 @@ var topics = Topics.Registry{
 	topic.GET_GRID:        MESSAGEBROKERSERVER_B_ADDRESS,
 	topic.GET_GRID_CHANGE: MESSAGEBROKERSERVER_B_ADDRESS,
 }
+var servePatterns = HTTP.PatternRegistry{
+	"/": HTTP.SendDirectory("../frontend"),
+}
 
 func main() {
-	httpServe := Module.NewHTTPServer("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
-		"/": HTTP.SendDirectory("../frontend"),
-	})
+	httpServe := Module.NewHTTPServer("HTTPfrontend", HTTP_DEV_PORT, "", "", servePatterns)
 	topicResolutionServer := Module.NewTopicResolutionServer("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, topics)
 	messageBrokerServerA := Module.NewMessageBrokerServer("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, ERROR_LOG_FILE_PATH, topics.GetTopics(MESSAGEBROKERSERVER_A_ADDRESS)...)
 	messageBrokerServerB := Module.NewMessageBrokerServer("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, ERROR_LOG_FILE_PATH, topics.GetTopics(MESSAGEBROKERSERVER_B_ADDRESS)...)
