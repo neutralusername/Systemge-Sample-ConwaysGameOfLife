@@ -3,6 +3,7 @@ package main
 import (
 	"Systemge/HTTP"
 	"Systemge/Module"
+	"Systemge/Topics"
 	"SystemgeSampleApp/appGameOfLife"
 	"SystemgeSampleApp/appWebsocket"
 	"SystemgeSampleApp/topic"
@@ -18,24 +19,17 @@ const WEBSOCKET_PORT = ":8443"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	messageBrokerServerA := Module.NewMessageBrokerServer("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, ERROR_LOG_FILE_PATH,
-		topic.GET_GRID_SYNC,
-		topic.GRID_CHANGE,
-		topic.NEXT_GENERATION,
-		topic.SET_GRID,
-	)
-	messageBrokerServerB := Module.NewMessageBrokerServer("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, ERROR_LOG_FILE_PATH,
-		topic.GET_GRID,
-		topic.GET_GRID_CHANGE,
-	)
-	topicResolutionServer := Module.NewTopicResolutionServer("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, map[string]string{
+	topics := Topics.TopicRegistry{
 		topic.GET_GRID_SYNC:   MESSAGEBROKERSERVER_A_ADDRESS,
 		topic.GRID_CHANGE:     MESSAGEBROKERSERVER_A_ADDRESS,
 		topic.NEXT_GENERATION: MESSAGEBROKERSERVER_A_ADDRESS,
 		topic.SET_GRID:        MESSAGEBROKERSERVER_A_ADDRESS,
 		topic.GET_GRID:        MESSAGEBROKERSERVER_B_ADDRESS,
 		topic.GET_GRID_CHANGE: MESSAGEBROKERSERVER_B_ADDRESS,
-	})
+	}
+	topicResolutionServer := Module.NewTopicResolutionServer("topicResolutionServer", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, topics)
+	messageBrokerServerA := Module.NewMessageBrokerServer("messageBrokerServerA", MESSAGEBROKERSERVER_A_ADDRESS, ERROR_LOG_FILE_PATH, topics.GetTopics(MESSAGEBROKERSERVER_A_ADDRESS)...)
+	messageBrokerServerB := Module.NewMessageBrokerServer("messageBrokerServerB", MESSAGEBROKERSERVER_B_ADDRESS, ERROR_LOG_FILE_PATH, topics.GetTopics(MESSAGEBROKERSERVER_B_ADDRESS)...)
 	httpServe := Module.NewHTTPServer("HTTPfrontend", HTTP_DEV_PORT, "", "", map[string]func(w http.ResponseWriter, r *http.Request){
 		"/": HTTP.SendDirectory("../frontend"),
 	})
