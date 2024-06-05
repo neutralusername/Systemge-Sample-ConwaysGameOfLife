@@ -3,7 +3,6 @@ package appGameOfLife
 import (
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
-	"SystemgeSampleApp/topic"
 	"sync"
 )
 
@@ -36,25 +35,4 @@ func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Clie
 		gridCols: gridCols,
 	}
 	return app
-}
-
-func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
-	return map[string]MessageBrokerClient.AsyncMessageHandler{
-		topic.GRID_CHANGE:     app.gridChange,
-		topic.NEXT_GENERATION: app.nextGeneration,
-		topic.SET_GRID:        app.setGrid,
-	}
-}
-
-func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
-	return map[string]MessageBrokerClient.SyncMessageHandler{
-		topic.GET_GRID_SYNC: app.getGridSync,
-	}
-}
-
-func (app *App) GetCustomCommandHandlers() map[string]MessageBrokerClient.CustomCommandHandler {
-	return map[string]MessageBrokerClient.CustomCommandHandler{
-		"randomize": app.randomizeGrid,
-		"invert":    app.invertGrid,
-	}
 }

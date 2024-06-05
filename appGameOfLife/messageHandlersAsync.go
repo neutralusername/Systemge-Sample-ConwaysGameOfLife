@@ -3,15 +3,18 @@ package appGameOfLife
 import (
 	"Systemge/Error"
 	"Systemge/Message"
+	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
 	"SystemgeSampleApp/dto"
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) getGridSync(message *Message.Message) (string, error) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
+func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
+	return map[string]MessageBrokerClient.AsyncMessageHandler{
+		topic.GRID_CHANGE:     app.gridChange,
+		topic.NEXT_GENERATION: app.nextGeneration,
+		topic.SET_GRID:        app.setGrid,
+	}
 }
 
 func (app *App) gridChange(message *Message.Message) error {
