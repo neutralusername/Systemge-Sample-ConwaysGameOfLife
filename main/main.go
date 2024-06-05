@@ -13,9 +13,9 @@ const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
 	Module.StartSystemgeConsole(Module.NewMultiModule(
-		Module.NewResolverServerFromConfig("topicResolutionServer.systemge", ERROR_LOG_FILE_PATH),
-		Module.NewBrokerServerFromConfig("messageBrokerServerA.systemge", ERROR_LOG_FILE_PATH),
-		Module.NewBrokerServerFromConfig("messageBrokerServerB.systemge", ERROR_LOG_FILE_PATH),
+		Module.NewResolverServerFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
+		Module.NewBrokerServerFromConfig("brokerGameOfLife.systemge", ERROR_LOG_FILE_PATH),
+		Module.NewBrokerServerFromConfig("brokerWebsocket.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewClient("clientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, appGameOfLife.New),
 		Module.NewWebsocketClient("clientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, "/ws", WEBSOCKET_PORT, "", "", appWebsocket.New),
 		Module.NewHTTPServerFromConfig("httpServe.systemge", ERROR_LOG_FILE_PATH),
