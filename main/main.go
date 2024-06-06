@@ -12,7 +12,7 @@ const WEBSOCKET_PORT = ":8443"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	Module.StartSystemgeConsole(Module.NewMultiModule(
+	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Module.NewResolverServerFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewBrokerServerFromConfig("brokerGameOfLife.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewBrokerServerFromConfig("brokerWebsocket.systemge", ERROR_LOG_FILE_PATH),
