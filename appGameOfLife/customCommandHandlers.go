@@ -1,14 +1,14 @@
 package appGameOfLife
 
 import (
+	"Systemge/Application"
 	"Systemge/Message"
-	"Systemge/MessageBrokerClient"
 	"SystemgeSampleApp/dto"
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) GetCustomCommandHandlers() map[string]MessageBrokerClient.CustomCommandHandler {
-	return map[string]MessageBrokerClient.CustomCommandHandler{
+func (app *App) GetCustomCommandHandlers() map[string]Application.CustomCommandHandler {
+	return map[string]Application.CustomCommandHandler{
 		"randomize": app.randomizeGrid,
 		"invert":    app.invertGrid,
 	}

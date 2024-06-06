@@ -1,23 +1,24 @@
 package appWebsocket
 
 import (
+	"Systemge/Application"
 	"Systemge/Message"
-	"Systemge/MessageBrokerClient"
+	"Systemge/WebsocketClient"
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) GetWebsocketMessageHandlers() map[string]MessageBrokerClient.WebsocketMessageHandler {
-	return map[string]MessageBrokerClient.WebsocketMessageHandler{
+func (app *App) GetWebsocketMessageHandlers() map[string]Application.WebsocketMessageHandler {
+	return map[string]Application.WebsocketMessageHandler{
 		topic.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
 		topic.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
 		topic.SET_GRID:        app.propagateWebsocketAsyncMessage,
 	}
 }
-func (app *App) propagateWebsocketAsyncMessage(connection *MessageBrokerClient.WebsocketClient, message *Message.Message) error {
+func (app *App) propagateWebsocketAsyncMessage(connection *WebsocketClient.Client, message *Message.Message) error {
 	return app.messageBrokerClient.AsyncMessage(message)
 }
 
-func (app *App) OnConnectHandler(connection *MessageBrokerClient.WebsocketClient) error {
+func (app *App) OnConnectHandler(connection *WebsocketClient.Client) error {
 	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.GetId()))
 	if err != nil {
 		return err
@@ -26,7 +27,7 @@ func (app *App) OnConnectHandler(connection *MessageBrokerClient.WebsocketClient
 	return nil
 }
 
-func (app *App) OnDisconnectHandler(connection *MessageBrokerClient.WebsocketClient) error {
+func (app *App) OnDisconnectHandler(connection *WebsocketClient.Client) error {
 	app.logger.Log("Connection closed")
 	return nil
 }

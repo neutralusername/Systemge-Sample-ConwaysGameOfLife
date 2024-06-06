@@ -1,14 +1,14 @@
 package appGameOfLife
 
 import (
+	"Systemge/Application"
 	"Systemge/Message"
-	"Systemge/MessageBrokerClient"
 	"SystemgeSampleApp/dto"
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
-	return map[string]MessageBrokerClient.SyncMessageHandler{
+func (app *App) GetSyncMessageHandlers() map[string]Application.SyncMessageHandler {
+	return map[string]Application.SyncMessageHandler{
 		topic.GET_GRID_SYNC: app.getGridSync,
 	}
 }

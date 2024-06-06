@@ -1,7 +1,7 @@
 package appWebsocket
 
-import "Systemge/MessageBrokerClient"
+import "Systemge/Application"
 
-func (app *App) GetSyncMessageHandlers() map[string]MessageBrokerClient.SyncMessageHandler {
-	return map[string]MessageBrokerClient.SyncMessageHandler{}
+func (app *App) GetSyncMessageHandlers() map[string]Application.SyncMessageHandler {
+	return map[string]Application.SyncMessageHandler{}
 }

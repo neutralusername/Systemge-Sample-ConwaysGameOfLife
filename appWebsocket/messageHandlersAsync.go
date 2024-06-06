@@ -1,18 +1,18 @@
 package appWebsocket
 
 import (
+	"Systemge/Application"
 	"Systemge/Message"
-	"Systemge/MessageBrokerClient"
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
-	return map[string]MessageBrokerClient.AsyncMessageHandler{
+func (app *App) GetAsyncMessageHandlers() map[string]Application.AsyncMessageHandler {
+	return map[string]Application.AsyncMessageHandler{
 		topic.GET_GRID:        app.WebsocketPropagate,
 		topic.GET_GRID_CHANGE: app.WebsocketPropagate,
 	}
 }
 func (app *App) WebsocketPropagate(message *Message.Message) error {
-	app.messageBrokerClient.WebsocketBroadcast([]byte(message.Serialize()))
+	app.messageBrokerClient.GetWebsocketServer().Broadcast([]byte(message.Serialize()))
 	return nil
 }

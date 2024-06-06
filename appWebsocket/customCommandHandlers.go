@@ -1,7 +1,7 @@
 package appWebsocket
 
-import "Systemge/MessageBrokerClient"
+import "Systemge/Application"
 
-func (app *App) GetCustomCommandHandlers() map[string]MessageBrokerClient.CustomCommandHandler {
-	return map[string]MessageBrokerClient.CustomCommandHandler{}
+func (app *App) GetCustomCommandHandlers() map[string]Application.CustomCommandHandler {
+	return map[string]Application.CustomCommandHandler{}
 }

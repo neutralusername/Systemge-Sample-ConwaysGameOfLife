@@ -1,16 +1,16 @@
 package appGameOfLife
 
 import (
+	"Systemge/Application"
 	"Systemge/Error"
 	"Systemge/Message"
-	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
 	"SystemgeSampleApp/dto"
 	"SystemgeSampleApp/topic"
 )
 
-func (app *App) GetAsyncMessageHandlers() map[string]MessageBrokerClient.AsyncMessageHandler {
-	return map[string]MessageBrokerClient.AsyncMessageHandler{
+func (app *App) GetAsyncMessageHandlers() map[string]Application.AsyncMessageHandler {
+	return map[string]Application.AsyncMessageHandler{
 		topic.GRID_CHANGE:     app.gridChange,
 		topic.NEXT_GENERATION: app.nextGeneration,
 		topic.SET_GRID:        app.setGrid,

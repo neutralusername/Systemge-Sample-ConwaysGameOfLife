@@ -1,6 +1,7 @@
 package appGameOfLife
 
 import (
+	"Systemge/Application"
 	"Systemge/MessageBrokerClient"
 	"Systemge/Utilities"
 	"sync"
@@ -20,7 +21,7 @@ type App struct {
 	gridCols   int
 }
 
-func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) MessageBrokerClient.Application {
+func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) Application.Application {
 	grid := make([][]int, gridRows)
 	for i := range grid {
 		grid[i] = make([]int, gridCols)
