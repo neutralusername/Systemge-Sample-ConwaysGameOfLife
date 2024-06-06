@@ -20,7 +20,7 @@ func (app *App) GetAsyncMessageHandlers() map[string]Application.AsyncMessageHan
 func (app *App) gridChange(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
-	gridChange := dto.UnmarshalGridChange(message.Payload)
+	gridChange := dto.UnmarshalGridChange(message.GetPayload())
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
 	app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID_CHANGE, app.messageBrokerClient.GetName(), gridChange.Marshal()))
 	return nil
@@ -40,12 +40,12 @@ func (app *App) nextGeneration(message *Message.Message) error {
 func (app *App) setGrid(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
-	if len(message.Payload) != app.gridCols*app.gridRows {
+	if len(message.GetPayload()) != app.gridCols*app.gridRows {
 		return Error.New("Invalid grid size", nil)
 	}
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = Utilities.StringToInt(string(message.Payload[row*app.gridCols+col]))
+			app.grid[row][col] = Utilities.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 		}
 	}
 	err := app.messageBrokerClient.AsyncMessage(Message.NewAsync(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal()))
