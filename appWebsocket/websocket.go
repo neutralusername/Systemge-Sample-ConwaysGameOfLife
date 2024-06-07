@@ -19,14 +19,16 @@ func (app *App) propagateWebsocketAsyncMessage(connection *WebsocketClient.Clien
 	return app.messageBrokerClient.AsyncMessage(message)
 }
 
-func (app *App) OnConnectHandler(connection *WebsocketClient.Client) {
+func (app *App) OnConnectHandler(connection *WebsocketClient.Client) error {
 	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.GetId()))
 	if err != nil {
-		app.logger.Log(Error.New("Error sending sync message", err).Error())
+		return Error.New("Error sending sync message", err)
 	}
 	connection.Send([]byte(response.Serialize()))
+	return nil
 }
 
-func (app *App) OnDisconnectHandler(connection *WebsocketClient.Client) {
+func (app *App) OnDisconnectHandler(connection *WebsocketClient.Client) error {
 	app.logger.Log("Connection closed")
+	return nil
 }
