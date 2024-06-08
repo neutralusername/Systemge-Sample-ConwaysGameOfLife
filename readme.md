@@ -3,8 +3,7 @@ a simple implementation of conways game of life as a "multiplayer" variant on a 
 a new generation is generated on button press and broadcasted to every client.
 changes to the grid are broadcasted.
 
-![Leeres Diagramm(3)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/10f09f37-28b4-42f8-b0ac-c63fd58e2410)
-
+![systemge-game-of-life](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/5929f6de-1316-4a28-a8eb-fb9dcde2a225)
 
 
 
