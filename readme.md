@@ -1,7 +1,15 @@
 # what is this
 a simple implementation of conways game of life as a "multiplayer" variant on a 75x75 grid.
 a new generation is generated on button press and broadcasted to every client.
-changes to the grid are broadcasted.
+there is a client-side implementation for a new generation loop with a variable interval. (time in ms)
+additionally there is a field which automatically updates with the current grid state.
+the content of this field can be copied and changed to save and load a state by pressing the set button. 
+resets clears the grid.
+
+changes to the grid are broadcasted automatically to all other websocket clients.
+
+![Screenshot from 2024-06-08 22-13-33](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/304513a9-7659-47b7-a83b-1174476d41cf)
+
 
 ![systemge-game-of-life(10)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/b6f9c94c-f8e6-4d5b-9c43-b8b044626413)
 
