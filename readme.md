@@ -3,7 +3,9 @@ a simple implementation of conways game of life as a "multiplayer" variant on a 
 a new generation is generated on button press and broadcasted to every client.
 changes to the grid are broadcasted.
 
-![60QV4Ftw9N](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/2f5b2d0c-65b4-4045-99da-b73d5727f160)
+![Leeres Diagramm(3)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/10f09f37-28b4-42f8-b0ac-c63fd58e2410)
+
+
 
 
 ## how to use:  
@@ -12,8 +14,8 @@ changes to the grid are broadcasted.
 - to see the grid open "localhost:8080" in your browser while the system is running.  
 - you can now click grids to change the square color. changes will be propagated to everyone else currently on this website and persist reloads.  
 
-![Leeres Diagramm(3)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/10f09f37-28b4-42f8-b0ac-c63fd58e2410)
 
+![60QV4Ftw9N](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/2f5b2d0c-65b4-4045-99da-b73d5727f160)
 
 
 ![chrome_i6yvUFMgJH](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/e220437f-a2c5-483f-a086-fb810827f419)
