@@ -12,7 +12,7 @@ changes to the grid are broadcasted.
 - to see the grid open "localhost:8080" in your browser while the system is running.  
 - you can now click grids to change the square color. changes will be propagated to everyone else currently on this website and persist reloads.  
 
-![Leeres Diagramm(2)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/60d55307-7113-43a0-9e6f-7362fc4d603a)
+![Leeres Diagramm(3)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/10f09f37-28b4-42f8-b0ac-c63fd58e2410)
 
 
 
