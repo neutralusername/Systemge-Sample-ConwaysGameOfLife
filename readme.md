@@ -14,4 +14,5 @@ changes to the grid are broadcasted.
 - to see the grid open "localhost:8080" in your browser while the system is running.  
 - you can now click grids to change the square color. changes will be propagated to everyone else currently on this website and persist reloads.  
 
-[systemgeGameOfLife.pdf](https://github.com/user-attachments/files/15749390/systemgeGameOfLife.pdf)
+![Screenshot from 2024-06-08 21-23-37](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/3e7cdf28-ec1e-4650-ad72-c5d7170996d9)
+
