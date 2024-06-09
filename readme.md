@@ -9,7 +9,7 @@
 
 changes to the grid are broadcasted automatically to all other websocket clients.
 
-![Screenshot from 2024-06-08 22-13-33](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/304513a9-7659-47b7-a83b-1174476d41cf)
+![chrome_8N6fII47kP](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/ea29055f-c9f9-404b-94a5-56fb0a07e051)
 
 
 ![systemge-game-of-life(10)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/b6f9c94c-f8e6-4d5b-9c43-b8b044626413)
