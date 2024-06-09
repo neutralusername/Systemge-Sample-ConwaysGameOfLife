@@ -5,7 +5,7 @@
 - there is a client-side implementation for a new generation loop with a variable interval (time in ms)  
 - additionally there is a field which automatically updates with the current grid state
 - the content of this field can be copied and changed to save and load a state by pressing the set button  
-- resets clear the grid
+- reset clears the grid
 
 changes to the grid are broadcasted automatically to all other websocket clients.
 
