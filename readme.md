@@ -21,7 +21,7 @@ changes to the grid are broadcasted automatically to all other websocket clients
 - locate /main and enter "go run ." in the terminal to launch the command line interface
 - type "start" and press enter 
 - to see the grid open "localhost:8080" in your browser after starting
-- you can now click cells to change its state. changes will be propagated to everyone else currently on the website and persist reloads
+- you can now click cells to change their state. changes will be propagated to everyone else currently on the website and persist reloads
 - you can type "randomize" in the console to randomize the entire grid
 - you can type "invert" to invert all grid cells
 
