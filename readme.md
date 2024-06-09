@@ -23,7 +23,7 @@ changes to the grid are broadcasted automatically to all other websocket clients
 - to see the grid open "localhost:8080" in your browser after starting
 - click cells to change their state. changes will be propagated to everyone else currently on the website and persist reloads
 - enter "randomize" into the command line interface to randomize every cells state
-- enter "invert" to invert all grid cells
+- enter "invert" to invert all cells
 
 
 ![60QV4Ftw9N](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/2f5b2d0c-65b4-4045-99da-b73d5727f160)
