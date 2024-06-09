@@ -16,6 +16,7 @@ changes to the grid are broadcasted automatically to all other websocket clients
 
 ## requirements
 - golang (version 1.22.3)
+- systemge library on your device
 
 ## how to use:  
 - make sure to import the Systemge library into the project using the correct path (go.mod)
