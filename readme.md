@@ -19,7 +19,7 @@ changes to the grid are broadcasted automatically to all other websocket clients
 
 ## how to use:  
 - make sure to import the Systemge library into the project using the correct path (go.mod)
-- locate /main and enter "go run ." in the terminal to launch the command line interface
+- locate /main and enter "go run ." into the terminal to launch the command line interface
 - type "start" and press enter 
 - to interact with the grid open "localhost:8080" in your browser after starting the system
 - click cells to change their states
