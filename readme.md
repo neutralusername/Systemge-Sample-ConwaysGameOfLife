@@ -18,7 +18,7 @@ changes to the grid are broadcasted automatically to all other websocket clients
 
 ## how to use:  
 - make sure to import the Systemge library to the SampleApp
-- locate /main and enter "go run ." which will start the system
+- locate /main and enter "go run ." in the terminal to launch the command line interface
 - type "start" and press enter 
 - to see the grid open "localhost:8080" in your browser while the system is running
 - you can now click grids to change the square color. changes will be propagated to everyone else currently on this website and persist reloads
