@@ -25,8 +25,7 @@ func (app *App) randomizeGrid(args []string) error {
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = app.randomizer.GenerateRandomNumber(1, 100)
-			if app.grid[row][col] <= percentageOfAliveCells {
+			if app.randomizer.GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
 				app.grid[row][col] = 1
 			} else {
 				app.grid[row][col] = 0
