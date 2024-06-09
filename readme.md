@@ -20,7 +20,7 @@ changes to the grid are broadcasted automatically to all other websocket clients
 - make sure to import the Systemge library into the project using the correct path (go.mod)
 - locate /main and enter "go run ." in the terminal to launch the command line interface
 - type "start" and press enter 
-- to see the grid open "localhost:8080" in your browser after starting
+- to interact with the grid open "localhost:8080" in your browser after starting the system
 - click cells to change their state. changes will be propagated to everyone else currently on the website and persist reloads
 - enter "randomize" into the command line interface to randomize every cells state
 - enter "invert" to invert all cells
