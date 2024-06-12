@@ -37,3 +37,11 @@ func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Clie
 	}
 	return app
 }
+
+func (app *App) OnStart() error {
+	return nil
+}
+
+func (app *App) OnStop() error {
+	return nil
+}
