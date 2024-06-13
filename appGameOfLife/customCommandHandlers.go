@@ -4,8 +4,8 @@ import (
 	"Systemge/Application"
 	"Systemge/Message"
 	"Systemge/Utilities"
-	"SystemgeSampleApp/dto"
-	"SystemgeSampleApp/topic"
+	"SystemgeSampleConwaysGameOfLife/dto"
+	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
 func (app *App) GetCustomCommandHandlers() map[string]Application.CustomCommandHandler {

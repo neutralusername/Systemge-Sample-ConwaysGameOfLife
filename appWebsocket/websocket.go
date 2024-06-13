@@ -5,7 +5,7 @@ import (
 	"Systemge/Error"
 	"Systemge/Message"
 	"Systemge/WebsocketClient"
-	"SystemgeSampleApp/topic"
+	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
 func (app *WebsocketApp) GetWebsocketMessageHandlers() map[string]Application.WebsocketMessageHandler {

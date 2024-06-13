@@ -3,7 +3,7 @@ package appWebsocket
 import (
 	"Systemge/Application"
 	"Systemge/Message"
-	"SystemgeSampleApp/topic"
+	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
 func (app *WebsocketApp) GetAsyncMessageHandlers() map[string]Application.AsyncMessageHandler {

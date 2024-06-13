@@ -3,8 +3,8 @@ package appGameOfLife
 import (
 	"Systemge/Application"
 	"Systemge/Message"
-	"SystemgeSampleApp/dto"
-	"SystemgeSampleApp/topic"
+	"SystemgeSampleConwaysGameOfLife/dto"
+	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
 func (app *App) GetSyncMessageHandlers() map[string]Application.SyncMessageHandler {

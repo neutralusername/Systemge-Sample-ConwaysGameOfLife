@@ -1,4 +1,4 @@
-module SystemgeSampleApp
+module SystemgeSampleConwaysGameOfLife
 
 go 1.22.3
 
