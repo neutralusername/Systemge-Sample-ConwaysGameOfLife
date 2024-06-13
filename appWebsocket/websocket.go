@@ -16,11 +16,11 @@ func (app *WebsocketApp) GetWebsocketMessageHandlers() map[string]Application.We
 	}
 }
 func (app *WebsocketApp) propagateWebsocketAsyncMessage(connection *WebsocketClient.Client, message *Message.Message) error {
-	return app.messageBrokerClient.AsyncMessage(message)
+	return app.messageBrokerClient.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
 }
 
 func (app *WebsocketApp) OnConnectHandler(connection *WebsocketClient.Client) {
-	response, err := app.messageBrokerClient.SyncMessage(Message.NewSync(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.GetId()))
+	response, err := app.messageBrokerClient.SyncMessage(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.GetId())
 	if err != nil {
 		app.logger.Log(Error.New("Error sending sync message", err).Error())
 	}
