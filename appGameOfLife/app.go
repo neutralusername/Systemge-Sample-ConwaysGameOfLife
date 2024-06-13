@@ -7,9 +7,6 @@ import (
 	"sync"
 )
 
-const gridRows = 90
-const gridCols = 140
-
 type App struct {
 	logger              *Utilities.Logger
 	messageBrokerClient *MessageBrokerClient.Client
@@ -22,23 +19,24 @@ type App struct {
 }
 
 func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) Application.Application {
-	grid := make([][]int, gridRows)
-	for i := range grid {
-		grid[i] = make([]int, gridCols)
-	}
 	app := &App{
 		logger:              logger,
 		randomizer:          Utilities.NewRandomizer(Utilities.GetSystemTime()),
 		messageBrokerClient: messageBrokerClient,
 
-		grid:     grid,
-		gridRows: gridRows,
-		gridCols: gridCols,
+		grid:     nil,
+		gridRows: 90,
+		gridCols: 140,
 	}
 	return app
 }
 
 func (app *App) OnStart() error {
+	grid := make([][]int, app.gridCols)
+	for i := range grid {
+		grid[i] = make([]int, app.gridRows)
+	}
+	app.grid = grid
 	return nil
 }
 
