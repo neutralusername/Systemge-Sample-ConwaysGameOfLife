@@ -1,6 +1,6 @@
 # what is this 
 - a simple implementation of conways game of life as a "multiplayer" variant on a 90x140 grid
-- dimensions can be changed by changing the corresponding constants in appGameOfLife/app.go
+- dimensions can be changed by changing the corresponding values in appGameOfLife/app.go/New()
 - a new generation is generated on button press
 - there is a client-side implementation for a new generation loop with a variable interval (time in ms)  
 - additionally there is a field which automatically updates with the current grid state
