@@ -5,9 +5,7 @@ export class Cell extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.cellState !== nextProps.cellState)
-            return true
-        return false
+        return this.props.cellState !== nextProps.cellState
     }
 
     render() {
