@@ -1,9 +1,9 @@
 # resolver
 :60000
-getGrid :60004
-gridChange :60004
-nextGeneration :60004
-setGrid :60004
+getGrid 127.0.0.1:60004
+gridChange 127.0.0.1:60004
+nextGeneration 127.0.0.1:60004
+setGrid 127.0.0.1:60004
 
-propagateGrid :60003
-propagateGridChange :60003
+propagateGrid 127.0.0.1:60003
+propagateGridChange 127.0.0.1:60003
