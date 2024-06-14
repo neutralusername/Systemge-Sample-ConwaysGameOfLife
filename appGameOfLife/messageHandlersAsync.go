@@ -22,7 +22,7 @@ func (app *App) gridChange(message *Message.Message) error {
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	app.messageBrokerClient.AsyncMessage(topic.GET_GRID_CHANGE, app.messageBrokerClient.GetName(), gridChange.Marshal())
+	app.messageBrokerClient.AsyncMessage(topic.PROPAGATE_GRID_CHANGE, app.messageBrokerClient.GetName(), gridChange.Marshal())
 	return nil
 }
 
@@ -30,7 +30,7 @@ func (app *App) nextGeneration(message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := app.messageBrokerClient.AsyncMessage(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := app.messageBrokerClient.AsyncMessage(topic.PROPGATE_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		app.logger.Log(Error.New("", err).Error())
 	}
@@ -48,7 +48,7 @@ func (app *App) setGrid(message *Message.Message) error {
 			app.grid[row][col] = Utilities.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(topic.GET_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := app.messageBrokerClient.AsyncMessage(topic.PROPGATE_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		app.logger.Log(Error.New("", err).Error())
 	}

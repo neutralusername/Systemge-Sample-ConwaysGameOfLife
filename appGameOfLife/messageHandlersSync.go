@@ -9,7 +9,7 @@ import (
 
 func (app *App) GetSyncMessageHandlers() map[string]Application.SyncMessageHandler {
 	return map[string]Application.SyncMessageHandler{
-		topic.GET_GRID_SYNC: app.getGridSync,
+		topic.GET_GRID: app.getGridSync,
 	}
 }
 

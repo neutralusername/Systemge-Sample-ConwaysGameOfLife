@@ -1,6 +1,6 @@
 # broker
 :60004
-getGridSync
-gridChange
-nextGeneration
-setGrid
+getGrid sync
+gridChange async
+nextGeneration async
+setGrid async

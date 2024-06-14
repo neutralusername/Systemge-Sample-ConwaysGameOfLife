@@ -1,4 +1,4 @@
 # broker
 :60003
-getGrid
-getGridChange
+propagateGrid async
+propagateGridChange async

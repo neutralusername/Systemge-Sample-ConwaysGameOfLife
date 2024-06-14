@@ -1,9 +1,9 @@
 # resolver
 :60000
-getGridSync :60004
+getGrid :60004
 gridChange :60004
 nextGeneration :60004
 setGrid :60004
 
-getGrid :60003
-getGridChange :60003
+propagateGrid :60003
+propagateGridChange :60003

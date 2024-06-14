@@ -30,9 +30,8 @@ export class root extends React.Component {
             (this.state.WS_CONNECTION.onmessage = (event) => {
                 let message = JSON.parse(event.data);
                 switch (message.topic) {
-                    case "getGridSync":
                     case "getGrid":
-
+                    case "propagateGrid":
                         let grid = JSON.parse(message.payload);
                         let newStateInput = ""
                         let cells = []
@@ -57,7 +56,7 @@ export class root extends React.Component {
                             cells: cells,
                         });
                         break;
-                    case "getGridChange": {
+                    case "propagateGridChange": {
                         let gridChange = JSON.parse(message.payload);
                         this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
                         let newStateInput = this.state.stateInput

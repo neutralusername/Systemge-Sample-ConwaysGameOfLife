@@ -20,7 +20,7 @@ func (app *WebsocketApp) propagateWebsocketAsyncMessage(connection *WebsocketCli
 }
 
 func (app *WebsocketApp) OnConnectHandler(connection *WebsocketClient.Client) {
-	response, err := app.messageBrokerClient.SyncMessage(topic.GET_GRID_SYNC, app.messageBrokerClient.GetName(), connection.GetId())
+	response, err := app.messageBrokerClient.SyncMessage(topic.GET_GRID, app.messageBrokerClient.GetName(), connection.GetId())
 	if err != nil {
 		app.logger.Log(Error.New("Error sending sync message", err).Error())
 	}

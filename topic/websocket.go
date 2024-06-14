@@ -1,4 +1,4 @@
 package topic
 
-const GET_GRID = "getGrid"
-const GET_GRID_CHANGE = "getGridChange"
+const PROPGATE_GRID = "propagateGrid"
+const PROPAGATE_GRID_CHANGE = "propagateGridChange"
