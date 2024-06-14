@@ -4,6 +4,12 @@ export class Cell extends React.Component {
         this.state = {}
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.cellState !== nextProps.cellState)
+            return true
+        return false
+    }
+
     render() {
         return React.createElement(
             "div", {
