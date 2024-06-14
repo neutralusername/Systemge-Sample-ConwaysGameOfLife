@@ -11,7 +11,6 @@ export class Cell extends React.Component {
     }
 
     render() {
-        console.log("a")
         return React.createElement(
             "div", {
                 id: "cell",
