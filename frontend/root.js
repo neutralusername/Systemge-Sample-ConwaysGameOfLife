@@ -1,6 +1,4 @@
-import {
-    Grid
-} from "./grid.js";
+import { Cell } from "./cell.js";
 import {
     Menu
 } from "./menu.js";
@@ -13,6 +11,8 @@ export class root extends React.Component {
 
                 SQUARESIZE: 10,
                 autoNextGenDelay_ms: 100,
+
+                cells : [],
 
                 grid: null,
                 nextGenerationLoop: null,
@@ -32,22 +32,43 @@ export class root extends React.Component {
                 switch (message.topic) {
                     case "getGridSync":
                     case "getGrid":
+
                         let grid = JSON.parse(message.payload);
                         let newStateInput = ""
-                        grid.grid.forEach((row) => {
-                            row.forEach((cell) => {
+                        let cells = []
+                        grid.grid.forEach((row, indexRow) => {
+                            row.forEach((cell, indexCol) => {
                                 newStateInput += cell
+                                cells.push(
+                                    React.createElement(Cell, {
+                                        cellState: cell,
+                                        indexRow: indexRow,
+                                        indexCol: indexCol,
+                                        cols: grid.cols,
+                                        WS_CONNECTION: this.state.WS_CONNECTION,
+                                        constructMessage: this.state.constructMessage,
+                                    })
+                                );
                             })
                         })
                         this.setState({
                             grid: grid,
                             stateInput: newStateInput,
+                            cells: cells,
                         });
                         break;
                     case "getGridChange": {
                         let gridChange = JSON.parse(message.payload);
                         this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
                         let newStateInput = this.state.stateInput
+                        this.state.cells[gridChange.row * this.state.grid.cols + gridChange.column] = React.createElement(Cell, {
+                            cellState: gridChange.state,
+                            indexRow: gridChange.row,
+                            indexCol: gridChange.column,
+                            cols: this.state.grid.cols,
+                            WS_CONNECTION: this.state.WS_CONNECTION,
+                            constructMessage: this.state.constructMessage,
+                        });
                         newStateInput = newStateInput.substring(0, gridChange.row * this.state.grid.cols + gridChange.column) + gridChange.state + newStateInput.substring(gridChange.row * this.state.grid.cols + gridChange.column + 1)
                         this.setState({
                             grid: this.state.grid,
@@ -93,7 +114,29 @@ export class root extends React.Component {
                 },
             },
             this.state.grid ? React.createElement(Menu, this.state) : null,
-            this.state.grid ? React.createElement(Grid, this.state) : null
+            this.state.grid ? React.createElement(
+                "div", {
+                    id: "grid",
+                    style: {
+                        display: "grid",
+                        gridTemplateColumns: "repeat(" + this.state.grid.cols + ", " + this.state.SQUARESIZE + "px)",
+                        gridTemplateRows: "repeat(" + this.state.grid.rows + ", " + this.state.SQUARESIZE + "px)",
+                        width: this.state.grid.cols * this.state.SQUARESIZE + "px",
+                        height: this.state.grid.rows * this.state.SQUARESIZE + "px",
+                        border: "1px solid black",
+                        margin: "auto",
+                        marginTop: "10px",
+                        marginBottom: "10px",
+                        backgroundColor: "white",
+                        padding: "0px",
+                        boxSizing: "border-box",
+                        position: "relative",
+                        overflow: "hidden",
+                        borderRadius: "5px",
+                    },
+                },
+                this.state.cells
+            ) : null
         );
     }
 }
