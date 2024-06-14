@@ -1,9 +1,13 @@
 # resolver
 :60000
-getGrid 127.0.0.1:60004
-gridChange 127.0.0.1:60004
-nextGeneration 127.0.0.1:60004
-setGrid 127.0.0.1:60004
 
-propagateGrid 127.0.0.1:60003
-propagateGridChange 127.0.0.1:60003
+brokerGameOfLife 127.0.0.1:60004 ./MyCertificate.crt
+brokerWebsocket 127.0.0.1:60003 ./MyCertificate.crt
+
+getGrid brokerGameOfLife
+gridChange brokerGameOfLife
+nextGeneration brokerGameOfLife
+setGrid brokerGameOfLife
+
+propagateGrid brokerWebsocket
+propagateGridChange brokerWebsocket

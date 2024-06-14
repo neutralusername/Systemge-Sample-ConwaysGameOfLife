@@ -1,5 +1,8 @@
 # broker
 :60004
+key ./MyKey.key
+cert ./MyCertificate.crt
+
 getGrid sync
 gridChange async
 nextGeneration async

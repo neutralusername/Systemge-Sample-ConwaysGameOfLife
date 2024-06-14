@@ -1,4 +1,7 @@
 # broker
 :60003
+key ./MyKey.key
+cert ./MyCertificate.crt
+
 propagateGrid async
 propagateGridChange async
