@@ -28,6 +28,9 @@ changes to the grid are broadcasted automatically to all other websocket clients
 - enter "randomize" into the command line interface to randomize every cells state
 - enter "invert" to invert all cells
 
+## notes
+if you intend to use this for production change the tls key and certificate
+
 
 ![60QV4Ftw9N](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/2f5b2d0c-65b4-4045-99da-b73d5727f160)
 
