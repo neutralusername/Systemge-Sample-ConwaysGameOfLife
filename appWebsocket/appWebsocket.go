@@ -5,20 +5,20 @@ import (
 	"Systemge/Client"
 )
 
-type WebsocketApp struct {
+type AppWebsocket struct {
 	client *Client.Client
 }
 
 func New(client *Client.Client, args []string) Application.WebsocketApplication {
-	return &WebsocketApp{
+	return &AppWebsocket{
 		client: client,
 	}
 }
 
-func (app *WebsocketApp) OnStart() error {
+func (app *AppWebsocket) OnStart() error {
 	return nil
 }
 
-func (app *WebsocketApp) OnStop() error {
+func (app *AppWebsocket) OnStop() error {
 	return nil
 }
