@@ -17,7 +17,7 @@ type App struct {
 	gridCols   int
 }
 
-func New(client *Client.Client, args []string) Application.Application {
+func New(client *Client.Client, args []string) (Application.Application, error) {
 	app := &App{
 		randomizer: Utilities.NewRandomizer(Utilities.GetSystemTime()),
 		client:     client,
@@ -26,7 +26,7 @@ func New(client *Client.Client, args []string) Application.Application {
 		gridRows: 90,
 		gridCols: 140,
 	}
-	return app
+	return app, nil
 }
 
 func (app *App) OnStart() error {
