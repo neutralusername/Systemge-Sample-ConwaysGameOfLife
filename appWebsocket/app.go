@@ -2,19 +2,16 @@ package appWebsocket
 
 import (
 	"Systemge/Application"
-	"Systemge/MessageBrokerClient"
-	"Systemge/Utilities"
+	"Systemge/Client"
 )
 
 type WebsocketApp struct {
-	logger              *Utilities.Logger
-	messageBrokerClient *MessageBrokerClient.Client
+	client *Client.Client
 }
 
-func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) Application.WebsocketApplication {
+func New(client *Client.Client, args []string) Application.WebsocketApplication {
 	return &WebsocketApp{
-		logger:              logger,
-		messageBrokerClient: messageBrokerClient,
+		client: client,
 	}
 }
 

@@ -31,9 +31,9 @@ func (app *App) randomizeGrid(args []string) error {
 			}
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(topic.PROPGATE_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := app.client.AsyncMessage(topic.PROPGATE_GRID, app.client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		app.logger.Log(err.Error())
+		app.client.GetLogger().Log(err.Error())
 	}
 	return nil
 }
@@ -46,9 +46,9 @@ func (app *App) invertGrid(args []string) error {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(topic.PROPGATE_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := app.client.AsyncMessage(topic.PROPGATE_GRID, app.client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		app.logger.Log(err.Error())
+		app.client.GetLogger().Log(err.Error())
 	}
 	return nil
 }
@@ -61,9 +61,9 @@ func (app *App) chessGrid(args []string) error {
 			app.grid[row][col] = (row + col) % 2
 		}
 	}
-	err := app.messageBrokerClient.AsyncMessage(topic.PROPGATE_GRID, app.messageBrokerClient.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := app.client.AsyncMessage(topic.PROPGATE_GRID, app.client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		app.logger.Log(err.Error())
+		app.client.GetLogger().Log(err.Error())
 	}
 	return nil
 }

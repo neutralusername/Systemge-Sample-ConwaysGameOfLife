@@ -13,6 +13,6 @@ func (app *WebsocketApp) GetAsyncMessageHandlers() map[string]Application.AsyncM
 	}
 }
 func (app *WebsocketApp) WebsocketPropagate(message *Message.Message) error {
-	app.messageBrokerClient.GetWebsocketServer().Broadcast(message)
+	app.client.GetWebsocketServer().Broadcast(message)
 	return nil
 }

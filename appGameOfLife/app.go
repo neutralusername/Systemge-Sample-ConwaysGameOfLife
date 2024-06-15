@@ -2,14 +2,13 @@ package appGameOfLife
 
 import (
 	"Systemge/Application"
-	"Systemge/MessageBrokerClient"
+	"Systemge/Client"
 	"Systemge/Utilities"
 	"sync"
 )
 
 type App struct {
-	logger              *Utilities.Logger
-	messageBrokerClient *MessageBrokerClient.Client
+	client *Client.Client
 
 	randomizer *Utilities.Randomizer
 	grid       [][]int
@@ -18,11 +17,10 @@ type App struct {
 	gridCols   int
 }
 
-func New(logger *Utilities.Logger, messageBrokerClient *MessageBrokerClient.Client) Application.Application {
+func New(client *Client.Client, args []string) Application.Application {
 	app := &App{
-		logger:              logger,
-		randomizer:          Utilities.NewRandomizer(Utilities.GetSystemTime()),
-		messageBrokerClient: messageBrokerClient,
+		randomizer: Utilities.NewRandomizer(Utilities.GetSystemTime()),
+		client:     client,
 
 		grid:     nil,
 		gridRows: 90,

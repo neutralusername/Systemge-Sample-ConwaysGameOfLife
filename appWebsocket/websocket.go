@@ -16,17 +16,17 @@ func (app *WebsocketApp) GetWebsocketMessageHandlers() map[string]Application.We
 	}
 }
 func (app *WebsocketApp) propagateWebsocketAsyncMessage(connection *WebsocketClient.Client, message *Message.Message) error {
-	return app.messageBrokerClient.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
+	return app.client.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
 }
 
 func (app *WebsocketApp) OnConnectHandler(connection *WebsocketClient.Client) {
-	response, err := app.messageBrokerClient.SyncMessage(topic.GET_GRID, app.messageBrokerClient.GetName(), connection.GetId())
+	response, err := app.client.SyncMessage(topic.GET_GRID, app.client.GetName(), connection.GetId())
 	if err != nil {
-		app.logger.Log(Error.New("Error sending sync message", err).Error())
+		app.client.GetLogger().Log(Error.New("Error sending sync message", err).Error())
 	}
 	connection.Send([]byte(response.Serialize()))
 }
 
 func (app *WebsocketApp) OnDisconnectHandler(connection *WebsocketClient.Client) {
-	app.logger.Log("Connection closed")
+	app.client.GetLogger().Log("Connection closed")
 }
