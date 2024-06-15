@@ -3,14 +3,14 @@ package appGameOfLife
 import (
 	"Systemge/Application"
 	"Systemge/Client"
-	"Systemge/Utilities"
+	"Systemge/Randomizer"
 	"sync"
 )
 
 type App struct {
 	client *Client.Client
 
-	randomizer *Utilities.Randomizer
+	randomizer *Randomizer.Randomizer
 	grid       [][]int
 	mutex      sync.Mutex
 	gridRows   int
@@ -19,7 +19,7 @@ type App struct {
 
 func New(client *Client.Client, args []string) (Application.Application, error) {
 	app := &App{
-		randomizer: Utilities.NewRandomizer(Utilities.GetSystemTime()),
+		randomizer: Randomizer.New(Randomizer.GetSystemTime()),
 		client:     client,
 
 		grid:     nil,
