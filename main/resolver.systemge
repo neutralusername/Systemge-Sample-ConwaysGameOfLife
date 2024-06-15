@@ -1,16 +1,6 @@
 # resolver
 resolver :60000
-config :60001
-cert ./MyCertificate.crt
-key ./MyKey.key
+config :60001 ./MyCertificate.crt ./MyKey.key
 
-brokerGameOfLife 127.0.0.1:60004 ./MyCertificate.crt
-brokerWebsocket 127.0.0.1:60003 ./MyCertificate.crt
-
-getGrid brokerGameOfLife
-gridChange brokerGameOfLife
-nextGeneration brokerGameOfLife
-setGrid brokerGameOfLife
-
-propagateGrid brokerWebsocket
-propagateGridChange brokerWebsocket
+brokerGameOfLife 127.0.0.1:60005 ./MyCertificate.crt getGrid gridChange nextGeneration setGrid
+brokerWebsocket 127.0.0.1:60003 ./MyCertificate.crt propagateGrid propagateGridChange
