@@ -15,6 +15,7 @@ type App struct {
 	mutex      sync.Mutex
 	gridRows   int
 	gridCols   int
+	toroidal   bool
 }
 
 func New(client *Client.Client, args []string) (Application.Application, error) {
@@ -25,6 +26,7 @@ func New(client *Client.Client, args []string) (Application.Application, error) 
 		grid:     nil,
 		gridRows: 90,
 		gridCols: 140,
+		toroidal: true,
 	}
 	return app, nil
 }

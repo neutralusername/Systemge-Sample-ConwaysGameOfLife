@@ -10,9 +10,17 @@ func (app *App) calcNextGeneration() {
 			aliveNeighbours := 0
 			for i := -1; i < 2; i++ {
 				for j := -1; j < 2; j++ {
-					neighbourRow := (row + i + app.gridRows) % app.gridRows
-					neighbourCol := (col + j + app.gridCols) % app.gridCols
-					aliveNeighbours += app.grid[neighbourRow][neighbourCol]
+					if app.toroidal {
+						neighbourRow := (row + i + app.gridRows) % app.gridRows
+						neighbourCol := (col + j + app.gridCols) % app.gridCols
+						aliveNeighbours += app.grid[neighbourRow][neighbourCol]
+					} else {
+						neighbourRow := row + i
+						neighbourCol := col + j
+						if neighbourRow >= 0 && neighbourRow < app.gridRows && neighbourCol >= 0 && neighbourCol < app.gridCols {
+							aliveNeighbours += app.grid[neighbourRow][neighbourCol]
+						}
+					}
 				}
 			}
 			aliveNeighbours -= app.grid[row][col]
