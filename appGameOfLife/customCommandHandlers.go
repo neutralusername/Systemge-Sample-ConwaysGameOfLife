@@ -21,9 +21,9 @@ func (app *App) toggleToroidal(args []string) error {
 	defer app.mutex.Unlock()
 	app.toroidal = !app.toroidal
 	if app.toroidal {
-		app.client.GetLogger().Log("Toroidal grid enabled")
+		println("Toroidal mode enabled")
 	} else {
-		app.client.GetLogger().Log("Toroidal grid disabled")
+		println("Toroidal mode disabled")
 	}
 	return nil
 }
