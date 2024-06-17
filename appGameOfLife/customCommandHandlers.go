@@ -9,10 +9,23 @@ import (
 
 func (app *App) GetCustomCommandHandlers() map[string]Application.CustomCommandHandler {
 	return map[string]Application.CustomCommandHandler{
-		"randomize": app.randomizeGrid,
-		"invert":    app.invertGrid,
-		"chess":     app.chessGrid,
+		"randomize":      app.randomizeGrid,
+		"invert":         app.invertGrid,
+		"chess":          app.chessGrid,
+		"toggleToroidal": app.toggleToroidal,
 	}
+}
+
+func (app *App) toggleToroidal(args []string) error {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	app.toroidal = !app.toroidal
+	if app.toroidal {
+		app.client.GetLogger().Log("Toroidal grid enabled")
+	} else {
+		app.client.GetLogger().Log("Toroidal grid disabled")
+	}
+	return nil
 }
 
 func (app *App) randomizeGrid(args []string) error {
