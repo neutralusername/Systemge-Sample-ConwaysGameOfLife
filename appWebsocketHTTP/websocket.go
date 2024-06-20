@@ -1,4 +1,4 @@
-package appWebsocket
+package appWebsocketHTTP
 
 import (
 	"Systemge/Application"
@@ -8,18 +8,18 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *AppWebsocket) GetWebsocketMessageHandlers() map[string]Application.WebsocketMessageHandler {
+func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Application.WebsocketMessageHandler {
 	return map[string]Application.WebsocketMessageHandler{
 		topic.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
 		topic.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
 		topic.SET_GRID:        app.propagateWebsocketAsyncMessage,
 	}
 }
-func (app *AppWebsocket) propagateWebsocketAsyncMessage(connection *WebsocketClient.Client, message *Message.Message) error {
+func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(connection *WebsocketClient.Client, message *Message.Message) error {
 	return app.client.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
 }
 
-func (app *AppWebsocket) OnConnectHandler(connection *WebsocketClient.Client) {
+func (app *AppWebsocketHTTP) OnConnectHandler(connection *WebsocketClient.Client) {
 	response, err := app.client.SyncMessage(topic.GET_GRID, app.client.GetName(), connection.GetId())
 	if err != nil {
 		app.client.GetLogger().Log(Utilities.NewError("Error sending sync message", err).Error())
@@ -27,6 +27,6 @@ func (app *AppWebsocket) OnConnectHandler(connection *WebsocketClient.Client) {
 	connection.Send([]byte(response.Serialize()))
 }
 
-func (app *AppWebsocket) OnDisconnectHandler(connection *WebsocketClient.Client) {
+func (app *AppWebsocketHTTP) OnDisconnectHandler(connection *WebsocketClient.Client) {
 	app.client.GetLogger().Log("Connection closed")
 }
