@@ -13,12 +13,28 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	clientGameOfLife := Module.NewClient("clientGameOfLife", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, appGameOfLife.New, nil)
+	clientGameOfLife := Module.NewClient(&Module.ClientConfig{
+		Name:            "clientGameOfLife",
+		ResolverAddress: TOPICRESOLUTIONSERVER_ADDRESS,
+		LoggerPath:      ERROR_LOG_FILE_PATH,
+	}, appGameOfLife.New, nil)
+	clientWebsocketHTTP := Module.NewCompositeClientWebsocketHTTP(&Module.ClientConfig{
+		Name:             "clientWebsocket",
+		ResolverAddress:  TOPICRESOLUTIONSERVER_ADDRESS,
+		LoggerPath:       ERROR_LOG_FILE_PATH,
+		WebsocketPattern: "/ws",
+		WebsocketPort:    WEBSOCKET_PORT,
+		WebsocketCert:    "",
+		WebsocketKey:     "",
+		HTTPPort:         HTTP_PORT,
+		HTTPCert:         "",
+		HTTPKey:          "",
+	}, appWebsocketHTTP.New, nil)
 	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Module.NewResolverFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewBrokerFromConfig("brokerGameOfLife.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewBrokerFromConfig("brokerWebsocket.systemge", ERROR_LOG_FILE_PATH),
 		clientGameOfLife,
-		Module.NewCompositeClientWebsocketHTTP("clientWebsocket", TOPICRESOLUTIONSERVER_ADDRESS, ERROR_LOG_FILE_PATH, "/ws", WEBSOCKET_PORT, "", "", HTTP_PORT, "", "", appWebsocketHTTP.New, nil),
+		clientWebsocketHTTP,
 	), clientGameOfLife.GetApplication().GetCustomCommandHandlers())
 }
