@@ -38,5 +38,5 @@ func main() {
 		Module.NewBrokerFromConfig("brokerWebsocket.systemge", ERROR_LOG_FILE_PATH),
 		clientGameOfLife,
 		clientWebsocketHTTP,
-	), clientGameOfLife.GetApplication().GetCustomCommandHandlers())
+	), clientGameOfLife.GetApplication().GetCustomCommandHandlers(), clientWebsocketHTTP.GetCustomCommandHandlers())
 }
