@@ -6,7 +6,9 @@ import (
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 )
 
-const TOPICRESOLUTIONSERVER_ADDRESS = "127.0.0.1:60000"
+const RESOLVER_ADDRESS = "127.0.0.1:60000"
+const RESOLVER_NAME_INDICATION = "127.0.0.1"
+const RESOLVER_TLS_CERT_PATH = "MyCertificate.crt"
 const WEBSOCKET_PORT = ":8443"
 const HTTP_PORT = ":8080"
 
@@ -14,21 +16,21 @@ const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
 	clientGameOfLife := Module.NewClient(&Module.ClientConfig{
-		Name:            "clientGameOfLife",
-		ResolverAddress: TOPICRESOLUTIONSERVER_ADDRESS,
-		LoggerPath:      ERROR_LOG_FILE_PATH,
+		Name:                   "clientGameOfLife",
+		ResolverAddress:        RESOLVER_ADDRESS,
+		ResolverNameIndication: RESOLVER_NAME_INDICATION,
+		ResolverTLSCertPath:    RESOLVER_TLS_CERT_PATH,
+		LoggerPath:             ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New, nil)
 	clientWebsocketHTTP := Module.NewCompositeClientWebsocketHTTP(&Module.ClientConfig{
-		Name:             "clientWebsocket",
-		ResolverAddress:  TOPICRESOLUTIONSERVER_ADDRESS,
-		LoggerPath:       ERROR_LOG_FILE_PATH,
-		WebsocketPattern: "/ws",
-		WebsocketPort:    WEBSOCKET_PORT,
-		WebsocketCert:    "",
-		WebsocketKey:     "",
-		HTTPPort:         HTTP_PORT,
-		HTTPCert:         "",
-		HTTPKey:          "",
+		Name:                   "clientWebsocket",
+		ResolverAddress:        RESOLVER_ADDRESS,
+		ResolverNameIndication: RESOLVER_NAME_INDICATION,
+		ResolverTLSCertPath:    RESOLVER_TLS_CERT_PATH,
+		LoggerPath:             ERROR_LOG_FILE_PATH,
+		WebsocketPattern:       "/ws",
+		WebsocketPort:          WEBSOCKET_PORT,
+		HTTPPort:               HTTP_PORT,
 	}, appWebsocketHTTP.New, nil)
 	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Module.NewResolverFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
