@@ -1,14 +1,14 @@
 package appGameOfLife
 
 import (
-	"Systemge/Application"
+	"Systemge/Client"
 	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *App) GetCustomCommandHandlers() map[string]Application.CustomCommandHandler {
-	return map[string]Application.CustomCommandHandler{
+func (app *App) GetCustomCommandHandlers() map[string]Client.CustomCommandHandler {
+	return map[string]Client.CustomCommandHandler{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,
@@ -16,7 +16,7 @@ func (app *App) GetCustomCommandHandlers() map[string]Application.CustomCommandH
 	}
 }
 
-func (app *App) toggleToroidal(args []string) error {
+func (app *App) toggleToroidal(client *Client.Client, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.toroidal = !app.toroidal
@@ -28,7 +28,7 @@ func (app *App) toggleToroidal(args []string) error {
 	return nil
 }
 
-func (app *App) randomizeGrid(args []string) error {
+func (app *App) randomizeGrid(client *Client.Client, args []string) error {
 	percentageOfAliveCells := 50
 	if len(args) > 0 {
 		percentageOfAliveCells = Utilities.StringToInt(args[0])
@@ -44,14 +44,14 @@ func (app *App) randomizeGrid(args []string) error {
 			}
 		}
 	}
-	err := app.client.AsyncMessage(topic.PROPGATE_GRID, app.client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		app.client.GetLogger().Log(err.Error())
+		client.GetLogger().Log(err.Error())
 	}
 	return nil
 }
 
-func (app *App) invertGrid(args []string) error {
+func (app *App) invertGrid(client *Client.Client, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -59,14 +59,14 @@ func (app *App) invertGrid(args []string) error {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	err := app.client.AsyncMessage(topic.PROPGATE_GRID, app.client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		app.client.GetLogger().Log(err.Error())
+		client.GetLogger().Log(err.Error())
 	}
 	return nil
 }
 
-func (app *App) chessGrid(args []string) error {
+func (app *App) chessGrid(client *Client.Client, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -74,9 +74,9 @@ func (app *App) chessGrid(args []string) error {
 			app.grid[row][col] = (row + col) % 2
 		}
 	}
-	err := app.client.AsyncMessage(topic.PROPGATE_GRID, app.client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		app.client.GetLogger().Log(err.Error())
+		client.GetLogger().Log(err.Error())
 	}
 	return nil
 }

@@ -1,18 +1,18 @@
 package appWebsocketHTTP
 
 import (
-	"Systemge/Application"
+	"Systemge/Client"
 	"Systemge/Message"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Application.AsyncMessageHandler {
-	return map[string]Application.AsyncMessageHandler{
+func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Client.AsyncMessageHandler {
+	return map[string]Client.AsyncMessageHandler{
 		topic.PROPGATE_GRID:         app.WebsocketPropagate,
 		topic.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
 	}
 }
-func (app *AppWebsocketHTTP) WebsocketPropagate(message *Message.Message) error {
-	app.client.GetWebsocketServer().Broadcast(message)
+func (app *AppWebsocketHTTP) WebsocketPropagate(client *Client.Client, message *Message.Message) error {
+	client.Broadcast(message)
 	return nil
 }

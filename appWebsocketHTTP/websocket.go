@@ -1,32 +1,32 @@
 package appWebsocketHTTP
 
 import (
-	"Systemge/Application"
+	"Systemge/Client"
 	"Systemge/Message"
 	"Systemge/Utilities"
 	"Systemge/WebsocketClient"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Application.WebsocketMessageHandler {
-	return map[string]Application.WebsocketMessageHandler{
+func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Client.WebsocketMessageHandler {
+	return map[string]Client.WebsocketMessageHandler{
 		topic.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
 		topic.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
 		topic.SET_GRID:        app.propagateWebsocketAsyncMessage,
 	}
 }
-func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(connection *WebsocketClient.Client, message *Message.Message) error {
-	return app.client.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
+func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(client *Client.Client, websocketClient *WebsocketClient.Client, message *Message.Message) error {
+	return client.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
 }
 
-func (app *AppWebsocketHTTP) OnConnectHandler(connection *WebsocketClient.Client) {
-	response, err := app.client.SyncMessage(topic.GET_GRID, app.client.GetName(), connection.GetId())
+func (app *AppWebsocketHTTP) OnConnectHandler(client *Client.Client, websocketClient *WebsocketClient.Client) {
+	response, err := client.SyncMessage(topic.GET_GRID, client.GetName(), websocketClient.GetId())
 	if err != nil {
-		app.client.GetLogger().Log(Utilities.NewError("Error sending sync message", err).Error())
+		client.GetLogger().Log(Utilities.NewError("Error sending sync message", err).Error())
 	}
-	connection.Send([]byte(response.Serialize()))
+	websocketClient.Send([]byte(response.Serialize()))
 }
 
-func (app *AppWebsocketHTTP) OnDisconnectHandler(connection *WebsocketClient.Client) {
-	app.client.GetLogger().Log("Connection closed")
+func (app *AppWebsocketHTTP) OnDisconnectHandler(client *Client.Client, websocketClient *WebsocketClient.Client) {
+	client.GetLogger().Log("Connection closed")
 }

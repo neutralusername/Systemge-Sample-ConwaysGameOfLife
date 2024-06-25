@@ -1,15 +1,12 @@
 package appGameOfLife
 
 import (
-	"Systemge/Application"
 	"Systemge/Client"
 	"Systemge/Randomizer"
 	"sync"
 )
 
 type App struct {
-	client *Client.Client
-
 	randomizer *Randomizer.Randomizer
 	grid       [][]int
 	mutex      sync.Mutex
@@ -18,20 +15,19 @@ type App struct {
 	toroidal   bool
 }
 
-func New(client *Client.Client, args []string) (Application.Application, error) {
+func New() Client.Application {
 	app := &App{
 		randomizer: Randomizer.New(Randomizer.GetSystemTime()),
-		client:     client,
 
 		grid:     nil,
 		gridRows: 90,
 		gridCols: 140,
 		toroidal: true,
 	}
-	return app, nil
+	return app
 }
 
-func (app *App) OnStart() error {
+func (app *App) OnStart(client *Client.Client) error {
 	grid := make([][]int, app.gridRows)
 	for i := range grid {
 		grid[i] = make([]int, app.gridCols)
@@ -40,6 +36,6 @@ func (app *App) OnStart() error {
 	return nil
 }
 
-func (app *App) OnStop() error {
+func (app *App) OnStop(client *Client.Client) error {
 	return nil
 }
