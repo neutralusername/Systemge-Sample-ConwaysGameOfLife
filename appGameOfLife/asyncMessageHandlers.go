@@ -2,6 +2,7 @@ package appGameOfLife
 
 import (
 	"Systemge/Client"
+	"Systemge/Error"
 	"Systemge/Message"
 	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/dto"
@@ -31,7 +32,7 @@ func (app *App) nextGeneration(client *Client.Client, message *Message.Message) 
 	app.calcNextGeneration()
 	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(Utilities.NewError("", err).Error())
+		client.GetLogger().Log(Error.New("", err).Error())
 	}
 	return nil
 }
@@ -40,7 +41,7 @@ func (app *App) setGrid(client *Client.Client, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.GetPayload()) != app.gridCols*app.gridRows {
-		return Utilities.NewError("Invalid grid size", nil)
+		return Error.New("Invalid grid size", nil)
 	}
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
@@ -49,7 +50,7 @@ func (app *App) setGrid(client *Client.Client, message *Message.Message) error {
 	}
 	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(Utilities.NewError("", err).Error())
+		client.GetLogger().Log(Error.New("", err).Error())
 	}
 	return nil
 }

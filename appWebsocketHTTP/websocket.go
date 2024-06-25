@@ -2,8 +2,8 @@ package appWebsocketHTTP
 
 import (
 	"Systemge/Client"
+	"Systemge/Error"
 	"Systemge/Message"
-	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
@@ -21,7 +21,7 @@ func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(client *Client.Clien
 func (app *AppWebsocketHTTP) OnConnectHandler(client *Client.Client, websocketClient *Client.WebsocketClient) {
 	response, err := client.SyncMessage(topic.GET_GRID, client.GetName(), websocketClient.GetId())
 	if err != nil {
-		client.GetLogger().Log(Utilities.NewError("Error sending sync message", err).Error())
+		client.GetLogger().Log(Error.New("Error sending sync message", err).Error())
 	}
 	websocketClient.Send([]byte(response.Serialize()))
 }
