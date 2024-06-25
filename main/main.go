@@ -18,22 +18,24 @@ const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
 	clientGameOfLife := Module.NewClient(&Client.Config{
-		Name:                   "clientGameOfLife",
-		ResolverAddress:        RESOLVER_ADDRESS,
-		ResolverNameIndication: RESOLVER_NAME_INDICATION,
-		ResolverTLSCert:        Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
-		LoggerPath:             ERROR_LOG_FILE_PATH,
+		Name:                       "clientGameOfLife",
+		ResolverAddress:            RESOLVER_ADDRESS,
+		ResolverNameIndication:     RESOLVER_NAME_INDICATION,
+		ResolverTLSCert:            Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
+		LoggerPath:                 ERROR_LOG_FILE_PATH,
+		HandleMessagesConcurrently: true,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
 	clientWebsocketHTTP := Module.NewClient(&Client.Config{
-		Name:                   "clientWebsocketHTTP",
-		ResolverAddress:        RESOLVER_ADDRESS,
-		ResolverNameIndication: RESOLVER_NAME_INDICATION,
-		ResolverTLSCert:        Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
-		LoggerPath:             ERROR_LOG_FILE_PATH,
-		WebsocketPattern:       "/ws",
-		WebsocketPort:          WEBSOCKET_PORT,
-		HTTPPort:               HTTP_PORT,
+		Name:                       "clientWebsocketHTTP",
+		ResolverAddress:            RESOLVER_ADDRESS,
+		ResolverNameIndication:     RESOLVER_NAME_INDICATION,
+		ResolverTLSCert:            Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
+		LoggerPath:                 ERROR_LOG_FILE_PATH,
+		WebsocketPattern:           "/ws",
+		WebsocketPort:              WEBSOCKET_PORT,
+		HTTPPort:                   HTTP_PORT,
+		HandleMessagesConcurrently: true,
 	}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP)
 	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Module.NewResolverFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
