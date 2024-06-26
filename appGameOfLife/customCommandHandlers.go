@@ -1,14 +1,14 @@
 package appGameOfLife
 
 import (
-	"Systemge/Client"
+	"Systemge/Node"
 	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *App) GetCustomCommandHandlers() map[string]Client.CustomCommandHandler {
-	return map[string]Client.CustomCommandHandler{
+func (app *App) GetCustomCommandHandlers() map[string]Node.CustomCommandHandler {
+	return map[string]Node.CustomCommandHandler{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,
@@ -16,7 +16,7 @@ func (app *App) GetCustomCommandHandlers() map[string]Client.CustomCommandHandle
 	}
 }
 
-func (app *App) toggleToroidal(client *Client.Client, args []string) error {
+func (app *App) toggleToroidal(client *Node.Node, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.toroidal = !app.toroidal
@@ -28,7 +28,7 @@ func (app *App) toggleToroidal(client *Client.Client, args []string) error {
 	return nil
 }
 
-func (app *App) randomizeGrid(client *Client.Client, args []string) error {
+func (app *App) randomizeGrid(client *Node.Node, args []string) error {
 	percentageOfAliveCells := 50
 	if len(args) > 0 {
 		percentageOfAliveCells = Utilities.StringToInt(args[0])
@@ -51,7 +51,7 @@ func (app *App) randomizeGrid(client *Client.Client, args []string) error {
 	return nil
 }
 
-func (app *App) invertGrid(client *Client.Client, args []string) error {
+func (app *App) invertGrid(client *Node.Node, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -66,7 +66,7 @@ func (app *App) invertGrid(client *Client.Client, args []string) error {
 	return nil
 }
 
-func (app *App) chessGrid(client *Client.Client, args []string) error {
+func (app *App) chessGrid(client *Node.Node, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {

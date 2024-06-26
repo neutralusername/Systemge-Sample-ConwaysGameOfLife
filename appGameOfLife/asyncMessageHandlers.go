@@ -1,23 +1,23 @@
 package appGameOfLife
 
 import (
-	"Systemge/Client"
 	"Systemge/Error"
 	"Systemge/Message"
+	"Systemge/Node"
 	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *App) GetAsyncMessageHandlers() map[string]Client.AsyncMessageHandler {
-	return map[string]Client.AsyncMessageHandler{
+func (app *App) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
+	return map[string]Node.AsyncMessageHandler{
 		topic.GRID_CHANGE:     app.gridChange,
 		topic.NEXT_GENERATION: app.nextGeneration,
 		topic.SET_GRID:        app.setGrid,
 	}
 }
 
-func (app *App) gridChange(client *Client.Client, message *Message.Message) error {
+func (app *App) gridChange(client *Node.Node, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -26,7 +26,7 @@ func (app *App) gridChange(client *Client.Client, message *Message.Message) erro
 	return nil
 }
 
-func (app *App) nextGeneration(client *Client.Client, message *Message.Message) error {
+func (app *App) nextGeneration(client *Node.Node, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
@@ -37,7 +37,7 @@ func (app *App) nextGeneration(client *Client.Client, message *Message.Message) 
 	return nil
 }
 
-func (app *App) setGrid(client *Client.Client, message *Message.Message) error {
+func (app *App) setGrid(client *Node.Node, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.GetPayload()) != app.gridCols*app.gridRows {

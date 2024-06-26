@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Systemge/Client"
 	"Systemge/Module"
+	"Systemge/Node"
 	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
@@ -17,7 +17,7 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	clientGameOfLife := Module.NewClient(&Client.Config{
+	clientGameOfLife := Module.NewClient(&Node.Config{
 		Name:                   "clientGameOfLife",
 		ResolverAddress:        RESOLVER_ADDRESS,
 		ResolverNameIndication: RESOLVER_NAME_INDICATION,
@@ -25,7 +25,7 @@ func main() {
 		LoggerPath:             ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	clientWebsocketHTTP := Module.NewClient(&Client.Config{
+	clientWebsocketHTTP := Module.NewClient(&Node.Config{
 		Name:                   "clientWebsocketHTTP",
 		ResolverAddress:        RESOLVER_ADDRESS,
 		ResolverNameIndication: RESOLVER_NAME_INDICATION,

@@ -1,19 +1,19 @@
 package appGameOfLife
 
 import (
-	"Systemge/Client"
 	"Systemge/Message"
+	"Systemge/Node"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *App) GetSyncMessageHandlers() map[string]Client.SyncMessageHandler {
-	return map[string]Client.SyncMessageHandler{
+func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
+	return map[string]Node.SyncMessageHandler{
 		topic.GET_GRID: app.getGridSync,
 	}
 }
 
-func (app *App) getGridSync(client *Client.Client, message *Message.Message) (string, error) {
+func (app *App) getGridSync(client *Node.Node, message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
