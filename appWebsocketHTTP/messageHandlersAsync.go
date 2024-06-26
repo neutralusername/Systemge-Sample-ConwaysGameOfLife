@@ -12,7 +12,7 @@ func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Node.AsyncMess
 		topic.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
 	}
 }
-func (app *AppWebsocketHTTP) WebsocketPropagate(client *Node.Node, message *Message.Message) error {
-	client.WebsocketBroadcast(message)
+func (app *AppWebsocketHTTP) WebsocketPropagate(node *Node.Node, message *Message.Message) error {
+	node.WebsocketBroadcast(message)
 	return nil
 }

@@ -17,27 +17,27 @@ func (app *App) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
 	}
 }
 
-func (app *App) gridChange(client *Node.Node, message *Message.Message) error {
+func (app *App) gridChange(node *Node.Node, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	client.AsyncMessage(topic.PROPAGATE_GRID_CHANGE, client.GetName(), gridChange.Marshal())
+	node.AsyncMessage(topic.PROPAGATE_GRID_CHANGE, node.GetName(), gridChange.Marshal())
 	return nil
 }
 
-func (app *App) nextGeneration(client *Node.Node, message *Message.Message) error {
+func (app *App) nextGeneration(node *Node.Node, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(Error.New("", err).Error())
+		node.GetLogger().Log(Error.New("", err).Error())
 	}
 	return nil
 }
 
-func (app *App) setGrid(client *Node.Node, message *Message.Message) error {
+func (app *App) setGrid(node *Node.Node, message *Message.Message) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.GetPayload()) != app.gridCols*app.gridRows {
@@ -48,9 +48,9 @@ func (app *App) setGrid(client *Node.Node, message *Message.Message) error {
 			app.grid[row][col] = Utilities.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 		}
 	}
-	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(Error.New("", err).Error())
+		node.GetLogger().Log(Error.New("", err).Error())
 	}
 	return nil
 }

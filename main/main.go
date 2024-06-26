@@ -17,16 +17,16 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	clientGameOfLife := Module.NewClient(&Node.Config{
-		Name:                   "clientGameOfLife",
+	nodeGameOfLife := Module.NewNode(&Node.Config{
+		Name:                   "nodeGameOfLife",
 		ResolverAddress:        RESOLVER_ADDRESS,
 		ResolverNameIndication: RESOLVER_NAME_INDICATION,
 		ResolverTLSCert:        Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
 		LoggerPath:             ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	clientWebsocketHTTP := Module.NewClient(&Node.Config{
-		Name:                   "clientWebsocketHTTP",
+	nodeWebsocketHTTP := Module.NewNode(&Node.Config{
+		Name:                   "nodeWebsocketHTTP",
 		ResolverAddress:        RESOLVER_ADDRESS,
 		ResolverNameIndication: RESOLVER_NAME_INDICATION,
 		ResolverTLSCert:        Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
@@ -39,7 +39,7 @@ func main() {
 		Module.NewResolverFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewBrokerFromConfig("brokerGameOfLife.systemge", ERROR_LOG_FILE_PATH),
 		Module.NewBrokerFromConfig("brokerWebsocket.systemge", ERROR_LOG_FILE_PATH),
-		clientGameOfLife,
-		clientWebsocketHTTP,
+		nodeGameOfLife,
+		nodeWebsocketHTTP,
 	))
 }

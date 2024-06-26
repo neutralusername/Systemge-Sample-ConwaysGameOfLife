@@ -27,7 +27,7 @@ func New() Node.Application {
 	return app
 }
 
-func (app *App) OnStart(client *Node.Node) error {
+func (app *App) OnStart(node *Node.Node) error {
 	grid := make([][]int, app.gridRows)
 	for i := range grid {
 		grid[i] = make([]int, app.gridCols)
@@ -36,6 +36,6 @@ func (app *App) OnStart(client *Node.Node) error {
 	return nil
 }
 
-func (app *App) OnStop(client *Node.Node) error {
+func (app *App) OnStop(node *Node.Node) error {
 	return nil
 }

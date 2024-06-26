@@ -14,18 +14,18 @@ func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Node.Webso
 		topic.SET_GRID:        app.propagateWebsocketAsyncMessage,
 	}
 }
-func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(client *Node.Node, websocketClient *Node.WebsocketClient, message *Message.Message) error {
-	return client.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
+func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(node *Node.Node, websocketClient *Node.WebsocketClient, message *Message.Message) error {
+	return node.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
 }
 
-func (app *AppWebsocketHTTP) OnConnectHandler(client *Node.Node, websocketClient *Node.WebsocketClient) {
-	response, err := client.SyncMessage(topic.GET_GRID, client.GetName(), websocketClient.GetId())
+func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
+	response, err := node.SyncMessage(topic.GET_GRID, node.GetName(), websocketClient.GetId())
 	if err != nil {
-		client.GetLogger().Log(Error.New("Error sending sync message", err).Error())
+		node.GetLogger().Log(Error.New("Error sending sync message", err).Error())
 	}
 	websocketClient.Send([]byte(response.Serialize()))
 }
 
-func (app *AppWebsocketHTTP) OnDisconnectHandler(client *Node.Node, websocketClient *Node.WebsocketClient) {
-	client.GetLogger().Log("Connection closed")
+func (app *AppWebsocketHTTP) OnDisconnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
+	node.GetLogger().Log("Connection closed")
 }

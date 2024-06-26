@@ -13,7 +13,7 @@ func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
 	}
 }
 
-func (app *App) getGridSync(client *Node.Node, message *Message.Message) (string, error) {
+func (app *App) getGridSync(node *Node.Node, message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil

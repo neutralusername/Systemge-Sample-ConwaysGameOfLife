@@ -16,7 +16,7 @@ func (app *App) GetCustomCommandHandlers() map[string]Node.CustomCommandHandler 
 	}
 }
 
-func (app *App) toggleToroidal(client *Node.Node, args []string) error {
+func (app *App) toggleToroidal(node *Node.Node, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.toroidal = !app.toroidal
@@ -28,7 +28,7 @@ func (app *App) toggleToroidal(client *Node.Node, args []string) error {
 	return nil
 }
 
-func (app *App) randomizeGrid(client *Node.Node, args []string) error {
+func (app *App) randomizeGrid(node *Node.Node, args []string) error {
 	percentageOfAliveCells := 50
 	if len(args) > 0 {
 		percentageOfAliveCells = Utilities.StringToInt(args[0])
@@ -44,14 +44,14 @@ func (app *App) randomizeGrid(client *Node.Node, args []string) error {
 			}
 		}
 	}
-	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(err.Error())
+		node.GetLogger().Log(err.Error())
 	}
 	return nil
 }
 
-func (app *App) invertGrid(client *Node.Node, args []string) error {
+func (app *App) invertGrid(node *Node.Node, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -59,14 +59,14 @@ func (app *App) invertGrid(client *Node.Node, args []string) error {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(err.Error())
+		node.GetLogger().Log(err.Error())
 	}
 	return nil
 }
 
-func (app *App) chessGrid(client *Node.Node, args []string) error {
+func (app *App) chessGrid(node *Node.Node, args []string) error {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -74,9 +74,9 @@ func (app *App) chessGrid(client *Node.Node, args []string) error {
 			app.grid[row][col] = (row + col) % 2
 		}
 	}
-	err := client.AsyncMessage(topic.PROPGATE_GRID, client.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		client.GetLogger().Log(err.Error())
+		node.GetLogger().Log(err.Error())
 	}
 	return nil
 }
