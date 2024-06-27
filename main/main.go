@@ -3,7 +3,6 @@ package main
 import (
 	"Systemge/Module"
 	"Systemge/Node"
-	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 )
@@ -17,23 +16,14 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	nodeGameOfLife := Module.NewNode(&Node.Config{
-		Name:                   "nodeGameOfLife",
-		ResolverAddress:        RESOLVER_ADDRESS,
-		ResolverNameIndication: RESOLVER_NAME_INDICATION,
-		ResolverTLSCert:        Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
-		LoggerPath:             ERROR_LOG_FILE_PATH,
+	nodeGameOfLife := Module.NewNode(&Node.NodeConfig{
+		Name:       "nodeGameOfLife",
+		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	nodeWebsocketHTTP := Module.NewNode(&Node.Config{
-		Name:                   "nodeWebsocketHTTP",
-		ResolverAddress:        RESOLVER_ADDRESS,
-		ResolverNameIndication: RESOLVER_NAME_INDICATION,
-		ResolverTLSCert:        Utilities.GetFileContent(RESOLVER_TLS_CERT_PATH),
-		LoggerPath:             ERROR_LOG_FILE_PATH,
-		WebsocketPattern:       "/ws",
-		WebsocketPort:          WEBSOCKET_PORT,
-		HTTPPort:               HTTP_PORT,
+	nodeWebsocketHTTP := Module.NewNode(&Node.NodeConfig{
+		Name:       "nodeWebsocketHTTP",
+		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP)
 	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Module.NewResolverFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
