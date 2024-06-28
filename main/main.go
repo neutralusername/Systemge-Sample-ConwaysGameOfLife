@@ -21,9 +21,9 @@ const ERROR_LOG_FILE_PATH = "error.log"
 func main() {
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
 	Module.StartCommandLineInterface(Module.NewMultiModule(
-		Resolver.New(Module.ParseResolverConfigFromFile("resolver.systemge")),
-		Broker.New(Module.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
-		Broker.New(Module.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
+		Resolver.New(Config.ParseResolverConfigFromFile("resolver.systemge")),
+		Broker.New(Config.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
+		Broker.New(Config.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
 		Node.New(Config.Node{
 			Name:       "nodeGameOfLife",
 			LoggerPath: ERROR_LOG_FILE_PATH,
