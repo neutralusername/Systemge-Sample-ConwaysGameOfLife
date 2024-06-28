@@ -1,8 +1,11 @@
 package main
 
 import (
+	"Systemge/Broker"
 	"Systemge/Config"
 	"Systemge/Module"
+	"Systemge/Node"
+	"Systemge/Resolver"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 )
@@ -16,19 +19,19 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	nodeGameOfLife := Module.NewNode(Config.Node{
+	nodeGameOfLife := Node.New(Config.Node{
 		Name:       "nodeGameOfLife",
 		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	nodeWebsocketHTTP := Module.NewNode(Config.Node{
+	nodeWebsocketHTTP := Node.New(Config.Node{
 		Name:       "nodeWebsocketHTTP",
 		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP)
 	Module.StartCommandLineInterface(Module.NewMultiModule(
-		Module.NewResolverFromConfig("resolver.systemge", ERROR_LOG_FILE_PATH),
-		Module.NewBrokerFromConfig("brokerGameOfLife.systemge", ERROR_LOG_FILE_PATH),
-		Module.NewBrokerFromConfig("brokerWebsocket.systemge", ERROR_LOG_FILE_PATH),
+		Resolver.New(Module.ParseResolverConfigFromFile("resolver.systemge")),
+		Broker.New(Module.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
+		Broker.New(Module.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
 		nodeGameOfLife,
 		nodeWebsocketHTTP,
 	))
