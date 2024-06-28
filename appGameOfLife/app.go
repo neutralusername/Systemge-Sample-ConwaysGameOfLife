@@ -16,7 +16,7 @@ type App struct {
 	toroidal   bool
 }
 
-func New() Node.Application {
+func New() *App {
 	app := &App{
 		randomizer: Utilities.NewRandomizer(Utilities.GetSystemTime()),
 
