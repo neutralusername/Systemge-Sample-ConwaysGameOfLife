@@ -1,8 +1,8 @@
 package main
 
 import (
+	"Systemge/Config"
 	"Systemge/Module"
-	"Systemge/Node"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 )
@@ -16,12 +16,12 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	nodeGameOfLife := Module.NewNode(&Node.NodeConfig{
+	nodeGameOfLife := Module.NewNode(&Config.Node{
 		Name:       "nodeGameOfLife",
 		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	nodeWebsocketHTTP := Module.NewNode(&Node.NodeConfig{
+	nodeWebsocketHTTP := Module.NewNode(&Config.Node{
 		Name:       "nodeWebsocketHTTP",
 		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP)
