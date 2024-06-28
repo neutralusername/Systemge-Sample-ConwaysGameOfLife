@@ -16,12 +16,12 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	nodeGameOfLife := Module.NewNode(&Config.Node{
+	nodeGameOfLife := Module.NewNode(Config.Node{
 		Name:       "nodeGameOfLife",
 		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	nodeWebsocketHTTP := Module.NewNode(&Config.Node{
+	nodeWebsocketHTTP := Module.NewNode(Config.Node{
 		Name:       "nodeWebsocketHTTP",
 		LoggerPath: ERROR_LOG_FILE_PATH,
 	}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP)
