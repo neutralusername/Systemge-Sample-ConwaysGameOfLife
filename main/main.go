@@ -19,20 +19,18 @@ const HTTP_PORT = ":8080"
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	nodeGameOfLife := Node.New(Config.Node{
-		Name:       "nodeGameOfLife",
-		LoggerPath: ERROR_LOG_FILE_PATH,
-	}, appGameOfLife.New(), nil, nil)
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
-	nodeWebsocketHTTP := Node.New(Config.Node{
-		Name:       "nodeWebsocketHTTP",
-		LoggerPath: ERROR_LOG_FILE_PATH,
-	}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP)
 	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Resolver.New(Module.ParseResolverConfigFromFile("resolver.systemge")),
 		Broker.New(Module.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
 		Broker.New(Module.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
-		nodeGameOfLife,
-		nodeWebsocketHTTP,
+		Node.New(Config.Node{
+			Name:       "nodeGameOfLife",
+			LoggerPath: ERROR_LOG_FILE_PATH,
+		}, appGameOfLife.New(), nil, nil),
+		Node.New(Config.Node{
+			Name:       "nodeWebsocketHTTP",
+			LoggerPath: ERROR_LOG_FILE_PATH,
+		}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP),
 	))
 }
