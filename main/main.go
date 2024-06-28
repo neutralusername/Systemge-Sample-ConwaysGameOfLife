@@ -27,10 +27,10 @@ func main() {
 		Node.New(Config.Node{
 			Name:       "nodeGameOfLife",
 			LoggerPath: ERROR_LOG_FILE_PATH,
-		}, appGameOfLife.New(), nil, nil),
+		}, appGameOfLife.New()),
 		Node.New(Config.Node{
 			Name:       "nodeWebsocketHTTP",
 			LoggerPath: ERROR_LOG_FILE_PATH,
-		}, applicationWebsocketHTTP, applicationWebsocketHTTP, applicationWebsocketHTTP),
+		}, applicationWebsocketHTTP),
 	))
 }
