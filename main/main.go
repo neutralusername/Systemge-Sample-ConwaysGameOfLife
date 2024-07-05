@@ -5,7 +5,9 @@ import (
 	"Systemge/Config"
 	"Systemge/Module"
 	"Systemge/Node"
+	"Systemge/Resolution"
 	"Systemge/Resolver"
+	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 )
@@ -25,12 +27,14 @@ func main() {
 		Broker.New(Config.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
 		Broker.New(Config.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
 		Node.New(Config.Node{
-			Name:       "nodeGameOfLife",
-			LoggerPath: ERROR_LOG_FILE_PATH,
+			Name:               "nodeGameOfLife",
+			LoggerPath:         ERROR_LOG_FILE_PATH,
+			ResolverResolution: Resolution.New("resolver", "127.0.0.1:60000", "127.0.0.1", Utilities.GetFileContent("MyCertificate.crt")),
 		}, appGameOfLife.New()),
 		Node.New(Config.Node{
-			Name:       "nodeWebsocketHTTP",
-			LoggerPath: ERROR_LOG_FILE_PATH,
+			Name:               "nodeWebsocketHTTP",
+			LoggerPath:         ERROR_LOG_FILE_PATH,
+			ResolverResolution: Resolution.New("resolver", "127.0.0.1:60000", "127.0.0.1", Utilities.GetFileContent("MyCertificate.crt")),
 		}, applicationWebsocketHTTP),
 	))
 }
