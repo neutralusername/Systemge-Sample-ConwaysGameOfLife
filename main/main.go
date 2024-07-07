@@ -32,7 +32,6 @@ func main() {
 			LoggerPath:                ERROR_LOG_FILE_PATH,
 			ResolverEndpoint:          TcpEndpoint.New(config.SERVER_IP+":"+Utilities.IntToString(config.RESOLVER_PORT), config.SERVER_NAME_INDICATION, Utilities.GetFileContent(config.CERT_PATH)),
 			SyncResponseTimeoutMs:     1000,
-			BrokerHeartbeatIntervalMs: 100,
 			TopicResolutionLifetimeMs: 10000,
 		}, appGameOfLife.New()),
 		Node.New(Config.Node{
@@ -40,7 +39,6 @@ func main() {
 			LoggerPath:                ERROR_LOG_FILE_PATH,
 			ResolverEndpoint:          TcpEndpoint.New(config.SERVER_IP+":"+Utilities.IntToString(config.RESOLVER_PORT), config.SERVER_NAME_INDICATION, Utilities.GetFileContent(config.CERT_PATH)),
 			SyncResponseTimeoutMs:     1000,
-			BrokerHeartbeatIntervalMs: 100,
 			TopicResolutionLifetimeMs: 10000,
 		}, applicationWebsocketHTTP),
 	))
