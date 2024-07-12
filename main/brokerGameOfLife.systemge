@@ -2,7 +2,6 @@
 _endpoint 127.0.0.1 example.com
 _error ./error.log
 _warning ./error.log
-_info ./error.log
 _debug ./error.log
 _broker 60005 ./MyCertificate.crt ./MyKey.key
 _config 60006 ./MyCertificate.crt ./MyKey.key
