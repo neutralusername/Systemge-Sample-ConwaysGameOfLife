@@ -46,7 +46,7 @@ func (app *App) randomizeGrid(node *Node.Node, args []string) error {
 	}
 	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Log(err.Error())
+		node.GetLogger().Error(err.Error())
 	}
 	return nil
 }
@@ -61,7 +61,7 @@ func (app *App) invertGrid(node *Node.Node, args []string) error {
 	}
 	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Log(err.Error())
+		node.GetLogger().Error(err.Error())
 	}
 	return nil
 }
@@ -76,7 +76,7 @@ func (app *App) chessGrid(node *Node.Node, args []string) error {
 	}
 	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Log(err.Error())
+		node.GetLogger().Error(err.Error())
 	}
 	return nil
 }

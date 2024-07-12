@@ -32,7 +32,7 @@ func (app *App) nextGeneration(node *Node.Node, message *Message.Message) error 
 	app.calcNextGeneration()
 	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Log(Error.New("", err).Error())
+		node.GetLogger().Error(Error.New("", err).Error())
 	}
 	return nil
 }
@@ -50,7 +50,7 @@ func (app *App) setGrid(node *Node.Node, message *Message.Message) error {
 	}
 	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Log(Error.New("", err).Error())
+		node.GetLogger().Error(Error.New("", err).Error())
 	}
 	return nil
 }

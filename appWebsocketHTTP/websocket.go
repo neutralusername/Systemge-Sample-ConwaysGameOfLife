@@ -23,13 +23,15 @@ func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(node *Node.Node, web
 func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
 	response, err := node.SyncMessage(topic.GET_GRID, node.GetName(), websocketClient.GetId())
 	if err != nil {
-		node.GetLogger().Log(Error.New("Error sending sync message", err).Error())
+		node.GetLogger().Error(Error.New("Error sending sync message", err).Error())
+		websocketClient.Disconnect()
+		return
 	}
 	websocketClient.Send([]byte(response.Serialize()))
 }
 
 func (app *AppWebsocketHTTP) OnDisconnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
-	node.GetLogger().Log("Connection closed")
+	node.GetLogger().Info("Client \"" + websocketClient.GetId() + "\" disconnected")
 }
 
 func (app *AppWebsocketHTTP) GetWebsocketComponentConfig() Config.Websocket {
