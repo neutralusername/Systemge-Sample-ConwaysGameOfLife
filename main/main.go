@@ -23,8 +23,11 @@ const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
 	applicationWebsocketHTTP := appWebsocketHTTP.New()
+	err := Resolver.New(Config.ParseResolverConfigFromFile("resolver.systemge")).Start()
+	if err != nil {
+		panic(err)
+	}
 	Module.StartCommandLineInterface(Module.NewMultiModule(
-		Resolver.New(Config.ParseResolverConfigFromFile("resolver.systemge")),
 		Broker.New(Config.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
 		Broker.New(Config.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
 		Node.New(Config.Node{
