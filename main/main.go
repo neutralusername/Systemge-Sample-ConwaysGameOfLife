@@ -37,6 +37,7 @@ func main() {
 			SyncResponseTimeoutMs:     1000,
 			TopicResolutionLifetimeMs: 10000,
 			BrokerSubscribeDelayMs:    1000,
+			TcpTimeoutMs:              5000,
 		}, appGameOfLife.New()),
 		Node.New(Config.Node{
 			Name:                      config.NODE_WEBSOCKET_HTTP_NAME,
@@ -45,6 +46,7 @@ func main() {
 			SyncResponseTimeoutMs:     1000,
 			TopicResolutionLifetimeMs: 10000,
 			BrokerSubscribeDelayMs:    1000,
+			TcpTimeoutMs:              5000,
 		}, applicationWebsocketHTTP),
 	))
 }
