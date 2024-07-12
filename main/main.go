@@ -6,11 +6,8 @@ import (
 	"Systemge/Module"
 	"Systemge/Node"
 	"Systemge/Resolver"
-	"Systemge/TcpEndpoint"
-	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
-	"SystemgeSampleConwaysGameOfLife/config"
 )
 
 const RESOLVER_ADDRESS = "127.0.0.1:60000"
@@ -30,23 +27,7 @@ func main() {
 	Module.StartCommandLineInterface(Module.NewMultiModule(
 		Broker.New(Config.ParseBrokerConfigFromFile("brokerGameOfLife.systemge")),
 		Broker.New(Config.ParseBrokerConfigFromFile("brokerWebsocketHTTP.systemge")),
-		Node.New(Config.Node{
-			Name:                      config.NODE_GAMEOFLIFE_NAME,
-			Logger:                    Utilities.NewLogger("", ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
-			ResolverEndpoint:          TcpEndpoint.New(config.SERVER_IP+":"+Utilities.IntToString(config.RESOLVER_PORT), config.SERVER_NAME_INDICATION, Utilities.GetFileContent(config.CERT_PATH)),
-			SyncResponseTimeoutMs:     1000,
-			TopicResolutionLifetimeMs: 10000,
-			BrokerSubscribeDelayMs:    1000,
-			TcpTimeoutMs:              5000,
-		}, appGameOfLife.New()),
-		Node.New(Config.Node{
-			Name:                      config.NODE_WEBSOCKET_HTTP_NAME,
-			Logger:                    Utilities.NewLogger("", ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
-			ResolverEndpoint:          TcpEndpoint.New(config.SERVER_IP+":"+Utilities.IntToString(config.RESOLVER_PORT), config.SERVER_NAME_INDICATION, Utilities.GetFileContent(config.CERT_PATH)),
-			SyncResponseTimeoutMs:     1000,
-			TopicResolutionLifetimeMs: 10000,
-			BrokerSubscribeDelayMs:    1000,
-			TcpTimeoutMs:              5000,
-		}, applicationWebsocketHTTP),
+		Node.New(Config.ParseNodeConfigFromFile("nodeGameOfLife.systemge"), appGameOfLife.New()),
+		Node.New(Config.ParseNodeConfigFromFile("nodeWebsocketHTTP.systemge"), applicationWebsocketHTTP),
 	))
 }
