@@ -3,5 +3,5 @@ _error	./error.log
 _warning	./error.log
 _debug	./error.log
 _tcpTimeoutMs	5000
-_resolver	60000	./MyCertificate.crt	./MyKey.key
-_config	60001	./MyCertificate.crt	./MyKey.key
+_resolver	60000
+_config	60001

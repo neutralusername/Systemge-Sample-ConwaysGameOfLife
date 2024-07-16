@@ -2,4 +2,4 @@
 _error	./error.log
 _warning	./error.log
 _debug	./error.log
-_resolver	127.0.0.1:60000	example.com	./MyCertificate.crt
+_resolver	127.0.0.1:60000
