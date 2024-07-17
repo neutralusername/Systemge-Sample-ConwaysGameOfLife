@@ -1,10 +1,25 @@
 package appWebsocketHTTP
 
 import (
+	"Systemge/Config"
 	"Systemge/Message"
 	"Systemge/Node"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
+
+func (app *AppWebsocketHTTP) OnStart(node *Node.Node) error {
+	return nil
+}
+
+func (app *AppWebsocketHTTP) OnStop(node *Node.Node) error {
+	return nil
+}
+
+func (app *AppWebsocketHTTP) GetSystemgeConfig() Config.Application {
+	return Config.Application{
+		HandleMessagesSequentially: false,
+	}
+}
 
 func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
 	return map[string]Node.AsyncMessageHandler{
@@ -15,4 +30,8 @@ func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Node.AsyncMess
 func (app *AppWebsocketHTTP) WebsocketPropagate(node *Node.Node, message *Message.Message) error {
 	node.WebsocketBroadcast(message)
 	return nil
+}
+
+func (app *AppWebsocketHTTP) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
+	return map[string]Node.SyncMessageHandler{}
 }

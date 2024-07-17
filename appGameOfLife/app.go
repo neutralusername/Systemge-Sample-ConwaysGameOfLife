@@ -1,9 +1,10 @@
 package appGameOfLife
 
 import (
-	"Systemge/Config"
 	"Systemge/Node"
 	"Systemge/Utilities"
+	"SystemgeSampleConwaysGameOfLife/dto"
+	"SystemgeSampleConwaysGameOfLife/topic"
 	"sync"
 )
 
@@ -28,21 +29,76 @@ func New() *App {
 	return app
 }
 
-func (app *App) OnStart(node *Node.Node) error {
-	grid := make([][]int, app.gridRows)
-	for i := range grid {
-		grid[i] = make([]int, app.gridCols)
+func (app *App) GetCustomCommandHandlers() map[string]Node.CustomCommandHandler {
+	return map[string]Node.CustomCommandHandler{
+		"randomize":      app.randomizeGrid,
+		"invert":         app.invertGrid,
+		"chess":          app.chessGrid,
+		"toggleToroidal": app.toggleToroidal,
 	}
-	app.grid = grid
+}
+
+func (app *App) toggleToroidal(node *Node.Node, args []string) error {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	app.toroidal = !app.toroidal
+	if app.toroidal {
+		println("Toroidal mode enabled")
+	} else {
+		println("Toroidal mode disabled")
+	}
 	return nil
 }
 
-func (app *App) OnStop(node *Node.Node) error {
+func (app *App) randomizeGrid(node *Node.Node, args []string) error {
+	percentageOfAliveCells := 50
+	if len(args) > 0 {
+		percentageOfAliveCells = Utilities.StringToInt(args[0])
+	}
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	for row := 0; row < app.gridRows; row++ {
+		for col := 0; col < app.gridCols; col++ {
+			if app.randomizer.GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
+				app.grid[row][col] = 1
+			} else {
+				app.grid[row][col] = 0
+			}
+		}
+	}
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	if err != nil {
+		node.GetLogger().Error(err.Error())
+	}
 	return nil
 }
 
-func (app *App) GetApplicationConfig() Config.Application {
-	return Config.Application{
-		HandleMessagesSequentially: false,
+func (app *App) invertGrid(node *Node.Node, args []string) error {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	for row := 0; row < app.gridRows; row++ {
+		for col := 0; col < app.gridCols; col++ {
+			app.grid[row][col] = 1 - app.grid[row][col]
+		}
 	}
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	if err != nil {
+		node.GetLogger().Error(err.Error())
+	}
+	return nil
+}
+
+func (app *App) chessGrid(node *Node.Node, args []string) error {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	for row := 0; row < app.gridRows; row++ {
+		for col := 0; col < app.gridCols; col++ {
+			app.grid[row][col] = (row + col) % 2
+		}
+	}
+	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	if err != nil {
+		node.GetLogger().Error(err.Error())
+	}
+	return nil
 }

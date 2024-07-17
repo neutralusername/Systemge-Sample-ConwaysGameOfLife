@@ -1,6 +1,7 @@
 package appGameOfLife
 
 import (
+	"Systemge/Config"
 	"Systemge/Error"
 	"Systemge/Message"
 	"Systemge/Node"
@@ -8,6 +9,37 @@ import (
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
+
+func (app *App) OnStart(node *Node.Node) error {
+	grid := make([][]int, app.gridRows)
+	for i := range grid {
+		grid[i] = make([]int, app.gridCols)
+	}
+	app.grid = grid
+	return nil
+}
+
+func (app *App) OnStop(node *Node.Node) error {
+	return nil
+}
+
+func (app *App) GetSystemgeConfig() Config.Application {
+	return Config.Application{
+		HandleMessagesSequentially: false,
+	}
+}
+
+func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
+	return map[string]Node.SyncMessageHandler{
+		topic.GET_GRID: app.getGridSync,
+	}
+}
+
+func (app *App) getGridSync(node *Node.Node, message *Message.Message) (string, error) {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
+}
 
 func (app *App) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
 	return map[string]Node.AsyncMessageHandler{

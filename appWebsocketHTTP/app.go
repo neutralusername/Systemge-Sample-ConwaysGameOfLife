@@ -1,7 +1,6 @@
 package appWebsocketHTTP
 
 import (
-	"Systemge/Config"
 	"Systemge/Node"
 )
 
@@ -12,16 +11,6 @@ func New() *AppWebsocketHTTP {
 	return &AppWebsocketHTTP{}
 }
 
-func (app *AppWebsocketHTTP) OnStart(node *Node.Node) error {
-	return nil
-}
-
-func (app *AppWebsocketHTTP) OnStop(node *Node.Node) error {
-	return nil
-}
-
-func (app *AppWebsocketHTTP) GetApplicationConfig() Config.Application {
-	return Config.Application{
-		HandleMessagesSequentially: false,
-	}
+func (app *AppWebsocketHTTP) GetCustomCommandHandlers() map[string]Node.CustomCommandHandler {
+	return map[string]Node.CustomCommandHandler{}
 }
