@@ -29,8 +29,8 @@ func New() *App {
 	return app
 }
 
-func (app *App) GetCommandHandlers() map[string]Node.CustomCommandHandler {
-	return map[string]Node.CustomCommandHandler{
+func (app *App) GetCommandHandlers() map[string]Node.CommandHandler {
+	return map[string]Node.CommandHandler{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,
