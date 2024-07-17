@@ -27,7 +27,6 @@ func main() {
 			ConfigServer: TcpServer.New(60001, "", ""),
 			TcpTimeoutMs: 5000,
 		})),
-
 		Node.New(Config.Node{
 			Name:   "nodeBrokerGameOfLife",
 			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
@@ -44,7 +43,6 @@ func main() {
 			SyncResponseTimeoutMs: 10000,
 			TcpTimeoutMs:          5000,
 		})),
-
 		Node.New(Config.Node{
 			Name:   "nodeBrokerWebsocketHTTP",
 			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
@@ -60,7 +58,6 @@ func main() {
 			SyncResponseTimeoutMs: 10000,
 			TcpTimeoutMs:          5000,
 		})),
-
 		Node.New(Config.Node{
 			Name:   "nodeGameOfLife",
 			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
