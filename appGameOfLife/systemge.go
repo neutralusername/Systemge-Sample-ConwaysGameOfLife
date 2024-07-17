@@ -10,7 +10,7 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topic"
 )
 
-func (app *App) GetSystemgeConfig() Config.Systemge {
+func (app *App) GetSystemgeComponentConfig() Config.Systemge {
 	return Config.Systemge{
 		HandleMessagesSequentially: false,
 	}
