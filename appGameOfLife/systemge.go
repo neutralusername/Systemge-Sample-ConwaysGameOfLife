@@ -5,20 +5,28 @@ import (
 	"Systemge/Error"
 	"Systemge/Message"
 	"Systemge/Node"
+	"Systemge/TcpEndpoint"
 	"Systemge/Utilities"
 	"SystemgeSampleConwaysGameOfLife/dto"
-	"SystemgeSampleConwaysGameOfLife/topic"
+	"SystemgeSampleConwaysGameOfLife/topics"
 )
 
 func (app *App) GetSystemgeComponentConfig() Config.Systemge {
 	return Config.Systemge{
 		HandleMessagesSequentially: false,
+
+		BrokerSubscribeDelayMs:    1000,
+		TopicResolutionLifetimeMs: 10000,
+		SyncResponseTimeoutMs:     10000,
+		TcpTimeoutMs:              5000,
+
+		ResolverEndpoint: TcpEndpoint.New("127.0.0.1:60000", "", ""),
 	}
 }
 
 func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
 	return map[string]Node.SyncMessageHandler{
-		topic.GET_GRID: app.getGridSync,
+		topics.GET_GRID: app.getGridSync,
 	}
 }
 
@@ -30,9 +38,9 @@ func (app *App) getGridSync(node *Node.Node, message *Message.Message) (string, 
 
 func (app *App) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
 	return map[string]Node.AsyncMessageHandler{
-		topic.GRID_CHANGE:     app.gridChange,
-		topic.NEXT_GENERATION: app.nextGeneration,
-		topic.SET_GRID:        app.setGrid,
+		topics.GRID_CHANGE:     app.gridChange,
+		topics.NEXT_GENERATION: app.nextGeneration,
+		topics.SET_GRID:        app.setGrid,
 	}
 }
 
@@ -41,7 +49,7 @@ func (app *App) gridChange(node *Node.Node, message *Message.Message) error {
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	node.AsyncMessage(topic.PROPAGATE_GRID_CHANGE, node.GetName(), gridChange.Marshal())
+	node.AsyncMessage(topics.PROPAGATE_GRID_CHANGE, node.GetName(), gridChange.Marshal())
 	return nil
 }
 
@@ -49,7 +57,7 @@ func (app *App) nextGeneration(node *Node.Node, message *Message.Message) error 
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		node.GetLogger().Error(Error.New("", err).Error())
 	}
@@ -67,7 +75,7 @@ func (app *App) setGrid(node *Node.Node, message *Message.Message) error {
 			app.grid[row][col] = Utilities.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 		}
 	}
-	err := node.AsyncMessage(topic.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		node.GetLogger().Error(Error.New("", err).Error())
 	}

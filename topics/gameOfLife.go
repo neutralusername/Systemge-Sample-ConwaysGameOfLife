@@ -1,4 +1,4 @@
-package topic
+package topics
 
 const GET_GRID = "getGrid"
 const GRID_CHANGE = "gridChange"

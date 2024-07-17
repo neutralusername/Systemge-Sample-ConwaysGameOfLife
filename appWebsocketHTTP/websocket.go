@@ -6,14 +6,14 @@ import (
 	"Systemge/Message"
 	"Systemge/Node"
 	"Systemge/TcpServer"
-	"SystemgeSampleConwaysGameOfLife/topic"
+	"SystemgeSampleConwaysGameOfLife/topics"
 )
 
 func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Node.WebsocketMessageHandler {
 	return map[string]Node.WebsocketMessageHandler{
-		topic.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
-		topic.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
-		topic.SET_GRID:        app.propagateWebsocketAsyncMessage,
+		topics.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
+		topics.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
+		topics.SET_GRID:        app.propagateWebsocketAsyncMessage,
 	}
 }
 func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(node *Node.Node, websocketClient *Node.WebsocketClient, message *Message.Message) error {
@@ -21,7 +21,7 @@ func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(node *Node.Node, web
 }
 
 func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
-	response, err := node.SyncMessage(topic.GET_GRID, node.GetName(), websocketClient.GetId())
+	response, err := node.SyncMessage(topics.GET_GRID, node.GetName(), websocketClient.GetId())
 	if err != nil {
 		node.GetLogger().Error(Error.New("Error sending sync message", err).Error())
 		websocketClient.Disconnect()

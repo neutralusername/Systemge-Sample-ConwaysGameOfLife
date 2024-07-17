@@ -4,19 +4,27 @@ import (
 	"Systemge/Config"
 	"Systemge/Message"
 	"Systemge/Node"
-	"SystemgeSampleConwaysGameOfLife/topic"
+	"Systemge/TcpEndpoint"
+	"SystemgeSampleConwaysGameOfLife/topics"
 )
 
 func (app *AppWebsocketHTTP) GetSystemgeComponentConfig() Config.Systemge {
 	return Config.Systemge{
 		HandleMessagesSequentially: false,
+
+		BrokerSubscribeDelayMs:    1000,
+		TopicResolutionLifetimeMs: 10000,
+		SyncResponseTimeoutMs:     10000,
+		TcpTimeoutMs:              5000,
+
+		ResolverEndpoint: TcpEndpoint.New("127.0.0.1:60000", "", ""),
 	}
 }
 
 func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
 	return map[string]Node.AsyncMessageHandler{
-		topic.PROPGATE_GRID:         app.WebsocketPropagate,
-		topic.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
+		topics.PROPGATE_GRID:         app.WebsocketPropagate,
+		topics.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
 	}
 }
 func (app *AppWebsocketHTTP) WebsocketPropagate(node *Node.Node, message *Message.Message) error {
