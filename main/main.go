@@ -17,58 +17,50 @@ import (
 const ERROR_LOG_FILE_PATH = "error.log"
 
 func main() {
-	err := Node.New(Config.Node{
-		Name:   "nodeResolver",
-		Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
-	}, Resolver.New(Config.Resolver{
-		Server:       TcpServer.New(60000, "", ""),
-		ConfigServer: TcpServer.New(60001, "", ""),
-		TcpTimeoutMs: 5000,
-	})).Start()
-	if err != nil {
-		panic(err)
-	}
 
-	err = Node.New(Config.Node{
-		Name:   "nodeBrokerGameOfLife",
-		Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
-	}, Broker.New(Config.Broker{
-		Server:       TcpServer.New(60002, "", ""),
-		Endpoint:     TcpEndpoint.New("127.0.0.1:60002", "", ""),
-		ConfigServer: TcpServer.New(60003, "", ""),
+	Module.StartCommandLineInterface(Module.NewMultiModule(true,
+		Node.New(Config.Node{
+			Name:   "nodeResolver",
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+		}, Resolver.New(Config.Resolver{
+			Server:       TcpServer.New(60000, "", ""),
+			ConfigServer: TcpServer.New(60001, "", ""),
+			TcpTimeoutMs: 5000,
+		})),
 
-		SyncTopics:  []string{topics.GET_GRID},
-		AsyncTopics: []string{topics.GRID_CHANGE, topics.NEXT_GENERATION, topics.SET_GRID},
+		Node.New(Config.Node{
+			Name:   "nodeBrokerGameOfLife",
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+		}, Broker.New(Config.Broker{
+			Server:       TcpServer.New(60002, "", ""),
+			Endpoint:     TcpEndpoint.New("127.0.0.1:60002", "", ""),
+			ConfigServer: TcpServer.New(60003, "", ""),
 
-		ResolverConfigEndpoint: TcpEndpoint.New("127.0.0.1:60001", "", ""),
+			SyncTopics:  []string{topics.GET_GRID},
+			AsyncTopics: []string{topics.GRID_CHANGE, topics.NEXT_GENERATION, topics.SET_GRID},
 
-		SyncResponseTimeoutMs: 10000,
-		TcpTimeoutMs:          5000,
-	})).Start()
-	if err != nil {
-		panic(err)
-	}
+			ResolverConfigEndpoint: TcpEndpoint.New("127.0.0.1:60001", "", ""),
 
-	err = Node.New(Config.Node{
-		Name:   "nodeBrokerWebsocketHTTP",
-		Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
-	}, Broker.New(Config.Broker{
-		Server:       TcpServer.New(60004, "", ""),
-		Endpoint:     TcpEndpoint.New("127.0.0.1:60004", "", ""),
-		ConfigServer: TcpServer.New(60005, "", ""),
+			SyncResponseTimeoutMs: 10000,
+			TcpTimeoutMs:          5000,
+		})),
 
-		AsyncTopics: []string{topics.PROPAGATE_GRID_CHANGE, topics.PROPGATE_GRID},
+		Node.New(Config.Node{
+			Name:   "nodeBrokerWebsocketHTTP",
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+		}, Broker.New(Config.Broker{
+			Server:       TcpServer.New(60004, "", ""),
+			Endpoint:     TcpEndpoint.New("127.0.0.1:60004", "", ""),
+			ConfigServer: TcpServer.New(60005, "", ""),
 
-		ResolverConfigEndpoint: TcpEndpoint.New("127.0.0.1:60001", "", ""),
+			AsyncTopics: []string{topics.PROPAGATE_GRID_CHANGE, topics.PROPGATE_GRID},
 
-		SyncResponseTimeoutMs: 10000,
-		TcpTimeoutMs:          5000,
-	})).Start()
-	if err != nil {
-		panic(err)
-	}
+			ResolverConfigEndpoint: TcpEndpoint.New("127.0.0.1:60001", "", ""),
 
-	Module.StartCommandLineInterface(Module.NewMultiModule(
+			SyncResponseTimeoutMs: 10000,
+			TcpTimeoutMs:          5000,
+		})),
+
 		Node.New(Config.Node{
 			Name:   "nodeGameOfLife",
 			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
