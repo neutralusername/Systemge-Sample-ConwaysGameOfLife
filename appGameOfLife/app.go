@@ -29,7 +29,7 @@ func New() *App {
 	return app
 }
 
-func (app *App) GetCustomCommandHandlers() map[string]Node.CustomCommandHandler {
+func (app *App) GetCommandHandlers() map[string]Node.CustomCommandHandler {
 	return map[string]Node.CustomCommandHandler{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
