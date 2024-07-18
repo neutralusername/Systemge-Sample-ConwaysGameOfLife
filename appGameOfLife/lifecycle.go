@@ -10,7 +10,3 @@ func (app *App) OnStart(node *Node.Node) error {
 	app.grid = grid
 	return nil
 }
-
-func (app *App) OnStop(node *Node.Node) error {
-	return nil
-}
