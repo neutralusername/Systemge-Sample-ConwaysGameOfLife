@@ -5,9 +5,7 @@ import (
 	"Systemge/Config"
 	"Systemge/Node"
 	"Systemge/Resolver"
-	"Systemge/TcpEndpoint"
-	"Systemge/TcpServer"
-	"Systemge/Utilities"
+	"Systemge/Tcp"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 	"SystemgeSampleConwaysGameOfLife/topics"
@@ -18,51 +16,81 @@ const ERROR_LOG_FILE_PATH = "error.log"
 func main() {
 	Node.StartCommandLineInterface(true,
 		Node.New(Config.Node{
-			Name:   "nodeResolver",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
+			Name: "nodeResolver",
+			Logger: Config.Logger{
+				InfoPath:    ERROR_LOG_FILE_PATH,
+				DebugPath:   ERROR_LOG_FILE_PATH,
+				ErrorPath:   ERROR_LOG_FILE_PATH,
+				WarningPath: ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+			},
 		}, Resolver.New(Config.Resolver{
-			Server:       TcpServer.New(60000, "", ""),
-			ConfigServer: TcpServer.New(60001, "", ""),
+			Server:       Tcp.NewServer(60000, "", ""),
+			ConfigServer: Tcp.NewServer(60001, "", ""),
 			TcpTimeoutMs: 5000,
 		})),
 		Node.New(Config.Node{
-			Name:   "nodeBrokerGameOfLife",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
+			Name: "nodeBrokerGameOfLife",
+			Logger: Config.Logger{
+				InfoPath:    ERROR_LOG_FILE_PATH,
+				DebugPath:   ERROR_LOG_FILE_PATH,
+				ErrorPath:   ERROR_LOG_FILE_PATH,
+				WarningPath: ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+			},
 		}, Broker.New(Config.Broker{
-			Server:       TcpServer.New(60002, "", ""),
-			Endpoint:     TcpEndpoint.New("127.0.0.1:60002", "", ""),
-			ConfigServer: TcpServer.New(60003, "", ""),
+			Server:       Tcp.NewServer(60002, "", ""),
+			Endpoint:     Tcp.NewEndpoint("127.0.0.1:60002", "", ""),
+			ConfigServer: Tcp.NewServer(60003, "", ""),
 
 			SyncTopics:  []string{topics.GET_GRID},
 			AsyncTopics: []string{topics.GRID_CHANGE, topics.NEXT_GENERATION, topics.SET_GRID},
 
-			ResolverConfigEndpoint: TcpEndpoint.New("127.0.0.1:60001", "", ""),
+			ResolverConfigEndpoint: Tcp.NewEndpoint("127.0.0.1:60001", "", ""),
 
 			SyncResponseTimeoutMs: 10000,
 			TcpTimeoutMs:          5000,
 		})),
 		Node.New(Config.Node{
-			Name:   "nodeBrokerWebsocketHTTP",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
+			Name: "nodeBrokerWebsocketHTTP",
+			Logger: Config.Logger{
+				InfoPath:    ERROR_LOG_FILE_PATH,
+				DebugPath:   ERROR_LOG_FILE_PATH,
+				ErrorPath:   ERROR_LOG_FILE_PATH,
+				WarningPath: ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+			},
 		}, Broker.New(Config.Broker{
-			Server:       TcpServer.New(60004, "", ""),
-			Endpoint:     TcpEndpoint.New("127.0.0.1:60004", "", ""),
-			ConfigServer: TcpServer.New(60005, "", ""),
+			Server:       Tcp.NewServer(60004, "", ""),
+			Endpoint:     Tcp.NewEndpoint("127.0.0.1:60004", "", ""),
+			ConfigServer: Tcp.NewServer(60005, "", ""),
 
 			AsyncTopics: []string{topics.PROPAGATE_GRID_CHANGE, topics.PROPGATE_GRID},
 
-			ResolverConfigEndpoint: TcpEndpoint.New("127.0.0.1:60001", "", ""),
+			ResolverConfigEndpoint: Tcp.NewEndpoint("127.0.0.1:60001", "", ""),
 
 			SyncResponseTimeoutMs: 10000,
 			TcpTimeoutMs:          5000,
 		})),
 		Node.New(Config.Node{
-			Name:   "nodeGameOfLife",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
+			Name: "nodeGameOfLife",
+			Logger: Config.Logger{
+				InfoPath:    ERROR_LOG_FILE_PATH,
+				DebugPath:   ERROR_LOG_FILE_PATH,
+				ErrorPath:   ERROR_LOG_FILE_PATH,
+				WarningPath: ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+			},
 		}, appGameOfLife.New()),
 		Node.New(Config.Node{
-			Name:   "nodeWebsocketHTTP",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
+			Name: "nodeWebsocketHTTP",
+			Logger: Config.Logger{
+				InfoPath:    ERROR_LOG_FILE_PATH,
+				DebugPath:   ERROR_LOG_FILE_PATH,
+				ErrorPath:   ERROR_LOG_FILE_PATH,
+				WarningPath: ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+			},
 		}, appWebsocketHTTP.New()),
 	)
 }

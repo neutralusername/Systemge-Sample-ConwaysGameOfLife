@@ -3,10 +3,10 @@ package appGameOfLife
 import (
 	"Systemge/Config"
 	"Systemge/Error"
+	"Systemge/Helpers"
 	"Systemge/Message"
 	"Systemge/Node"
-	"Systemge/TcpEndpoint"
-	"Systemge/Utilities"
+	"Systemge/Tcp"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topics"
 )
@@ -20,7 +20,7 @@ func (app *App) GetSystemgeComponentConfig() Config.Systemge {
 		SyncResponseTimeoutMs:     10000,
 		TcpTimeoutMs:              5000,
 
-		ResolverEndpoint: TcpEndpoint.New("127.0.0.1:60000", "", ""),
+		ResolverEndpoint: Tcp.NewEndpoint("127.0.0.1:60000", "", ""),
 	}
 }
 
@@ -72,7 +72,7 @@ func (app *App) setGrid(node *Node.Node, message *Message.Message) error {
 	}
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = Utilities.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
+			app.grid[row][col] = Helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 		}
 	}
 	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())

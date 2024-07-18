@@ -1,15 +1,16 @@
 package appGameOfLife
 
 import (
+	"Systemge/Helpers"
 	"Systemge/Node"
-	"Systemge/Utilities"
+	"Systemge/Tools"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 )
 
 type App struct {
-	randomizer *Utilities.Randomizer
+	randomizer *Tools.Randomizer
 	grid       [][]int
 	mutex      sync.Mutex
 	gridRows   int
@@ -19,7 +20,7 @@ type App struct {
 
 func New() *App {
 	app := &App{
-		randomizer: Utilities.NewRandomizer(Utilities.GetSystemTime()),
+		randomizer: Tools.NewRandomizer(Tools.GetSystemTime()),
 
 		grid:     nil,
 		gridRows: 90,
@@ -53,7 +54,7 @@ func (app *App) toggleToroidal(node *Node.Node, args []string) error {
 func (app *App) randomizeGrid(node *Node.Node, args []string) error {
 	percentageOfAliveCells := 50
 	if len(args) > 0 {
-		percentageOfAliveCells = Utilities.StringToInt(args[0])
+		percentageOfAliveCells = Helpers.StringToInt(args[0])
 	}
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
