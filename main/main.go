@@ -20,7 +20,7 @@ func main() {
 	Module.StartCommandLineInterface(Module.NewMultiModule(true,
 		Node.New(Config.Node{
 			Name:   "nodeResolver",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
 		}, Resolver.New(Config.Resolver{
 			Server:       TcpServer.New(60000, "", ""),
 			ConfigServer: TcpServer.New(60001, "", ""),
@@ -28,7 +28,7 @@ func main() {
 		})),
 		Node.New(Config.Node{
 			Name:   "nodeBrokerGameOfLife",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
 		}, Broker.New(Config.Broker{
 			Server:       TcpServer.New(60002, "", ""),
 			Endpoint:     TcpEndpoint.New("127.0.0.1:60002", "", ""),
@@ -44,7 +44,7 @@ func main() {
 		})),
 		Node.New(Config.Node{
 			Name:   "nodeBrokerWebsocketHTTP",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
 		}, Broker.New(Config.Broker{
 			Server:       TcpServer.New(60004, "", ""),
 			Endpoint:     TcpEndpoint.New("127.0.0.1:60004", "", ""),
@@ -59,11 +59,11 @@ func main() {
 		})),
 		Node.New(Config.Node{
 			Name:   "nodeGameOfLife",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
 		}, appGameOfLife.New()),
 		Node.New(Config.Node{
 			Name:   "nodeWebsocketHTTP",
-			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, nil),
+			Logger: Utilities.NewLogger(ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH, ERROR_LOG_FILE_PATH),
 		}, appWebsocketHTTP.New()),
 	))
 }
