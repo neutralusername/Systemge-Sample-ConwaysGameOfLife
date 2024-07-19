@@ -10,7 +10,7 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topics"
 )
 
-const LOGGER_PATH = "error.log"
+const LOGGER_PATH = "logs.log"
 
 func main() {
 	Node.StartCommandLineInterface(true,
