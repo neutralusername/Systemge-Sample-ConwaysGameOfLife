@@ -3,25 +3,21 @@ package appGameOfLife
 import (
 	"Systemge/Helpers"
 	"Systemge/Node"
-	"Systemge/Tools"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 )
 
 type App struct {
-	randomizer *Tools.Randomizer
-	grid       [][]int
-	mutex      sync.Mutex
-	gridRows   int
-	gridCols   int
-	toroidal   bool
+	grid     [][]int
+	mutex    sync.Mutex
+	gridRows int
+	gridCols int
+	toroidal bool
 }
 
 func New() *App {
 	app := &App{
-		randomizer: Tools.NewRandomizer(Tools.GetSystemTime()),
-
 		grid:     nil,
 		gridRows: 90,
 		gridCols: 140,
@@ -60,7 +56,7 @@ func (app *App) randomizeGrid(node *Node.Node, args []string) error {
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
-			if app.randomizer.GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
+			if node.GetRandomizer().GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
 				app.grid[row][col] = 1
 			} else {
 				app.grid[row][col] = 0
