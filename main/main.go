@@ -16,12 +16,25 @@ func main() {
 	Node.StartCommandLineInterface(true,
 		Node.New(&Config.Node{
 			Name: "nodeResolver",
-			Logger: &Config.Logger{
-				InfoPath:    ERROR_LOG_FILE_PATH,
-				DebugPath:   ERROR_LOG_FILE_PATH,
-				ErrorPath:   ERROR_LOG_FILE_PATH,
-				WarningPath: ERROR_LOG_FILE_PATH,
+			InfoLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
 				QueueBuffer: 10000,
+				Prefix:      "[Info \"Resolver\"] ",
+			},
+			WarningLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Warning \"Resolver\"] ",
+			},
+			ErrorLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Error \"Resolver\"] ",
+			},
+			DebugLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Debug \"Resolver\"] ",
 			},
 		}, Resolver.New(&Config.Resolver{
 			Server: &Config.TcpServer{
@@ -34,12 +47,25 @@ func main() {
 		})),
 		Node.New(&Config.Node{
 			Name: "nodeBrokerGameOfLife",
-			Logger: &Config.Logger{
-				InfoPath:    ERROR_LOG_FILE_PATH,
-				DebugPath:   ERROR_LOG_FILE_PATH,
-				ErrorPath:   ERROR_LOG_FILE_PATH,
-				WarningPath: ERROR_LOG_FILE_PATH,
+			InfoLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
 				QueueBuffer: 10000,
+				Prefix:      "[Info \"Resolver\"] ",
+			},
+			WarningLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Warning \"Resolver\"] ",
+			},
+			ErrorLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Error \"Resolver\"] ",
+			},
+			DebugLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Debug \"Resolver\"] ",
 			},
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
@@ -61,12 +87,25 @@ func main() {
 		})),
 		Node.New(&Config.Node{
 			Name: "nodeBrokerWebsocketHTTP",
-			Logger: &Config.Logger{
-				InfoPath:    ERROR_LOG_FILE_PATH,
-				DebugPath:   ERROR_LOG_FILE_PATH,
-				ErrorPath:   ERROR_LOG_FILE_PATH,
-				WarningPath: ERROR_LOG_FILE_PATH,
+			InfoLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
 				QueueBuffer: 10000,
+				Prefix:      "[Info \"Resolver\"] ",
+			},
+			WarningLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Warning \"Resolver\"] ",
+			},
+			ErrorLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Error \"Resolver\"] ",
+			},
+			DebugLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Debug \"Resolver\"] ",
 			},
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
@@ -87,22 +126,48 @@ func main() {
 		})),
 		Node.New(&Config.Node{
 			Name: "nodeGameOfLife",
-			Logger: &Config.Logger{
-				InfoPath:    ERROR_LOG_FILE_PATH,
-				DebugPath:   ERROR_LOG_FILE_PATH,
-				ErrorPath:   ERROR_LOG_FILE_PATH,
-				WarningPath: ERROR_LOG_FILE_PATH,
+			InfoLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
 				QueueBuffer: 10000,
+				Prefix:      "[Info \"Resolver\"] ",
+			},
+			WarningLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Warning \"Resolver\"] ",
+			},
+			ErrorLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Error \"Resolver\"] ",
+			},
+			DebugLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Debug \"Resolver\"] ",
 			},
 		}, appGameOfLife.New()),
 		Node.New(&Config.Node{
 			Name: "nodeWebsocketHTTP",
-			Logger: &Config.Logger{
-				InfoPath:    ERROR_LOG_FILE_PATH,
-				DebugPath:   ERROR_LOG_FILE_PATH,
-				ErrorPath:   ERROR_LOG_FILE_PATH,
-				WarningPath: ERROR_LOG_FILE_PATH,
+			InfoLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
 				QueueBuffer: 10000,
+				Prefix:      "[Info \"Resolver\"] ",
+			},
+			WarningLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Warning \"Resolver\"] ",
+			},
+			ErrorLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Error \"Resolver\"] ",
+			},
+			DebugLogger: &Config.Logger{
+				Path:        ERROR_LOG_FILE_PATH,
+				QueueBuffer: 10000,
+				Prefix:      "[Debug \"Resolver\"] ",
 			},
 		}, appWebsocketHTTP.New()),
 	)

@@ -69,7 +69,9 @@ func (app *App) randomizeGrid(node *Node.Node, args []string) error {
 	}
 	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Error(err.Error())
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log("Failed to propagate grid: " + err.Error())
+		}
 	}
 	return nil
 }
@@ -84,7 +86,9 @@ func (app *App) invertGrid(node *Node.Node, args []string) error {
 	}
 	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Error(err.Error())
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log("Failed to propagate grid: " + err.Error())
+		}
 	}
 	return nil
 }
@@ -99,7 +103,9 @@ func (app *App) chessGrid(node *Node.Node, args []string) error {
 	}
 	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Error(err.Error())
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log("Failed to propagate grid: " + err.Error())
+		}
 	}
 	return nil
 }

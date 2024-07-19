@@ -22,7 +22,9 @@ func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(node *Node.Node, web
 func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
 	response, err := node.SyncMessage(topics.GET_GRID, node.GetName(), websocketClient.GetId())
 	if err != nil {
-		node.GetLogger().Error(Error.New("Error sending sync message", err).Error())
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log(Error.New("Failed to get grid", err).Error())
+		}
 		websocketClient.Disconnect()
 		return
 	}
@@ -30,7 +32,7 @@ func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *
 }
 
 func (app *AppWebsocketHTTP) OnDisconnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
-	node.GetLogger().Info("Client \"" + websocketClient.GetId() + "\" disconnected")
+
 }
 
 func (app *AppWebsocketHTTP) GetWebsocketComponentConfig() *Config.Websocket {

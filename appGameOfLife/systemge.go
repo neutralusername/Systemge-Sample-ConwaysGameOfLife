@@ -60,7 +60,9 @@ func (app *App) nextGeneration(node *Node.Node, message *Message.Message) error 
 	app.calcNextGeneration()
 	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Error(Error.New("", err).Error())
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log("Failed to propagate grid: " + err.Error())
+		}
 	}
 	return nil
 }
@@ -78,7 +80,9 @@ func (app *App) setGrid(node *Node.Node, message *Message.Message) error {
 	}
 	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
-		node.GetLogger().Error(Error.New("", err).Error())
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log("Failed to propagate grid: " + err.Error())
+		}
 	}
 	return nil
 }
