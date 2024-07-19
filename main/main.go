@@ -5,6 +5,7 @@ import (
 	"Systemge/Config"
 	"Systemge/Node"
 	"Systemge/Resolver"
+	"Systemge/Tools"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 	"SystemgeSampleConwaysGameOfLife/topics"
@@ -15,7 +16,8 @@ const LOGGER_PATH = "logs.log"
 func main() {
 	Node.StartCommandLineInterface(true,
 		Node.New(&Config.Node{
-			Name: "nodeResolver",
+			Name:           "nodeResolver",
+			RandomizerSeed: Tools.GetSystemTime(),
 			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
@@ -46,7 +48,8 @@ func main() {
 			TcpTimeoutMs: 5000,
 		})),
 		Node.New(&Config.Node{
-			Name: "nodeBrokerGameOfLife",
+			Name:           "nodeBrokerGameOfLife",
+			RandomizerSeed: Tools.GetSystemTime(),
 			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
@@ -86,7 +89,8 @@ func main() {
 			TcpTimeoutMs:          5000,
 		})),
 		Node.New(&Config.Node{
-			Name: "nodeBrokerWebsocketHTTP",
+			Name:           "nodeBrokerWebsocketHTTP",
+			RandomizerSeed: Tools.GetSystemTime(),
 			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
@@ -125,7 +129,8 @@ func main() {
 			TcpTimeoutMs:          5000,
 		})),
 		Node.New(&Config.Node{
-			Name: "nodeGameOfLife",
+			Name:           "nodeGameOfLife",
+			RandomizerSeed: Tools.GetSystemTime(),
 			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
@@ -148,7 +153,8 @@ func main() {
 			},
 		}, appGameOfLife.New()),
 		Node.New(&Config.Node{
-			Name: "nodeWebsocketHTTP",
+			Name:           "nodeWebsocketHTTP",
+			RandomizerSeed: Tools.GetSystemTime(),
 			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
