@@ -10,29 +10,29 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topics"
 )
 
-const ERROR_LOG_FILE_PATH = "error.log"
+const LOGGER_PATH = "error.log"
 
 func main() {
 	Node.StartCommandLineInterface(true,
 		Node.New(&Config.Node{
 			Name: "nodeResolver",
 			InfoLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"Resolver\"] ",
 			},
 			WarningLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Warning \"Resolver\"] ",
 			},
 			ErrorLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Error \"Resolver\"] ",
 			},
 			DebugLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"Resolver\"] ",
 			},
@@ -48,22 +48,22 @@ func main() {
 		Node.New(&Config.Node{
 			Name: "nodeBrokerGameOfLife",
 			InfoLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"Resolver\"] ",
 			},
 			WarningLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Warning \"Resolver\"] ",
 			},
 			ErrorLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Error \"Resolver\"] ",
 			},
 			DebugLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"Resolver\"] ",
 			},
@@ -88,22 +88,22 @@ func main() {
 		Node.New(&Config.Node{
 			Name: "nodeBrokerWebsocketHTTP",
 			InfoLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"Resolver\"] ",
 			},
 			WarningLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Warning \"Resolver\"] ",
 			},
 			ErrorLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Error \"Resolver\"] ",
 			},
 			DebugLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"Resolver\"] ",
 			},
@@ -127,22 +127,22 @@ func main() {
 		Node.New(&Config.Node{
 			Name: "nodeGameOfLife",
 			InfoLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"Resolver\"] ",
 			},
 			WarningLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Warning \"Resolver\"] ",
 			},
 			ErrorLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Error \"Resolver\"] ",
 			},
 			DebugLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"Resolver\"] ",
 			},
@@ -150,22 +150,22 @@ func main() {
 		Node.New(&Config.Node{
 			Name: "nodeWebsocketHTTP",
 			InfoLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"Resolver\"] ",
 			},
 			WarningLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Warning \"Resolver\"] ",
 			},
 			ErrorLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Error \"Resolver\"] ",
 			},
 			DebugLogger: &Config.Logger{
-				Path:        ERROR_LOG_FILE_PATH,
+				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"Resolver\"] ",
 			},
