@@ -35,19 +35,14 @@ func (app *App) GetCommandHandlers() map[string]Node.CommandHandler {
 	}
 }
 
-func (app *App) toggleToroidal(node *Node.Node, args []string) error {
+func (app *App) toggleToroidal(node *Node.Node, args []string) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.toroidal = !app.toroidal
-	if app.toroidal {
-		println("Toroidal mode enabled")
-	} else {
-		println("Toroidal mode disabled")
-	}
-	return nil
+	return "sucess", nil
 }
 
-func (app *App) randomizeGrid(node *Node.Node, args []string) error {
+func (app *App) randomizeGrid(node *Node.Node, args []string) (string, error) {
 	percentageOfAliveCells := 50
 	if len(args) > 0 {
 		percentageOfAliveCells = Helpers.StringToInt(args[0])
@@ -69,10 +64,10 @@ func (app *App) randomizeGrid(node *Node.Node, args []string) error {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())
 		}
 	}
-	return nil
+	return "success", nil
 }
 
-func (app *App) invertGrid(node *Node.Node, args []string) error {
+func (app *App) invertGrid(node *Node.Node, args []string) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -86,10 +81,10 @@ func (app *App) invertGrid(node *Node.Node, args []string) error {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())
 		}
 	}
-	return nil
+	return "success", nil
 }
 
-func (app *App) chessGrid(node *Node.Node, args []string) error {
+func (app *App) chessGrid(node *Node.Node, args []string) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
@@ -103,5 +98,5 @@ func (app *App) chessGrid(node *Node.Node, args []string) error {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())
 		}
 	}
-	return nil
+	return "success", nil
 }
