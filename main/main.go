@@ -43,6 +43,8 @@ func main() {
 			Server: &Config.TcpServer{
 				Port: 8081,
 			},
+			Blacklist: []string{},
+			Whitelist: []string{},
 		},
 		StatusUpdateIntervalMs: 1000,
 	},
