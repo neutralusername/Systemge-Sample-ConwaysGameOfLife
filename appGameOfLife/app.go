@@ -1,6 +1,7 @@
 package appGameOfLife
 
 import (
+	"Systemge/Config"
 	"Systemge/Helpers"
 	"Systemge/Node"
 	"SystemgeSampleConwaysGameOfLife/dto"
@@ -9,11 +10,15 @@ import (
 )
 
 type App struct {
-	grid     [][]int
-	mutex    sync.Mutex
-	gridRows int
-	gridCols int
-	toroidal bool
+	grid                 [][]int
+	mutex                sync.Mutex
+	gridRows             int
+	gridCols             int
+	toroidal             bool
+	commandHandlers      map[string]Node.CommandHandler
+	syncMessageHandlers  map[string]Node.SyncMessageHandler
+	asyncMessageHandlers map[string]Node.AsyncMessageHandler
+	systemgeConfig       *Config.Systemge
 }
 
 func New() *App {
@@ -23,16 +28,38 @@ func New() *App {
 		gridCols: 140,
 		toroidal: true,
 	}
-	return app
-}
-
-func (app *App) GetCommandHandlers() map[string]Node.CommandHandler {
-	return map[string]Node.CommandHandler{
+	app.commandHandlers = map[string]Node.CommandHandler{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,
 		"toggleToroidal": app.toggleToroidal,
 	}
+	app.syncMessageHandlers = map[string]Node.SyncMessageHandler{
+		topics.GET_GRID: app.getGridSync,
+	}
+	app.asyncMessageHandlers = map[string]Node.AsyncMessageHandler{
+		topics.GRID_CHANGE:     app.gridChange,
+		topics.NEXT_GENERATION: app.nextGeneration,
+		topics.SET_GRID:        app.setGrid,
+	}
+	app.systemgeConfig = &Config.Systemge{
+		HandleMessagesSequentially: false,
+
+		BrokerSubscribeDelayMs:    1000,
+		TopicResolutionLifetimeMs: 10000,
+		SyncResponseTimeoutMs:     10000,
+		TcpTimeoutMs:              5000,
+
+		ResolverEndpoint: &Config.TcpEndpoint{
+			Address: "127.0.0.1:60000",
+		},
+	}
+
+	return app
+}
+
+func (app *App) GetCommandHandlers() map[string]Node.CommandHandler {
+	return app.commandHandlers
 }
 
 func (app *App) toggleToroidal(node *Node.Node, args []string) (string, error) {

@@ -11,24 +11,11 @@ import (
 )
 
 func (app *App) GetSystemgeComponentConfig() *Config.Systemge {
-	return &Config.Systemge{
-		HandleMessagesSequentially: false,
-
-		BrokerSubscribeDelayMs:    1000,
-		TopicResolutionLifetimeMs: 10000,
-		SyncResponseTimeoutMs:     10000,
-		TcpTimeoutMs:              5000,
-
-		ResolverEndpoint: &Config.TcpEndpoint{
-			Address: "127.0.0.1:60000",
-		},
-	}
+	return app.systemgeConfig
 }
 
 func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
-	return map[string]Node.SyncMessageHandler{
-		topics.GET_GRID: app.getGridSync,
-	}
+	return app.syncMessageHandlers
 }
 
 func (app *App) getGridSync(node *Node.Node, message *Message.Message) (string, error) {
@@ -38,11 +25,7 @@ func (app *App) getGridSync(node *Node.Node, message *Message.Message) (string, 
 }
 
 func (app *App) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
-	return map[string]Node.AsyncMessageHandler{
-		topics.GRID_CHANGE:     app.gridChange,
-		topics.NEXT_GENERATION: app.nextGeneration,
-		topics.SET_GRID:        app.setGrid,
-	}
+	return app.asyncMessageHandlers
 }
 
 func (app *App) gridChange(node *Node.Node, message *Message.Message) error {
