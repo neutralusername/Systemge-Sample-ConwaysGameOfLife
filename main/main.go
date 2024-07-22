@@ -25,6 +25,7 @@ func main() {
 			Whitelist: []string{},
 		},
 		StatusUpdateIntervalMs: 1000,
+		HeapUpdateIntervalMs:   1000,
 	},
 		Node.New(&Config.Node{
 			Name:           "nodeResolver",
