@@ -15,7 +15,6 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-
 	Node.New(&Config.Node{
 		Name:           "dashboard",
 		RandomizerSeed: Tools.GetSystemTime(),
