@@ -88,6 +88,5 @@ func main() {
 			Name:           "nodeWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
 		}, appWebsocketHTTP.New()),
-	)).Start()
-	<-make(chan struct{})
+	)).StartBlocking()
 }
