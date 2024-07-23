@@ -26,6 +26,7 @@ func main() {
 		},
 		StatusUpdateIntervalMs: 1000,
 		HeapUpdateIntervalMs:   1000,
+		MessageCountIntervalMs: 1000,
 		AutoStart:              true,
 	},
 		Node.New(&Config.Node{
