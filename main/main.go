@@ -18,7 +18,7 @@ func main() {
 	dashboardNode := Node.New(&Config.Node{
 		Name:           "dashboard",
 		RandomizerSeed: Tools.GetSystemTime(),
-		InfoLogger: &Config.Logger{
+		/* InfoLogger: &Config.Logger{
 			Path:        LOGGER_PATH,
 			QueueBuffer: 10000,
 			Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
@@ -37,7 +37,7 @@ func main() {
 			Path:        LOGGER_PATH,
 			QueueBuffer: 10000,
 			Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-		},
+		}, */
 	}, Dashboard.New(&Config.Dashboard{
 		Server: &Config.TcpServer{
 			Port:      8081,
@@ -53,7 +53,7 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeResolver",
 			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger: &Config.Logger{
+			/* 	InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
@@ -72,7 +72,7 @@ func main() {
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			},
+			}, */
 		}, Resolver.New(&Config.Resolver{
 			Server: &Config.TcpServer{
 				Port: 60000,
@@ -85,7 +85,7 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeBrokerGameOfLife",
 			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger: &Config.Logger{
+			/* InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
@@ -104,7 +104,7 @@ func main() {
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			},
+			}, */
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60002,
@@ -126,7 +126,7 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeBrokerWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger: &Config.Logger{
+			/* InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
@@ -145,7 +145,7 @@ func main() {
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			},
+			}, */
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60004,
@@ -166,7 +166,7 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeGameOfLife",
 			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger: &Config.Logger{
+			/* InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
@@ -185,12 +185,12 @@ func main() {
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			},
+			}, */
 		}, appGameOfLife.New()),
 		Node.New(&Config.Node{
 			Name:           "nodeWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger: &Config.Logger{
+			/* InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
@@ -209,7 +209,7 @@ func main() {
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
 				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			},
+			}, */
 		}, appWebsocketHTTP.New()),
 	))
 	dashboardNode.StartBlocking()
