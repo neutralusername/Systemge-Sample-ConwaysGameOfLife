@@ -90,5 +90,5 @@ func main() {
 			RandomizerSeed: Tools.GetSystemTime(),
 		}, appWebsocketHTTP.New()),
 	))
-	dashboardNode.StartBlocking(nil)
+	dashboardNode.StartBlocking()
 }
