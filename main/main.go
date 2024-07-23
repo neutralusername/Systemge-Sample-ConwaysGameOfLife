@@ -15,7 +15,7 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	Node.New(&Config.Node{
+	dashboardNode := Node.New(&Config.Node{
 		Name:           "dashboard",
 		RandomizerSeed: Tools.GetSystemTime(),
 	}, Dashboard.New(&Config.Dashboard{
@@ -88,5 +88,6 @@ func main() {
 			Name:           "nodeWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
 		}, appWebsocketHTTP.New()),
-	)).StartBlocking()
+	))
+	dashboardNode.StartBlocking(nil)
 }
