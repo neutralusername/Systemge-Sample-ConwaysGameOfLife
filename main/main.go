@@ -48,6 +48,7 @@ func main() {
 		NodeSystemgeCounterIntervalMs:  1000,
 		NodeWebsocketCounterIntervalMs: 1000,
 		NodeBrokerCounterIntervalMs:    1000,
+		NodeResolverCounterIntervalMs:  1000,
 		HeapUpdateIntervalMs:           1000,
 		AutoStart:                      true,
 	},
