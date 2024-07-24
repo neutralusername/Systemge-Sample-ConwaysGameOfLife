@@ -21,22 +21,22 @@ func main() {
 		/* InfoLogger: &Config.Logger{
 			Path:        LOGGER_PATH,
 			QueueBuffer: 10000,
-			Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
+			Prefix:      "[Info \"dashboard\"] ",
 		},
 		WarningLogger: &Config.Logger{
 			Path:        LOGGER_PATH,
 			QueueBuffer: 10000,
-			Prefix:      "[Warning \"nodeAppWebsocketHTTP\"] ",
+			Prefix:      "[Warning \"dashboard\"] ",
 		},
 		ErrorLogger: &Config.Logger{
 			Path:        LOGGER_PATH,
 			QueueBuffer: 10000,
-			Prefix:      "[Error \"nodeAppWebsocketHTTP\"] ",
+			Prefix:      "[Error \"dashboard\"] ",
 		},
 		DebugLogger: &Config.Logger{
 			Path:        LOGGER_PATH,
 			QueueBuffer: 10000,
-			Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
+			Prefix:      "[Debug \"dashboard\"] ",
 		}, */
 	}, Dashboard.New(&Config.Dashboard{
 		Server: &Config.TcpServer{
@@ -55,26 +55,26 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeResolver",
 			RandomizerSeed: Tools.GetSystemTime(),
-			/* 	InfoLogger: &Config.Logger{
+			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Info \"nodeResolver\"] ",
 			},
 			WarningLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Warning \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Warning \"nodeResolver\"] ",
 			},
 			ErrorLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Error \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Error \"nodeResolver\"] ",
 			},
 			DebugLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			}, */
+				Prefix:      "[Debug \"nodeResolver\"] ",
+			},
 		}, Resolver.New(&Config.Resolver{
 			Server: &Config.TcpServer{
 				Port: 60000,
@@ -87,26 +87,26 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeBrokerGameOfLife",
 			RandomizerSeed: Tools.GetSystemTime(),
-			/* InfoLogger: &Config.Logger{
+			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Info \"nodeBrokerGameOfLife\"] ",
 			},
 			WarningLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Warning \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Warning \"nodeBrokerGameOfLife\"] ",
 			},
 			ErrorLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Error \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Error \"nodeBrokerGameOfLife\"] ",
 			},
 			DebugLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			}, */
+				Prefix:      "[Debug \"nodeBrokerGameOfLife\"] ",
+			},
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60002,
@@ -128,26 +128,26 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeBrokerWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
-			/* InfoLogger: &Config.Logger{
+			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Info \"nodeBrokerWebsocketHTTP\"] ",
 			},
 			WarningLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Warning \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Warning \"nodeBrokerWebsocketHTTP\"] ",
 			},
 			ErrorLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Error \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Error \"nodeBrokerWebsocketHTTP\"] ",
 			},
 			DebugLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			}, */
+				Prefix:      "[Debug \"nodeBrokerWebsocketHTTP\"] ",
+			},
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60004,
@@ -168,50 +168,50 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeGameOfLife",
 			RandomizerSeed: Tools.GetSystemTime(),
-			/* InfoLogger: &Config.Logger{
+			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Info \"nodeGameOfLife\"] ",
 			},
 			WarningLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Warning \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Warning \"nodeGameOfLife\"] ",
 			},
 			ErrorLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Error \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Error \"nodeGameOfLife\"] ",
 			},
 			DebugLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			}, */
+				Prefix:      "[Debug \"nodeGameOfLife\"] ",
+			},
 		}, appGameOfLife.New()),
 		Node.New(&Config.Node{
 			Name:           "nodeWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
-			/* InfoLogger: &Config.Logger{
+			InfoLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Info \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Info \"nodeWebsocketHTTP\"] ",
 			},
 			WarningLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Warning \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Warning \"nodeWebsocketHTTP\"] ",
 			},
 			ErrorLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Error \"nodeAppWebsocketHTTP\"] ",
+				Prefix:      "[Error \"nodeWebsocketHTTP\"] ",
 			},
 			DebugLogger: &Config.Logger{
 				Path:        LOGGER_PATH,
 				QueueBuffer: 10000,
-				Prefix:      "[Debug \"nodeAppWebsocketHTTP\"] ",
-			}, */
+				Prefix:      "[Debug \"nodeWebsocketHTTP\"] ",
+			},
 		}, appWebsocketHTTP.New()),
 	))
 	dashboardNode.StartBlocking()
