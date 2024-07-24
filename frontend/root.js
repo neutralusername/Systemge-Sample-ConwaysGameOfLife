@@ -1,107 +1,97 @@
 import { Cell } from "./cell.js";
-import {
-    Menu
-} from "./menu.js";
+import { Menu } from "./menu.js";
 
 export class root extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-                WS_CONNECTION: new WebSocket("ws://localhost:8443/ws"),
-
-                SQUARESIZE: 10,
-                autoNextGenDelay_ms: 100,
-
-                cells : [],
-
-                grid: null,
-                nextGenerationLoop: null,
-                stateInput: "",
-                constructMessage: (topic, payload) => {
-                    return JSON.stringify({
-                        topic: topic,
-                        payload: payload,
-                    });
-                },
-                setStateRoot: (state) => {
-                    this.setState(state)
-                }
-            },
-            (this.state.WS_CONNECTION.onmessage = (event) => {
-                let message = JSON.parse(event.data);
-                switch (message.topic) {
-                    case "getGrid":
-                    case "propagateGrid":
-                        let grid = JSON.parse(message.payload);
-                        let newStateInput = ""
-                        let cells = []
-                        grid.grid.forEach((row, indexRow) => {
-                            row.forEach((cell, indexCol) => {
-                                newStateInput += cell
-                                cells.push(
-                                    React.createElement(Cell, {
-                                        cellState: cell,
-                                        indexRow: indexRow,
-                                        indexCol: indexCol,
-                                        cols: grid.cols,
-                                        WS_CONNECTION: this.state.WS_CONNECTION,
-                                        constructMessage: this.state.constructMessage,
-                                    })
-                                );
-                            })
-                        })
-                        this.setState({
-                            grid: grid,
-                            stateInput: newStateInput,
-                            cells: cells,
-                        });
-                        break;
-                    case "propagateGridChange": {
-                        let gridChange = JSON.parse(message.payload);
-                        this.state.grid.grid[gridChange.row][gridChange.column] = gridChange.state;
-                        let newStateInput = this.state.stateInput
-                        this.state.cells[gridChange.row * this.state.grid.cols + gridChange.column] = React.createElement(Cell, {
-                            cellState: gridChange.state,
-                            indexRow: gridChange.row,
-                            indexCol: gridChange.column,
-                            cols: this.state.grid.cols,
-                            WS_CONNECTION: this.state.WS_CONNECTION,
-                            constructMessage: this.state.constructMessage,
-                        });
-                        newStateInput = newStateInput.substring(0, gridChange.row * this.state.grid.cols + gridChange.column) + gridChange.state + newStateInput.substring(gridChange.row * this.state.grid.cols + gridChange.column + 1)
-                        this.setState({
-                            grid: this.state.grid,
-                            stateInput: newStateInput,
-                        });
-                        break;
-                    }
-                    default:
-                        console.log("Unknown message topic: " + event.data);
-                        break;
-                }
-            });
-        this.state.WS_CONNECTION.onclose = () => {
-            setTimeout(() => {
-                if (this.state.WS_CONNECTION.readyState === WebSocket.CLOSED) {}
-                window.location.reload();
-            }, 2000);
+            SQUARESIZE: 10,
+            cells: [],
+            grid: null,
+            stateInput: "",
         };
-        this.state.WS_CONNECTION.onopen = () => {
-            let myLoop = () => {
-                this.state.WS_CONNECTION.send(this.state.constructMessage("heartbeat", ""));
-                setTimeout(myLoop, 15 * 1000);
-            };
-            setTimeout(myLoop, 15 * 1000);
-        };
+        
+        this.WS_CONNECTION = new WebSocket("ws://localhost:8443/ws");
+        this.WS_CONNECTION.onmessage = this.handleMessage.bind(this);
+        this.WS_CONNECTION.onclose = this.handleClose.bind(this);
+        this.WS_CONNECTION.onopen = this.handleOpen.bind(this);
     }
 
+    handleMessage(event) {
+        const message = JSON.parse(event.data);
+        switch (message.topic) {
+            case "getGrid":
+            case "propagateGrid":
+                this.updateGrid(JSON.parse(message.payload));
+                break;
+            case "propagateGridChange":
+                this.updateGridChange(JSON.parse(message.payload));
+                break;
+            default:
+                console.log("Unknown message topic: " + event.data);
+                break;
+        }
+    }
+
+    handleClose() {
+        setTimeout(() => {
+            if (this.WS_CONNECTION.readyState === WebSocket.CLOSED) {
+                window.location.reload();
+            }
+        }, 2000);
+    }
+
+    handleOpen() {
+        const sendHeartbeat = () => {
+            this.WS_CONNECTION.send(this.constructMessage("heartbeat", ""));
+            setTimeout(sendHeartbeat, 15 * 1000);
+        };
+        setTimeout(sendHeartbeat, 15 * 1000);
+    }
+
+    constructMessage(topic, payload) {
+        return JSON.stringify({ topic, payload });
+    }
+
+    updateGrid(grid) {
+        const newStateInput = grid.grid.flat().join('');
+        const cells = grid.grid.flatMap((row, indexRow) =>
+            row.map((cell, indexCol) =>
+                React.createElement(Cell, {
+                    key: `${indexRow}-${indexCol}`,
+                    cellState: cell,
+                    indexRow,
+                    indexCol,
+                    cols: grid.cols,
+                    WS_CONNECTION: this.WS_CONNECTION,
+                    constructMessage: this.constructMessage,
+                })
+            )
+        );
+
+        this.setState({ grid, stateInput: newStateInput, cells });
+    }
+
+    updateGridChange(gridChange) {
+        const { row, column, state } = gridChange;
+        this.setState((prevState) => {
+            const newGrid = { ...prevState.grid };
+            newGrid.grid[row][column] = state;
+            const newCells = [...prevState.cells];
+            const cellIndex = row * newGrid.cols + column;
+            newCells[cellIndex] = React.cloneElement(newCells[cellIndex], { cellState: state });
+            const newStateInput = prevState.stateInput.substring(0, cellIndex) + state + prevState.stateInput.substring(cellIndex + 1);
+            return { grid: newGrid, stateInput: newStateInput, cells: newCells };
+        });
+    }
+    
     render() {
+        const { grid, cells, SQUARESIZE } = this.state;
         return React.createElement(
-            "div", {
+            "div",
+            {
                 id: "root",
-                onContextMenu: (e) => {
-                    e.preventDefault();
-                },
+                onContextMenu: (e) => e.preventDefault(),
                 style: {
                     fontFamily: "sans-serif",
                     display: "flex",
@@ -112,30 +102,34 @@ export class root extends React.Component {
                     userSelect: "none",
                 },
             },
-            this.state.grid ? React.createElement(Menu, this.state) : null,
-            this.state.grid ? React.createElement(
-                "div", {
-                    id: "grid",
-                    style: {
-                        display: "grid",
-                        gridTemplateColumns: "repeat(" + this.state.grid.cols + ", " + this.state.SQUARESIZE + "px)",
-                        gridTemplateRows: "repeat(" + this.state.grid.rows + ", " + this.state.SQUARESIZE + "px)",
-                        width: this.state.grid.cols * this.state.SQUARESIZE + "px",
-                        height: this.state.grid.rows * this.state.SQUARESIZE + "px",
-                        border: "1px solid black",
-                        margin: "auto",
-                        marginTop: "10px",
-                        marginBottom: "10px",
-                        backgroundColor: "white",
-                        padding: "0px",
-                        boxSizing: "border-box",
-                        position: "relative",
-                        overflow: "hidden",
-                        borderRadius: "5px",
-                    },
-                },
-                this.state.cells
-            ) : null
+            grid ? React.createElement(Menu, { 
+                ...this.state, 
+                setStateRoot: this.setState.bind(this),
+                WS_CONNECTION: this.WS_CONNECTION,
+                constructMessage: this.constructMessage,
+            }) : null,
+            grid
+                ? React.createElement(
+                      "div",
+                      {
+                          id: "grid",
+                          style: {
+                              display: "grid",
+                              gridTemplateColumns: `repeat(${grid.cols}, ${SQUARESIZE}px)`,
+                              gridTemplateRows: `repeat(${grid.rows}, ${SQUARESIZE}px)`,
+                              width: grid.cols * SQUARESIZE,
+                              height: grid.rows * SQUARESIZE,
+                              border: "1px solid black",
+                              margin: "10px auto",
+                              backgroundColor: "white",
+                              padding: "0",
+                              boxSizing: "border-box",
+                              borderRadius: "5px",
+                          },
+                      },
+                      cells
+                  )
+                : null
         );
     }
 }

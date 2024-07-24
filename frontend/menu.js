@@ -1,15 +1,18 @@
 export class Menu extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            nextGenerationLoop: null,
+            autoNextGenDelay_ms: 100,
+        }
     }
 
     nextGeneratioLoop = () => {
         this.props.WS_CONNECTION.send(
             this.props.constructMessage("nextGeneration", "")
         );
-        this.props.setStateRoot({
-            nextGenerationLoop: setTimeout(this.nextGeneratioLoop, this.props.autoNextGenDelay_ms),
+        this.setState({
+            nextGenerationLoop: setTimeout(this.nextGeneratioLoop, this.state.autoNextGenDelay_ms),
         });
     }
 
@@ -68,17 +71,17 @@ export class Menu extends React.Component {
                             cursor: "pointer",
                         },
                         onClick: () => {
-                            if (this.props.nextGenerationLoop === null) {
+                            if (this.state.nextGenerationLoop === null) {
                                 this.nextGeneratioLoop()
                             } else {
-                                clearTimeout(this.props.nextGenerationLoop);
-                                this.props.setStateRoot({
+                                clearTimeout(this.state.nextGenerationLoop);
+                                this.setState({
                                     nextGenerationLoop: null,
                                 });
                             }
                         },
                     },
-                    this.props.nextGenerationLoop === null ? "Start Loop" : "Stop Loop"
+                    this.state.nextGenerationLoop === null ? "Start Loop" : "Stop Loop"
                 ),
                 React.createElement("input", {
                     id: "autoNextGenDelay",
@@ -94,9 +97,9 @@ export class Menu extends React.Component {
                         fontFamily: "Arial",
                         fontSize: "16px",
                     },
-                    value: this.props.autoNextGenDelay_ms,
+                    value: this.state.autoNextGenDelay_ms,
                     onChange: (e) => {
-                        this.props.setStateRoot({
+                        this.setState({
                             autoNextGenDelay_ms: e.target.value,
                         });
                     },
