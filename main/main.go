@@ -15,6 +15,7 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
+	loggerQueue := Tools.NewLoggerQueue(LOGGER_PATH, 10000)
 	dashboardNode := Node.New(&Config.Node{
 		Name:           "dashboard",
 		RandomizerSeed: Tools.GetSystemTime(),
@@ -30,16 +31,14 @@ func main() {
 		NodeBrokerCounterIntervalMs:    1000,
 		NodeResolverCounterIntervalMs:  1000,
 		HeapUpdateIntervalMs:           1000,
-		AutoStart:                      true,
+		//AutoStart:                      true,
 	},
 		Node.New(&Config.Node{
 			Name:           "nodeResolver",
 			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger: &Config.Logger{
-				Path:        LOGGER_PATH,
-				QueueBuffer: 10000,
-				Prefix:      "[Info \"nodeResolver\"] ",
-			},
+			InfoLogger:     Tools.NewLogger("[Info \"nodeResolver\"]", loggerQueue),
+			WarningLogger:  Tools.NewLogger("[Warning \"nodeResolver\"] ", loggerQueue),
+			ErrorLogger:    Tools.NewLogger("[Error \"nodeResolver\"] ", loggerQueue),
 		}, Resolver.New(&Config.Resolver{
 			Server: &Config.TcpServer{
 				Port: 60000,
@@ -52,6 +51,9 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeBrokerGameOfLife",
 			RandomizerSeed: Tools.GetSystemTime(),
+			InfoLogger:     Tools.NewLogger("[Info \"nodeBrokerGameOfLife\"]", loggerQueue),
+			WarningLogger:  Tools.NewLogger("[Warning \"nodeBrokerGameOfLife\"] ", loggerQueue),
+			ErrorLogger:    Tools.NewLogger("[Error \"nodeBrokerGameOfLife\"] ", loggerQueue),
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60002,
@@ -73,6 +75,9 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeBrokerWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
+			InfoLogger:     Tools.NewLogger("[Info \"nodeBrokerWebsocketHTTP\"]", loggerQueue),
+			WarningLogger:  Tools.NewLogger("[Warning \"nodeBrokerWebsocketHTTP\"] ", loggerQueue),
+			ErrorLogger:    Tools.NewLogger("[Error \"nodeBrokerWebsocketHTTP\"] ", loggerQueue),
 		}, Broker.New(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60004,
@@ -93,10 +98,16 @@ func main() {
 		Node.New(&Config.Node{
 			Name:           "nodeGameOfLife",
 			RandomizerSeed: Tools.GetSystemTime(),
+			InfoLogger:     Tools.NewLogger("[Info \"nodeGameOfLife\"]", loggerQueue),
+			WarningLogger:  Tools.NewLogger("[Warning \"nodeGameOfLife\"] ", loggerQueue),
+			ErrorLogger:    Tools.NewLogger("[Error \"nodeGameOfLife\"] ", loggerQueue),
 		}, appGameOfLife.New()),
 		Node.New(&Config.Node{
 			Name:           "nodeWebsocketHTTP",
 			RandomizerSeed: Tools.GetSystemTime(),
+			InfoLogger:     Tools.NewLogger("[Info \"nodeWebsocketHTTP\"]", loggerQueue),
+			WarningLogger:  Tools.NewLogger("[Warning \"nodeWebsocketHTTP\"] ", loggerQueue),
+			ErrorLogger:    Tools.NewLogger("[Error \"nodeWebsocketHTTP\"] ", loggerQueue),
 		}, appWebsocketHTTP.New()),
 	))
 	dashboardNode.StartBlocking()
