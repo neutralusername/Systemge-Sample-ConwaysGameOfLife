@@ -1,9 +1,9 @@
 package appWebsocketHTTP
 
 import (
-	"Systemge/Config"
-	"Systemge/Message"
-	"Systemge/Node"
+	"github.com/neutralusername/Systemge/Config"
+	"github.com/neutralusername/Systemge/Message"
+	"github.com/neutralusername/Systemge/Node"
 )
 
 func (app *AppWebsocketHTTP) GetSystemgeComponentConfig() *Config.Systemge {

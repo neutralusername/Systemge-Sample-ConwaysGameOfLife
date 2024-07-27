@@ -1,15 +1,16 @@
 package main
 
 import (
-	"Systemge/Broker"
-	"Systemge/Config"
-	"Systemge/Dashboard"
-	"Systemge/Node"
-	"Systemge/Resolver"
-	"Systemge/Tools"
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
 	"SystemgeSampleConwaysGameOfLife/topics"
+
+	"github.com/neutralusername/Systemge/Broker"
+	"github.com/neutralusername/Systemge/Config"
+	"github.com/neutralusername/Systemge/Dashboard"
+	"github.com/neutralusername/Systemge/Node"
+	"github.com/neutralusername/Systemge/Resolver"
+	"github.com/neutralusername/Systemge/Tools"
 )
 
 const LOGGER_PATH = "logs.log"

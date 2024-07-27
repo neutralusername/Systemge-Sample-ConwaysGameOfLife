@@ -1,12 +1,13 @@
 package appGameOfLife
 
 import (
-	"Systemge/Config"
-	"Systemge/Helpers"
-	"Systemge/Node"
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
+
+	"github.com/neutralusername/Systemge/Config"
+	"github.com/neutralusername/Systemge/Helpers"
+	"github.com/neutralusername/Systemge/Node"
 )
 
 type App struct {
