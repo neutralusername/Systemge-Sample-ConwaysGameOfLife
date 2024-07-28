@@ -71,9 +71,9 @@ func (app *App) toggleToroidal(node *Node.Node, args []string) (string, error) {
 }
 
 func (app *App) randomizeGrid(node *Node.Node, args []string) (string, error) {
-	percentageOfAliveCells := 50
+	percentageOfAliveCells := int64(50)
 	if len(args) > 0 {
-		percentageOfAliveCells = Helpers.StringToInt(args[0])
+		percentageOfAliveCells = Helpers.StringToInt64(args[0])
 	}
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
