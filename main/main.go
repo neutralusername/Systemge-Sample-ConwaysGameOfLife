@@ -33,6 +33,7 @@ func main() {
 		NodeBrokerCounterIntervalMs:    1000,
 		NodeResolverCounterIntervalMs:  1000,
 		HeapUpdateIntervalMs:           1000,
+		EnableDashboardCounters:        true,
 		//AutoStart:                      true,
 	},
 		Node.New(&Config.Node{
