@@ -14,7 +14,7 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	loggerQueue := Tools.NewLoggerQueue(LOGGER_PATH, 10000)
+	Tools.NewLoggerQueue(LOGGER_PATH, 10000)
 	dashboardNode := Node.New(&Config.Node{
 		Name:           "dashboard",
 		RandomizerSeed: Tools.GetSystemTime(),
@@ -37,11 +37,11 @@ func main() {
 		AddDashboardToDashboard:        true,
 	},
 		Node.New(&Config.Node{
-			Name:           "nodeResolver",
-			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger:     Tools.NewLogger("[Info \"nodeResolver\"]", loggerQueue),
-			WarningLogger:  Tools.NewLogger("[Warning \"nodeResolver\"] ", loggerQueue),
-			ErrorLogger:    Tools.NewLogger("[Error \"nodeResolver\"] ", loggerQueue),
+			Name:              "nodeResolver",
+			RandomizerSeed:    Tools.GetSystemTime(),
+			InfoLoggerPath:    LOGGER_PATH,
+			WarningLoggerPath: LOGGER_PATH,
+			ErrorLoggerPath:   LOGGER_PATH,
 		}, Node.NewResolverApplication(&Config.Resolver{
 			Server: &Config.TcpServer{
 				Port: 60000,
@@ -52,11 +52,11 @@ func main() {
 			TcpTimeoutMs: 5000,
 		})),
 		Node.New(&Config.Node{
-			Name:           "nodeBrokerWebsocketHTTP",
-			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger:     Tools.NewLogger("[Info \"nodeBrokerWebsocketHTTP\"]", loggerQueue),
-			WarningLogger:  Tools.NewLogger("[Warning \"nodeBrokerWebsocketHTTP\"] ", loggerQueue),
-			ErrorLogger:    Tools.NewLogger("[Error \"nodeBrokerWebsocketHTTP\"] ", loggerQueue),
+			Name:              "nodeBrokerWebsocketHTTP",
+			RandomizerSeed:    Tools.GetSystemTime(),
+			InfoLoggerPath:    LOGGER_PATH,
+			WarningLoggerPath: LOGGER_PATH,
+			ErrorLoggerPath:   LOGGER_PATH,
 		}, Node.NewBrokerApplication(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60004,
@@ -75,11 +75,11 @@ func main() {
 			TcpTimeoutMs:          5000,
 		})),
 		Node.New(&Config.Node{
-			Name:           "nodeBrokerGameOfLife",
-			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger:     Tools.NewLogger("[Info \"nodeBrokerGameOfLife\"]", loggerQueue),
-			WarningLogger:  Tools.NewLogger("[Warning \"nodeBrokerGameOfLife\"] ", loggerQueue),
-			ErrorLogger:    Tools.NewLogger("[Error \"nodeBrokerGameOfLife\"] ", loggerQueue),
+			Name:              "nodeBrokerGameOfLife",
+			RandomizerSeed:    Tools.GetSystemTime(),
+			InfoLoggerPath:    LOGGER_PATH,
+			WarningLoggerPath: LOGGER_PATH,
+			ErrorLoggerPath:   LOGGER_PATH,
 		}, Node.NewBrokerApplication(&Config.Broker{
 			Server: &Config.TcpServer{
 				Port: 60002,
@@ -99,18 +99,18 @@ func main() {
 			TcpTimeoutMs:          5000,
 		})),
 		Node.New(&Config.Node{
-			Name:           "nodeWebsocketHTTP",
-			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger:     Tools.NewLogger("[Info \"nodeWebsocketHTTP\"]", loggerQueue),
-			WarningLogger:  Tools.NewLogger("[Warning \"nodeWebsocketHTTP\"] ", loggerQueue),
-			ErrorLogger:    Tools.NewLogger("[Error \"nodeWebsocketHTTP\"] ", loggerQueue),
+			Name:              "nodeWebsocketHTTP",
+			RandomizerSeed:    Tools.GetSystemTime(),
+			InfoLoggerPath:    LOGGER_PATH,
+			WarningLoggerPath: LOGGER_PATH,
+			ErrorLoggerPath:   LOGGER_PATH,
 		}, appWebsocketHTTP.New()),
 		Node.New(&Config.Node{
-			Name:           "nodeGameOfLife",
-			RandomizerSeed: Tools.GetSystemTime(),
-			InfoLogger:     Tools.NewLogger("[Info \"nodeGameOfLife\"]", loggerQueue),
-			WarningLogger:  Tools.NewLogger("[Warning \"nodeGameOfLife\"] ", loggerQueue),
-			ErrorLogger:    Tools.NewLogger("[Error \"nodeGameOfLife\"] ", loggerQueue),
+			Name:              "nodeGameOfLife",
+			RandomizerSeed:    Tools.GetSystemTime(),
+			InfoLoggerPath:    LOGGER_PATH,
+			WarningLoggerPath: LOGGER_PATH,
+			ErrorLoggerPath:   LOGGER_PATH,
 		}, appGameOfLife.New()),
 	))
 	dashboardNode.StartBlocking()
