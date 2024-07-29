@@ -38,8 +38,10 @@ func New() *AppWebsocketHTTP {
 		SyncResponseTimeoutMs:     10000,
 		TcpTimeoutMs:              5000,
 
-		ResolverEndpoint: &Config.TcpEndpoint{
-			Address: "127.0.0.1:60000",
+		ResolverEndpoints: []*Config.TcpEndpoint{
+			{
+				Address: "127.0.0.1:60000",
+			},
 		},
 	}
 	app.websocketConfig = &Config.Websocket{

@@ -68,8 +68,10 @@ func main() {
 				Port: 60005,
 			},
 			AsyncTopics: []string{topics.PROPAGATE_GRID_CHANGE, topics.PROPGATE_GRID},
-			ResolverConfigEndpoint: &Config.TcpEndpoint{
-				Address: "127.0.0.1:60001",
+			ResolverConfigEndpoints: []*Config.TcpEndpoint{
+				{
+					Address: "127.0.0.1:60001",
+				},
 			},
 			SyncResponseTimeoutMs: 10000,
 			TcpTimeoutMs:          5000,
@@ -92,8 +94,10 @@ func main() {
 			},
 			SyncTopics:  []string{topics.GET_GRID},
 			AsyncTopics: []string{topics.GRID_CHANGE, topics.NEXT_GENERATION, topics.SET_GRID},
-			ResolverConfigEndpoint: &Config.TcpEndpoint{
-				Address: "127.0.0.1:60001",
+			ResolverConfigEndpoints: []*Config.TcpEndpoint{
+				{
+					Address: "127.0.0.1:60001",
+				},
 			},
 			SyncResponseTimeoutMs: 10000,
 			TcpTimeoutMs:          5000,
