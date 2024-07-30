@@ -28,6 +28,10 @@ func (app *App) GetSystemgeComponentConfig() *Config.Systemge {
 				Address: "localhost:60002",
 			},
 		},
+		IncomingMessageByteLimit: 0,
+		MaxPayloadSize:           0,
+		MaxTopicSize:             0,
+		MaxSyncTokenSize:         0,
 	}
 }
 
