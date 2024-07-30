@@ -2,10 +2,7 @@ package appWebsocketHTTP
 
 import (
 	"SystemgeSampleConwaysGameOfLife/topics"
-	"net/http"
 
-	"github.com/gorilla/websocket"
-	"github.com/neutralusername/Systemge/Config"
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/Node"
@@ -13,27 +10,6 @@ import (
 
 func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Node.WebsocketMessageHandler {
 	return app.websocketMessageHandlers
-}
-
-func (app *AppWebsocketHTTP) GetWebsocketComponentConfig() *Config.Websocket {
-	return &Config.Websocket{
-		Pattern: "/ws",
-		ServerConfig: &Config.TcpServer{
-			Port:      8443,
-			Blacklist: []string{},
-			Whitelist: []string{},
-		},
-		HandleClientMessagesSequentially: false,
-		ClientMessageCooldownMs:          0,
-		ClientWatchdogTimeoutMs:          20000,
-		Upgrader: &websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		},
-	}
 }
 
 func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {

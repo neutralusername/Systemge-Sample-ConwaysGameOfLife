@@ -4,36 +4,11 @@ import (
 	"SystemgeSampleConwaysGameOfLife/dto"
 	"SystemgeSampleConwaysGameOfLife/topics"
 
-	"github.com/neutralusername/Systemge/Config"
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/Helpers"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/Node"
 )
-
-func (app *App) GetSystemgeComponentConfig() *Config.Systemge {
-	return &Config.Systemge{
-		HandleMessagesSequentially: false,
-
-		SyncRequestTimeoutMs:            10000,
-		TcpTimeoutMs:                    5000,
-		MaxConnectionAttempts:           0,
-		ConnectionAttemptDelayMs:        1000,
-		StopAfterOutgoingConnectionLoss: true,
-		ServerConfig: &Config.TcpServer{
-			Port: 60001,
-		},
-		EndpointConfigs: []*Config.TcpEndpoint{
-			{
-				Address: "localhost:60002",
-			},
-		},
-		IncomingMessageByteLimit: 0,
-		MaxPayloadSize:           0,
-		MaxTopicSize:             0,
-		MaxSyncTokenSize:         0,
-	}
-}
 
 func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
 	return app.syncMessageHandlers
