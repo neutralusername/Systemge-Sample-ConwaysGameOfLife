@@ -53,7 +53,7 @@ func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *
 		websocketClient.Disconnect()
 		return
 	}
-	getGridMessage := Message.NewAsync(topics.GET_GRID, response.GetResponseMessage().GetPayload())
+	getGridMessage := Message.NewAsync(topics.GET_GRID, response.GetMessage().GetPayload())
 	websocketClient.Send([]byte(getGridMessage.Serialize()))
 }
 
