@@ -5,6 +5,7 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
+	"github.com/neutralusername/Systemge/Config"
 	"github.com/neutralusername/Systemge/Helpers"
 	"github.com/neutralusername/Systemge/Node"
 )
@@ -18,6 +19,28 @@ type App struct {
 	commandHandlers      map[string]Node.CommandHandler
 	syncMessageHandlers  map[string]Node.SyncMessageHandler
 	asyncMessageHandlers map[string]Node.AsyncMessageHandler
+}
+
+var SYSTEMGE_CONFIG = &Config.Systemge{
+	HandleMessagesSequentially: false,
+
+	SyncRequestTimeoutMs:            10000,
+	TcpTimeoutMs:                    5000,
+	MaxConnectionAttempts:           0,
+	ConnectionAttemptDelayMs:        1000,
+	StopAfterOutgoingConnectionLoss: true,
+	ServerConfig: &Config.TcpServer{
+		Port: 60001,
+	},
+	EndpointConfigs: []*Config.TcpEndpoint{
+		{
+			Address: "localhost:60002",
+		},
+	},
+	IncomingMessageByteLimit: 0,
+	MaxPayloadSize:           0,
+	MaxTopicSize:             0,
+	MaxSyncTokenSize:         0,
 }
 
 func New() *App {

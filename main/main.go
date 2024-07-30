@@ -96,27 +96,7 @@ func main() {
 				WarningLoggerPath: LOGGER_PATH,
 				ErrorLoggerPath:   LOGGER_PATH,
 			},
-			SystemgeConfig: &Config.Systemge{
-				HandleMessagesSequentially: false,
-
-				SyncRequestTimeoutMs:            10000,
-				TcpTimeoutMs:                    5000,
-				MaxConnectionAttempts:           0,
-				ConnectionAttemptDelayMs:        1000,
-				StopAfterOutgoingConnectionLoss: true,
-				ServerConfig: &Config.TcpServer{
-					Port: 60001,
-				},
-				EndpointConfigs: []*Config.TcpEndpoint{
-					{
-						Address: "localhost:60002",
-					},
-				},
-				IncomingMessageByteLimit: 0,
-				MaxPayloadSize:           0,
-				MaxTopicSize:             0,
-				MaxSyncTokenSize:         0,
-			},
+			SystemgeConfig: appGameOfLife.SYSTEMGE_CONFIG,
 		}, appGameOfLife.New()),
 	)
 	dashboardNode.StartBlocking()
