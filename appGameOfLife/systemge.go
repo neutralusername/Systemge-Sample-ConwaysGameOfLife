@@ -12,7 +12,23 @@ import (
 )
 
 func (app *App) GetSystemgeComponentConfig() *Config.Systemge {
-	return app.systemgeConfig
+	return &Config.Systemge{
+		HandleMessagesSequentially: false,
+
+		SyncRequestTimeoutMs:            10000,
+		TcpTimeoutMs:                    5000,
+		MaxConnectionAttempts:           0,
+		ConnectionAttemptDelayMs:        1000,
+		StopAfterOutgoingConnectionLoss: true,
+		ServerConfig: &Config.TcpServer{
+			Port: 60001,
+		},
+		EndpointConfigs: []*Config.TcpEndpoint{
+			{
+				Address: "localhost:60002",
+			},
+		},
+	}
 }
 
 func (app *App) GetSyncMessageHandlers() map[string]Node.SyncMessageHandler {
@@ -34,7 +50,7 @@ func (app *App) gridChange(node *Node.Node, message *Message.Message) error {
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
 	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	node.AsyncMessage(topics.PROPAGATE_GRID_CHANGE, node.GetName(), gridChange.Marshal())
+	node.AsyncMessage(topics.PROPAGATE_GRID_CHANGE, gridChange.Marshal())
 	return nil
 }
 
@@ -42,7 +58,7 @@ func (app *App) nextGeneration(node *Node.Node, message *Message.Message) error 
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
-	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())
@@ -62,7 +78,7 @@ func (app *App) setGrid(node *Node.Node, message *Message.Message) error {
 			app.grid[row][col] = Helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 		}
 	}
-	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())

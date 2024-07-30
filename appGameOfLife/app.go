@@ -5,7 +5,6 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
-	"github.com/neutralusername/Systemge/Config"
 	"github.com/neutralusername/Systemge/Helpers"
 	"github.com/neutralusername/Systemge/Node"
 )
@@ -19,7 +18,6 @@ type App struct {
 	commandHandlers      map[string]Node.CommandHandler
 	syncMessageHandlers  map[string]Node.SyncMessageHandler
 	asyncMessageHandlers map[string]Node.AsyncMessageHandler
-	systemgeConfig       *Config.Systemge
 }
 
 func New() *App {
@@ -43,21 +41,6 @@ func New() *App {
 		topics.NEXT_GENERATION: app.nextGeneration,
 		topics.SET_GRID:        app.setGrid,
 	}
-	app.systemgeConfig = &Config.Systemge{
-		HandleMessagesSequentially: false,
-
-		BrokerSubscribeDelayMs:    1000,
-		TopicResolutionLifetimeMs: 10000,
-		SyncResponseTimeoutMs:     10000,
-		TcpTimeoutMs:              5000,
-
-		ResolverEndpoints: []*Config.TcpEndpoint{
-			{
-				Address: "127.0.0.1:60000",
-			},
-		},
-	}
-
 	return app
 }
 
@@ -88,7 +71,7 @@ func (app *App) randomizeGrid(node *Node.Node, args []string) (string, error) {
 			}
 		}
 	}
-	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())
@@ -105,7 +88,7 @@ func (app *App) invertGrid(node *Node.Node, args []string) (string, error) {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())
@@ -122,7 +105,7 @@ func (app *App) chessGrid(node *Node.Node, args []string) (string, error) {
 			app.grid[row][col] = (row + col) % 2
 		}
 	}
-	err := node.AsyncMessage(topics.PROPGATE_GRID, node.GetName(), dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	err := node.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	if err != nil {
 		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
 			errorLogger.Log("Failed to propagate grid: " + err.Error())

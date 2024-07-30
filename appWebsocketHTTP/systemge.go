@@ -7,7 +7,23 @@ import (
 )
 
 func (app *AppWebsocketHTTP) GetSystemgeComponentConfig() *Config.Systemge {
-	return app.systemgeConfig
+	return &Config.Systemge{
+		HandleMessagesSequentially: false,
+
+		SyncRequestTimeoutMs:            10000,
+		TcpTimeoutMs:                    5000,
+		MaxConnectionAttempts:           0,
+		ConnectionAttemptDelayMs:        1000,
+		StopAfterOutgoingConnectionLoss: true,
+		ServerConfig: &Config.TcpServer{
+			Port: 60002,
+		},
+		EndpointConfigs: []*Config.TcpEndpoint{
+			{
+				Address: "localhost:60001",
+			},
+		},
+	}
 }
 
 func (app *AppWebsocketHTTP) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {

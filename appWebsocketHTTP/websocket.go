@@ -2,7 +2,9 @@ package appWebsocketHTTP
 
 import (
 	"SystemgeSampleConwaysGameOfLife/topics"
+	"net/http"
 
+	"github.com/gorilla/websocket"
 	"github.com/neutralusername/Systemge/Config"
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/Message"
@@ -14,11 +16,28 @@ func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Node.Webso
 }
 
 func (app *AppWebsocketHTTP) GetWebsocketComponentConfig() *Config.Websocket {
-	return app.websocketConfig
+	return &Config.Websocket{
+		Pattern: "/ws",
+		ServerConfig: &Config.TcpServer{
+			Port:      8443,
+			Blacklist: []string{},
+			Whitelist: []string{},
+		},
+		HandleClientMessagesSequentially: false,
+		ClientMessageCooldownMs:          0,
+		ClientWatchdogTimeoutMs:          20000,
+		Upgrader: &websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
+	}
 }
 
 func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
-	response, err := node.SyncMessage(topics.GET_GRID, node.GetName(), websocketClient.GetId())
+	responseChannel, err := node.SyncMessage(topics.GET_GRID, websocketClient.GetId())
 	if err != nil {
 		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
 			errorLogger.Log(Error.New("Failed to get grid", err).Error())
@@ -26,7 +45,16 @@ func (app *AppWebsocketHTTP) OnConnectHandler(node *Node.Node, websocketClient *
 		websocketClient.Disconnect()
 		return
 	}
-	websocketClient.Send([]byte(response.Serialize()))
+	response, err := responseChannel.ReceiveResponse()
+	if err != nil {
+		if errorLogger := node.GetErrorLogger(); errorLogger != nil {
+			errorLogger.Log(Error.New("Failed to receive response", err).Error())
+		}
+		websocketClient.Disconnect()
+		return
+	}
+	getGridMessage := Message.NewAsync(topics.GET_GRID, response.GetResponseMessage().GetPayload())
+	websocketClient.Send([]byte(getGridMessage.Serialize()))
 }
 
 func (app *AppWebsocketHTTP) OnDisconnectHandler(node *Node.Node, websocketClient *Node.WebsocketClient) {
@@ -34,5 +62,5 @@ func (app *AppWebsocketHTTP) OnDisconnectHandler(node *Node.Node, websocketClien
 }
 
 func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(node *Node.Node, websocketClient *Node.WebsocketClient, message *Message.Message) error {
-	return node.AsyncMessage(message.GetTopic(), message.GetOrigin(), message.GetPayload())
+	return node.AsyncMessage(message.GetTopic(), message.GetPayload())
 }

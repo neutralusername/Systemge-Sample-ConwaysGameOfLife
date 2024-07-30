@@ -15,7 +15,7 @@ func (app *AppWebsocketHTTP) GetHTTPMessageHandlers() map[string]http.HandlerFun
 
 func (app *AppWebsocketHTTP) GetHTTPComponentConfig() *Config.HTTP {
 	return &Config.HTTP{
-		Server: &Config.TcpServer{
+		ServerConfig: &Config.TcpServer{
 			Port: 8080,
 		},
 	}
