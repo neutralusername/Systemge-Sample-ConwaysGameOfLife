@@ -51,6 +51,7 @@ func main() {
 				MaxConnectionAttempts:           0,
 				ConnectionAttemptDelayMs:        1000,
 				StopAfterOutgoingConnectionLoss: true,
+				SyncResponseLimit:               1,
 				ServerConfig: &Config.TcpServer{
 					Port: 60002,
 				},

@@ -41,6 +41,7 @@ var SYSTEMGE_CONFIG = &Config.Systemge{
 	MaxPayloadSize:           0,
 	MaxTopicSize:             0,
 	MaxSyncTokenSize:         0,
+	SyncResponseLimit:        1,
 }
 
 func New() *App {
