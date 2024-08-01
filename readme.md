@@ -12,8 +12,6 @@ changes to the grid are broadcasted automatically to all other websocket clients
 ![chrome_8N6fII47kP](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/ea29055f-c9f9-404b-94a5-56fb0a07e051)
 
 
-![systemge-game-of-life(10)](https://github.com/NeutralUsername/Systemge-Sample-ConwaysGameOfLife/assets/39095721/b6f9c94c-f8e6-4d5b-9c43-b8b044626413)
-
 ## requirements
 - golang (version 1.22.3)
 - systemge library on your device
