@@ -22,7 +22,8 @@ type App struct {
 }
 
 var SYSTEMGE_CONFIG = &Config.Systemge{
-	HandleMessagesSequentially: false,
+	ProcessMessagesOfEachConnectionSequentially: true,
+	ProcessAllMessagesSequentially:              false,
 
 	SyncRequestTimeoutMs:            10000,
 	TcpTimeoutMs:                    5000,
