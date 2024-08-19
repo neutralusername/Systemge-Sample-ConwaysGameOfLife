@@ -2,20 +2,20 @@ package main
 
 import (
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
-	"SystemgeSampleConwaysGameOfLife/appWebsocketHTTP"
-	"net/http"
-
-	"github.com/gorilla/websocket"
-	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/Dashboard"
-	"github.com/neutralusername/Systemge/Node"
-	"github.com/neutralusername/Systemge/Tools"
+	"SystemgeSampleConwaysGameOfLife/appWebsocketHttp"
+	"time"
 )
 
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	Tools.NewLoggerQueue(LOGGER_PATH, 10000)
+	appWebsocketHttp.New()
+	appGameOfLife.New()
+	time.Sleep(24 * time.Hour)
+}
+
+/*
+Tools.NewLoggerQueue(LOGGER_PATH, 10000)
 	dashboardNode := Dashboard.New(&Config.Dashboard{
 		NodeConfig: &Config.Node{
 			Name:           "dashboard",
@@ -169,4 +169,4 @@ func main() {
 		}, appGameOfLife.New()),
 	)
 	dashboardNode.StartBlocking()
-}
+*/
