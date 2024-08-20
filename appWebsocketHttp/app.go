@@ -2,17 +2,23 @@ package appWebsocketHttp
 
 import (
 	"SystemgeSampleConwaysGameOfLife/topics"
+	"sync"
 
 	"github.com/neutralusername/Systemge/Config"
+	"github.com/neutralusername/Systemge/Dashboard"
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/HTTPServer"
 	"github.com/neutralusername/Systemge/Message"
+	"github.com/neutralusername/Systemge/Status"
 	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/SystemgeServer"
 	"github.com/neutralusername/Systemge/WebsocketServer"
 )
 
 type AppWebsocketHTTP struct {
+	status      int
+	statusMutex sync.Mutex
+
 	systemgeServer  *SystemgeServer.SystemgeServer
 	websocketServer *WebsocketServer.WebsocketServer
 	httpServer      *HTTPServer.HTTPServer
@@ -28,7 +34,7 @@ func New() *AppWebsocketHTTP {
 			},
 		},
 		ConnectionConfig: &Config.SystemgeConnection{},
-	}, &Config.SystemgeReceiver{},
+	}, nil, nil,
 		SystemgeMessageHandler.New(SystemgeMessageHandler.AsyncMessageHandlers{
 			topics.PROPGATE_GRID:         app.WebsocketPropagate,
 			topics.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
@@ -51,12 +57,59 @@ func New() *AppWebsocketHTTP {
 	}, HTTPServer.Handlers{
 		"/": HTTPServer.SendDirectory("../frontend"),
 	})
-	if err := app.systemgeServer.Start(); err != nil {
-		panic(err)
-	}
-	app.websocketServer.Start()
-	app.httpServer.Start()
+	Dashboard.NewClient(&Config.DashboardClient{
+		Name:             "appWebsocketHttp",
+		ConnectionConfig: &Config.SystemgeConnection{},
+		EndpointConfig: &Config.TcpEndpoint{
+			Address: "localhost:60000",
+		},
+	}, app.start, app.stop, app.getMetrics, app.getStatus, nil)
 	return app
+}
+
+func (app *AppWebsocketHTTP) getStatus() int {
+	return app.status
+}
+
+func (app *AppWebsocketHTTP) getMetrics() map[string]uint64 {
+	return map[string]uint64{
+		"test": 4321,
+	}
+}
+
+func (app *AppWebsocketHTTP) start() error {
+	app.statusMutex.Lock()
+	defer app.statusMutex.Unlock()
+	if app.status != Status.STOPPED {
+		return Error.New("App already started", nil)
+	}
+	if err := app.systemgeServer.Start(); err != nil {
+		return Error.New("Failed to start systemgeServer", err)
+	}
+	if err := app.websocketServer.Start(); err != nil {
+		app.systemgeServer.Stop()
+		return Error.New("Failed to start websocketServer", err)
+	}
+	if err := app.httpServer.Start(); err != nil {
+		app.systemgeServer.Stop()
+		app.websocketServer.Stop()
+		return Error.New("Failed to start httpServer", err)
+	}
+	app.status = Status.STARTED
+	return nil
+}
+
+func (app *AppWebsocketHTTP) stop() error {
+	app.statusMutex.Lock()
+	defer app.statusMutex.Unlock()
+	if app.status != Status.STARTED {
+		return Error.New("App not started", nil)
+	}
+	app.httpServer.Stop()
+	app.websocketServer.Stop()
+	app.systemgeServer.Stop()
+	app.status = Status.STOPPED
+	return nil
 }
 
 func (app *AppWebsocketHTTP) WebsocketPropagate(message *Message.Message) {

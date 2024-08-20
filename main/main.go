@@ -4,169 +4,38 @@ import (
 	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/appWebsocketHttp"
 	"time"
+
+	"github.com/neutralusername/Systemge/Config"
+	"github.com/neutralusername/Systemge/Dashboard"
 )
 
 const LOGGER_PATH = "logs.log"
 
 func main() {
+	Dashboard.NewServer(&Config.DashboardServer{
+		HTTPServerConfig: &Config.HTTPServer{
+			TcpListenerConfig: &Config.TcpListener{
+				Port: 8081,
+			},
+		},
+		WebsocketServerConfig: &Config.WebsocketServer{
+			Pattern:                 "/ws",
+			ClientWatchdogTimeoutMs: 1000 * 60,
+			TcpListenerConfig: &Config.TcpListener{
+				Port: 8444,
+			},
+		},
+		SystemgeServerConfig: &Config.SystemgeServer{
+			Name: "dashboardServer",
+			ListenerConfig: &Config.SystemgeListener{
+				TcpListenerConfig: &Config.TcpListener{
+					Port: 60000,
+				},
+			},
+			ConnectionConfig: &Config.SystemgeConnection{},
+		},
+	})
 	appWebsocketHttp.New()
 	appGameOfLife.New()
 	time.Sleep(24 * time.Hour)
 }
-
-/*
-Tools.NewLoggerQueue(LOGGER_PATH, 10000)
-	dashboardNode := Dashboard.New(&Config.Dashboard{
-		NodeConfig: &Config.Node{
-			Name:           "dashboard",
-			RandomizerSeed: Tools.GetSystemTime(),
-		},
-		ServerConfig: &Config.TcpServer{
-			Port:      8081,
-			Blacklist: []string{},
-			Whitelist: []string{},
-		},
-		NodeStatusIntervalMs: 1000,
-
-		NodeSystemgeClientCounterIntervalMs:             1000,
-		NodeSystemgeClientRateLimitCounterIntervalMs:    1000,
-		NodeSystemgeClientConnectionCounterIntervalMs:   1000,
-		NodeSystemgeClientAsyncMessageCounterIntervalMs: 1000,
-		NodeSystemgeClientSyncResponseCounterIntervalMs: 1000,
-		NodeSystemgeClientSyncRequestCounterIntervalMs:  1000,
-		NodeSystemgeClientTopicCounterIntervalMs:        1000,
-
-		NodeSystemgeServerCounterIntervalMs:             1000,
-		NodeSystemgeServerRateLimitCounterIntervalMs:    1000,
-		NodeSystemgeServerConnectionCounterIntervalMs:   1000,
-		NodeSystemgeServerAsyncMessageCounterIntervalMs: 1000,
-		NodeSystemgeServerSyncResponseCounterIntervalMs: 1000,
-		NodeSystemgeServerSyncRequestCounterIntervalMs:  1000,
-		NodeSystemgeServerTopicCounterIntervalMs:        1000,
-
-		NodeWebsocketCounterIntervalMs: 1000,
-		HeapUpdateIntervalMs:           1000,
-		GoroutineUpdateIntervalMs:      1000,
-		NodeSpawnerCounterIntervalMs:   1000,
-		NodeHTTPCounterIntervalMs:      1000,
-		AutoStart:                      true,
-		AddDashboardToDashboard:        true,
-	},
-		Node.New(&Config.NewNode{
-			NodeConfig: &Config.Node{Name: "nodeWebsocketHTTP",
-				RandomizerSeed:            Tools.GetSystemTime(),
-				InfoLoggerPath:            LOGGER_PATH,
-				WarningLoggerPath:         LOGGER_PATH,
-				ErrorLoggerPath:           LOGGER_PATH,
-				InternalInfoLoggerPath:    LOGGER_PATH,
-				InternalWarningLoggerPath: LOGGER_PATH,
-			},
-			SystemgeServerConfig: &Config.SystemgeServer{
-				TcpTimeoutMs: 5000,
-				ProcessMessagesOfEachConnectionSequentially: true,
-				ProcessAllMessagesSequentially:              true,
-				ProcessAllMessagesSequentiallyChannelSize:   10000,
-				ServerConfig: &Config.TcpServer{
-					Port: 60002,
-				},
-				Endpoint: &Config.TcpEndpoint{
-					Address: "localhost:60002",
-				},
-				TcpBufferBytes:           1024 * 4,
-				IncomingMessageByteLimit: 0,
-				MaxPayloadSize:           0,
-				MaxTopicSize:             0,
-				MaxSyncTokenSize:         0,
-				MaxNodeNameSize:          0,
-			},
-			SystemgeClientConfig: &Config.SystemgeClient{
-				SyncRequestTimeoutMs:            10000,
-				TcpTimeoutMs:                    5000,
-				MaxConnectionAttempts:           0,
-				ConnectionAttemptDelayMs:        1000,
-				StopAfterOutgoingConnectionLoss: true,
-				EndpointConfigs: []*Config.TcpEndpoint{
-					{
-						Address: "localhost:60001",
-					},
-				},
-				TcpBufferBytes:           1024 * 4,
-				IncomingMessageByteLimit: 0,
-				MaxPayloadSize:           0,
-				MaxTopicSize:             0,
-				MaxSyncTokenSize:         0,
-				MaxNodeNameSize:          0,
-			},
-			HttpConfig: &Config.HTTP{
-				ServerConfig: &Config.TcpServer{
-					Port: 8080,
-				},
-			},
-			WebsocketConfig: &Config.Websocket{
-				Pattern: "/ws",
-				ServerConfig: &Config.TcpServer{
-					Port:      8443,
-					Blacklist: []string{},
-					Whitelist: []string{},
-				},
-				HandleClientMessagesSequentially: false,
-				ClientWatchdogTimeoutMs:          20000,
-				Upgrader: &websocket.Upgrader{
-					ReadBufferSize:  1024,
-					WriteBufferSize: 1024,
-					CheckOrigin: func(r *http.Request) bool {
-						return true
-					},
-				},
-			},
-		}, appWebsocketHTTP.New()),
-		Node.New(&Config.NewNode{
-			NodeConfig: &Config.Node{
-				Name:                      "nodeGameOfLife",
-				RandomizerSeed:            Tools.GetSystemTime(),
-				InfoLoggerPath:            LOGGER_PATH,
-				WarningLoggerPath:         LOGGER_PATH,
-				ErrorLoggerPath:           LOGGER_PATH,
-				InternalInfoLoggerPath:    LOGGER_PATH,
-				InternalWarningLoggerPath: LOGGER_PATH,
-			},
-			SystemgeServerConfig: &Config.SystemgeServer{
-				TcpTimeoutMs: 5000,
-				ProcessMessagesOfEachConnectionSequentially: true,
-				ProcessAllMessagesSequentially:              true,
-				ProcessAllMessagesSequentiallyChannelSize:   10000,
-				ServerConfig: &Config.TcpServer{
-					Port: 60001,
-				},
-				Endpoint: &Config.TcpEndpoint{
-					Address: "localhost:60001",
-				},
-				TcpBufferBytes:           1024 * 4,
-				IncomingMessageByteLimit: 0,
-				MaxPayloadSize:           0,
-				MaxTopicSize:             0,
-				MaxSyncTokenSize:         0,
-				MaxNodeNameSize:          0,
-			},
-			SystemgeClientConfig: &Config.SystemgeClient{
-				SyncRequestTimeoutMs:            10000,
-				TcpTimeoutMs:                    5000,
-				MaxConnectionAttempts:           0,
-				ConnectionAttemptDelayMs:        1000,
-				StopAfterOutgoingConnectionLoss: true,
-				EndpointConfigs: []*Config.TcpEndpoint{
-					{
-						Address: "localhost:60002",
-					},
-				},
-				TcpBufferBytes:           1024 * 4,
-				IncomingMessageByteLimit: 0,
-				MaxPayloadSize:           0,
-				MaxTopicSize:             0,
-				MaxSyncTokenSize:         0,
-				MaxNodeNameSize:          0,
-			},
-		}, appGameOfLife.New()),
-	)
-	dashboardNode.StartBlocking()
-*/
