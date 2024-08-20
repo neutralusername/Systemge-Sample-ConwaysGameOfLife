@@ -34,6 +34,10 @@ func main() {
 			},
 			ConnectionConfig: &Config.SystemgeConnection{},
 		},
+		HeapUpdateIntervalMs:      1000,
+		GoroutineUpdateIntervalMs: 1000,
+		StatusUpdateIntervalMs:    1000,
+		MetricsUpdateIntervalMs:   1000,
 	})
 	appWebsocketHttp.New()
 	appGameOfLife.New()

@@ -67,9 +67,10 @@ func New() *App {
 }
 
 func (app *App) getMetrics() map[string]uint64 {
-	return map[string]uint64{
-		"test": 1234,
-	}
+	metrics := make(map[string]uint64)
+	metrics["bytesSent"] = app.systemgeClient.GetBytesSent()
+	metrics["bytesReceived"] = app.systemgeClient.GetBytesReceived()
+	return metrics
 }
 
 func (app *App) getGridSync(message *Message.Message) (string, error) {
