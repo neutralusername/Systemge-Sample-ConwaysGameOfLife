@@ -63,19 +63,12 @@ func New() *AppWebsocketHTTP {
 		EndpointConfig: &Config.TcpEndpoint{
 			Address: "localhost:60000",
 		},
-	}, app.start, app.stop, app.getMetrics, app.getStatus, nil)
+	}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus, nil)
 	return app
 }
 
 func (app *AppWebsocketHTTP) getStatus() int {
 	return app.status
-}
-
-func (app *AppWebsocketHTTP) getMetrics() Dashboard.Metrics {
-	return Dashboard.Metrics{
-		"bytesSent":     app.systemgeServer.RetrieveBytesSent(),
-		"bytesReceived": app.systemgeServer.RetrieveBytesReceived(),
-	}
 }
 
 func (app *AppWebsocketHTTP) start() error {

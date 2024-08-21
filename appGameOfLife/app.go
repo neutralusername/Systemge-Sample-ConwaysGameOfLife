@@ -36,41 +36,37 @@ func New() *App {
 		grid[i] = make([]int, app.gridCols)
 	}
 	app.grid = grid
-	app.systemgeClient = SystemgeClient.New(&Config.SystemgeClient{
-		Name: "systemgeClient",
-		EndpointConfigs: []*Config.TcpEndpoint{
-			{
-				Address: "localhost:60001",
+	app.systemgeClient = SystemgeClient.New(
+		&Config.SystemgeClient{
+			Name: "systemgeClient",
+			EndpointConfigs: []*Config.TcpEndpoint{
+				{
+					Address: "localhost:60001",
+				},
 			},
+			ConnectionConfig: &Config.SystemgeConnection{},
 		},
-		ConnectionConfig: &Config.SystemgeConnection{},
-	}, SystemgeMessageHandler.New(SystemgeMessageHandler.AsyncMessageHandlers{
-		topics.GRID_CHANGE:     app.gridChange,
-		topics.NEXT_GENERATION: app.nextGeneration,
-		topics.SET_GRID:        app.setGrid,
-	}, SystemgeMessageHandler.SyncMessageHandlers{
-		topics.GET_GRID: app.getGridSync,
-	}))
+		nil, nil,
+		SystemgeMessageHandler.New(SystemgeMessageHandler.AsyncMessageHandlers{
+			topics.GRID_CHANGE:     app.gridChange,
+			topics.NEXT_GENERATION: app.nextGeneration,
+			topics.SET_GRID:        app.setGrid,
+		}, SystemgeMessageHandler.SyncMessageHandlers{
+			topics.GET_GRID: app.getGridSync,
+		}))
 	Dashboard.NewClient(&Config.DashboardClient{
 		Name:             "appGameOfLife",
 		ConnectionConfig: &Config.SystemgeConnection{},
 		EndpointConfig: &Config.TcpEndpoint{
 			Address: "localhost:60000",
 		},
-	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.getMetrics, app.systemgeClient.GetStatus, Dashboard.CommandHandlers{
+	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus, Dashboard.CommandHandlers{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,
 		"toggleToroidal": app.toggleToroidal,
 	})
 	return app
-}
-
-func (app *App) getMetrics() Dashboard.Metrics {
-	return Dashboard.Metrics{
-		"bytesSent":     app.systemgeClient.RetrieveBytesSent(),
-		"bytesReceived": app.systemgeClient.RetrieveBytesReceived(),
-	}
 }
 
 func (app *App) getGridSync(message *Message.Message) (string, error) {
