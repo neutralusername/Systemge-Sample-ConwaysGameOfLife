@@ -68,8 +68,8 @@ func New() *App {
 
 func (app *App) getMetrics() map[string]uint64 {
 	metrics := make(map[string]uint64)
-	metrics["bytesSent"] = app.systemgeClient.GetBytesSent()
-	metrics["bytesReceived"] = app.systemgeClient.GetBytesReceived()
+	metrics["bytesSent"] = app.systemgeClient.RetrieveBytesSent()
+	metrics["bytesReceived"] = app.systemgeClient.RetrieveBytesReceived()
 	return metrics
 }
 
