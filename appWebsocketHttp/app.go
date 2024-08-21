@@ -45,7 +45,7 @@ func New() *AppWebsocketHTTP {
 		TcpListenerConfig: &Config.TcpListener{
 			Port: 8443,
 		},
-	}, map[string]WebsocketServer.MessageHandler{
+	}, WebsocketServer.MessageHandlers{
 		topics.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
 		topics.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
 		topics.SET_GRID:        app.propagateWebsocketAsyncMessage,
