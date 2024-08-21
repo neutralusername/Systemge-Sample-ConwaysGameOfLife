@@ -57,7 +57,7 @@ func New() *App {
 		EndpointConfig: &Config.TcpEndpoint{
 			Address: "localhost:60000",
 		},
-	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.getMetrics, app.systemgeClient.GetStatus, map[string]Dashboard.CommandHandler{
+	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.getMetrics, app.systemgeClient.GetStatus, Dashboard.CommandHandlers{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,

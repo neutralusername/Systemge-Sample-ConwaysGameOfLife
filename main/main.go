@@ -41,5 +41,5 @@ func main() {
 	})
 	appWebsocketHttp.New()
 	appGameOfLife.New()
-	time.Sleep(24 * time.Hour)
+	<-make(chan time.Time)
 }
