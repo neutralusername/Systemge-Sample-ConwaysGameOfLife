@@ -71,11 +71,11 @@ func (app *AppWebsocketHTTP) getStatus() int {
 	return app.status
 }
 
-func (app *AppWebsocketHTTP) getMetrics() map[string]uint64 {
-	metrics := map[string]uint64{}
-	metrics["bytesSent"] = app.systemgeServer.RetrieveBytesSent()
-	metrics["bytesReceived"] = app.systemgeServer.RetrieveBytesReceived()
-	return metrics
+func (app *AppWebsocketHTTP) getMetrics() Dashboard.Metrics {
+	return Dashboard.Metrics{
+		"bytesSent":     app.systemgeServer.RetrieveBytesSent(),
+		"bytesReceived": app.systemgeServer.RetrieveBytesReceived(),
+	}
 }
 
 func (app *AppWebsocketHTTP) start() error {
