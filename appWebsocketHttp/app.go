@@ -73,7 +73,7 @@ func (app *AppWebsocketHTTP) getStatus() int {
 
 func (app *AppWebsocketHTTP) getMetrics() map[string]uint64 {
 	metrics := map[string]uint64{}
-	metrics["bytessSent"] = app.systemgeServer.GetBytesSent()
+	metrics["bytesSent"] = app.systemgeServer.GetBytesSent()
 	metrics["bytesReceived"] = app.systemgeServer.GetBytesReceived()
 	return metrics
 }
