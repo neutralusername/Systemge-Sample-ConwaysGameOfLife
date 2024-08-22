@@ -5,6 +5,7 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
+	"github.com/neutralusername/Systemge/Commands"
 	"github.com/neutralusername/Systemge/Config"
 	"github.com/neutralusername/Systemge/Dashboard"
 	"github.com/neutralusername/Systemge/Helpers"
@@ -60,7 +61,7 @@ func New() *App {
 		EndpointConfig: &Config.TcpEndpoint{
 			Address: "localhost:60000",
 		},
-	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus, Dashboard.CommandHandlers{
+	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus, Commands.Handlers{
 		"randomize":      app.randomizeGrid,
 		"invert":         app.invertGrid,
 		"chess":          app.chessGrid,
