@@ -34,6 +34,8 @@ func New() *AppWebsocketHTTP {
 			topics.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
 		},
 		SystemgeMessageHandler.SyncMessageHandlers{},
+		nil, nil,
+		false,
 	)
 	app.systemgeServer = SystemgeServer.New(
 		&Config.SystemgeServer{

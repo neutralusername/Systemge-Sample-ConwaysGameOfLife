@@ -48,6 +48,8 @@ func New() *App {
 		SystemgeMessageHandler.SyncMessageHandlers{
 			topics.GET_GRID: app.getGridSync,
 		},
+		nil, nil,
+		false,
 	)
 	app.systemgeClient = SystemgeClient.New(
 		&Config.SystemgeClient{
