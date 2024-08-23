@@ -66,18 +66,21 @@ func New() *App {
 			},
 		),
 	)
-	Dashboard.NewClient(&Config.DashboardClient{
-		Name:             "appGameOfLife",
-		ConnectionConfig: &Config.SystemgeConnection{},
-		EndpointConfig: &Config.TcpEndpoint{
-			Address: "localhost:60000",
+	Dashboard.NewClient(
+		&Config.DashboardClient{
+			Name:             "appGameOfLife",
+			ConnectionConfig: &Config.SystemgeConnection{},
+			EndpointConfig: &Config.TcpEndpoint{
+				Address: "localhost:60000",
+			},
 		},
-	}, app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus, Commands.Handlers{
-		"randomize":      app.randomizeGrid,
-		"invert":         app.invertGrid,
-		"chess":          app.chessGrid,
-		"toggleToroidal": app.toggleToroidal,
-	})
+		app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus,
+		Commands.Handlers{
+			"randomize":      app.randomizeGrid,
+			"invert":         app.invertGrid,
+			"chess":          app.chessGrid,
+			"toggleToroidal": app.toggleToroidal,
+		})
 	return app
 }
 
