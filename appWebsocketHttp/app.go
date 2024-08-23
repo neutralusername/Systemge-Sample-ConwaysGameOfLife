@@ -28,14 +28,13 @@ type AppWebsocketHTTP struct {
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
 
-	messageHandler := SystemgeMessageHandler.New(
+	messageHandler := SystemgeMessageHandler.NewConcurrentMessageHandler(
 		SystemgeMessageHandler.AsyncMessageHandlers{
 			topics.PROPGATE_GRID:         app.WebsocketPropagate,
 			topics.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
 		},
 		SystemgeMessageHandler.SyncMessageHandlers{},
 		nil, nil,
-		false,
 	)
 	app.systemgeServer = SystemgeServer.New(
 		&Config.SystemgeServer{
