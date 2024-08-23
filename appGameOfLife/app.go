@@ -38,6 +38,17 @@ func New() *App {
 		grid[i] = make([]int, app.gridCols)
 	}
 	app.grid = grid
+
+	messageHandler := SystemgeMessageHandler.New(
+		SystemgeMessageHandler.AsyncMessageHandlers{
+			topics.GRID_CHANGE:     app.gridChange,
+			topics.NEXT_GENERATION: app.nextGeneration,
+			topics.SET_GRID:        app.setGrid,
+		},
+		SystemgeMessageHandler.SyncMessageHandlers{
+			topics.GET_GRID: app.getGridSync,
+		},
+	)
 	app.systemgeClient = SystemgeClient.New(
 		&Config.SystemgeClient{
 			Name: "systemgeClient",
@@ -49,22 +60,12 @@ func New() *App {
 			ConnectionConfig: &Config.SystemgeConnection{},
 		},
 		func(connection *SystemgeConnection.SystemgeConnection) error {
-			connection.StartProcessingLoopSequentially()
+			connection.StartProcessingLoopSequentially(messageHandler)
 			return nil
 		},
 		func(connection *SystemgeConnection.SystemgeConnection) {
 			connection.StopProcessingLoop()
 		},
-		SystemgeMessageHandler.New(
-			SystemgeMessageHandler.AsyncMessageHandlers{
-				topics.GRID_CHANGE:     app.gridChange,
-				topics.NEXT_GENERATION: app.nextGeneration,
-				topics.SET_GRID:        app.setGrid,
-			},
-			SystemgeMessageHandler.SyncMessageHandlers{
-				topics.GET_GRID: app.getGridSync,
-			},
-		),
 	)
 	Dashboard.NewClient(
 		&Config.DashboardClient{
