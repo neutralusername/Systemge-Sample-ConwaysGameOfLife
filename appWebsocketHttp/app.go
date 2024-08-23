@@ -10,6 +10,7 @@ import (
 	"github.com/neutralusername/Systemge/HTTPServer"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/Status"
+	"github.com/neutralusername/Systemge/SystemgeConnection"
 	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/SystemgeServer"
 	"github.com/neutralusername/Systemge/WebsocketServer"
@@ -26,44 +27,66 @@ type AppWebsocketHTTP struct {
 
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
-	app.systemgeServer = SystemgeServer.New(&Config.SystemgeServer{
-		Name: "systemgeServer",
-		ListenerConfig: &Config.SystemgeListener{
+	app.systemgeServer = SystemgeServer.New(
+		&Config.SystemgeServer{
+			Name: "systemgeServer",
+			ListenerConfig: &Config.SystemgeListener{
+				TcpListenerConfig: &Config.TcpListener{
+					Port: 60001,
+				},
+			},
+			ConnectionConfig: &Config.SystemgeConnection{},
+		},
+		func(connection *SystemgeConnection.SystemgeConnection) error {
+			connection.StartProcessingLoopSequentially()
+			return nil
+		},
+		func(connection *SystemgeConnection.SystemgeConnection) {
+			connection.StopProcessingLoop()
+		},
+		SystemgeMessageHandler.New(
+			SystemgeMessageHandler.AsyncMessageHandlers{
+				topics.PROPGATE_GRID:         app.WebsocketPropagate,
+				topics.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
+			},
+			SystemgeMessageHandler.SyncMessageHandlers{},
+		),
+	)
+	app.websocketServer = WebsocketServer.New(
+		&Config.WebsocketServer{
+			ClientWatchdogTimeoutMs: 1000 * 60,
+			Pattern:                 "/ws",
 			TcpListenerConfig: &Config.TcpListener{
-				Port: 60001,
+				Port: 8443,
 			},
 		},
-		ConnectionConfig: &Config.SystemgeConnection{},
-	}, nil, nil,
-		SystemgeMessageHandler.New(SystemgeMessageHandler.AsyncMessageHandlers{
-			topics.PROPGATE_GRID:         app.WebsocketPropagate,
-			topics.PROPAGATE_GRID_CHANGE: app.WebsocketPropagate,
-		}, SystemgeMessageHandler.SyncMessageHandlers{}))
-	app.websocketServer = WebsocketServer.New(&Config.WebsocketServer{
-		ClientWatchdogTimeoutMs: 1000 * 60,
-		Pattern:                 "/ws",
-		TcpListenerConfig: &Config.TcpListener{
-			Port: 8443,
+		WebsocketServer.MessageHandlers{
+			topics.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
+			topics.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
+			topics.SET_GRID:        app.propagateWebsocketAsyncMessage,
 		},
-	}, WebsocketServer.MessageHandlers{
-		topics.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
-		topics.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
-		topics.SET_GRID:        app.propagateWebsocketAsyncMessage,
-	}, app.OnConnectHandler, nil)
-	app.httpServer = HTTPServer.New(&Config.HTTPServer{
-		TcpListenerConfig: &Config.TcpListener{
-			Port: 8080,
+		app.OnConnectHandler, nil,
+	)
+	app.httpServer = HTTPServer.New(
+		&Config.HTTPServer{
+			TcpListenerConfig: &Config.TcpListener{
+				Port: 8080,
+			},
 		},
-	}, HTTPServer.Handlers{
-		"/": HTTPServer.SendDirectory("../frontend"),
-	})
-	Dashboard.NewClient(&Config.DashboardClient{
-		Name:             "appWebsocketHttp",
-		ConnectionConfig: &Config.SystemgeConnection{},
-		EndpointConfig: &Config.TcpEndpoint{
-			Address: "localhost:60000",
+		HTTPServer.Handlers{
+			"/": HTTPServer.SendDirectory("../frontend"),
 		},
-	}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus, nil)
+	)
+	Dashboard.NewClient(
+		&Config.DashboardClient{
+			Name:             "appWebsocketHttp",
+			ConnectionConfig: &Config.SystemgeConnection{},
+			EndpointConfig: &Config.TcpEndpoint{
+				Address: "localhost:60000",
+			},
+		}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus,
+		nil,
+	)
 	return app
 }
 

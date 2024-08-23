@@ -11,6 +11,7 @@ import (
 	"github.com/neutralusername/Systemge/Helpers"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
+	"github.com/neutralusername/Systemge/SystemgeConnection"
 	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/Tools"
 )
@@ -47,14 +48,24 @@ func New() *App {
 			},
 			ConnectionConfig: &Config.SystemgeConnection{},
 		},
-		nil, nil,
-		SystemgeMessageHandler.New(SystemgeMessageHandler.AsyncMessageHandlers{
-			topics.GRID_CHANGE:     app.gridChange,
-			topics.NEXT_GENERATION: app.nextGeneration,
-			topics.SET_GRID:        app.setGrid,
-		}, SystemgeMessageHandler.SyncMessageHandlers{
-			topics.GET_GRID: app.getGridSync,
-		}))
+		func(connection *SystemgeConnection.SystemgeConnection) error {
+			connection.StartProcessingLoopSequentially()
+			return nil
+		},
+		func(connection *SystemgeConnection.SystemgeConnection) {
+			connection.StopProcessingLoop()
+		},
+		SystemgeMessageHandler.New(
+			SystemgeMessageHandler.AsyncMessageHandlers{
+				topics.GRID_CHANGE:     app.gridChange,
+				topics.NEXT_GENERATION: app.nextGeneration,
+				topics.SET_GRID:        app.setGrid,
+			},
+			SystemgeMessageHandler.SyncMessageHandlers{
+				topics.GET_GRID: app.getGridSync,
+			},
+		),
+	)
 	Dashboard.NewClient(&Config.DashboardClient{
 		Name:             "appGameOfLife",
 		ConnectionConfig: &Config.SystemgeConnection{},
