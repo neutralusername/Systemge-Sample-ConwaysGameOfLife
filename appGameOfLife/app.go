@@ -12,7 +12,6 @@ import (
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/Tools"
 )
 
@@ -39,13 +38,13 @@ func New() *App {
 	}
 	app.grid = grid
 
-	messageHandler := SystemgeMessageHandler.NewConcurrentMessageHandler(
-		SystemgeMessageHandler.AsyncMessageHandlers{
+	messageHandler := SystemgeConnection.NewConcurrentMessageHandler(
+		SystemgeConnection.AsyncMessageHandlers{
 			topics.GRID_CHANGE:     app.gridChange,
 			topics.NEXT_GENERATION: app.nextGeneration,
 			topics.SET_GRID:        app.setGrid,
 		},
-		SystemgeMessageHandler.SyncMessageHandlers{
+		SystemgeConnection.SyncMessageHandlers{
 			topics.GET_GRID: app.getGridSync,
 		},
 		nil, nil,
@@ -86,13 +85,13 @@ func New() *App {
 	return app
 }
 
-func (app *App) getGridSync(message *Message.Message) (string, error) {
+func (app *App) getGridSync(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
 }
 
-func (app *App) gridChange(message *Message.Message) {
+func (app *App) gridChange(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -100,14 +99,14 @@ func (app *App) gridChange(message *Message.Message) {
 	app.systemgeClient.AsyncMessage(topics.PROPAGATE_GRID_CHANGE, gridChange.Marshal())
 }
 
-func (app *App) nextGeneration(message *Message.Message) {
+func (app *App) nextGeneration(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
 	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 }
 
-func (app *App) setGrid(message *Message.Message) {
+func (app *App) setGrid(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.GetPayload()) != app.gridCols*app.gridRows {
