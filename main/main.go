@@ -12,7 +12,7 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	Dashboard.NewServer(&Config.DashboardServer{
+	dashboardServer := Dashboard.NewServer(&Config.DashboardServer{
 		HTTPServerConfig: &Config.HTTPServer{
 			TcpListenerConfig: &Config.TcpListener{
 				Port: 8081,
@@ -39,6 +39,9 @@ func main() {
 		StatusUpdateIntervalMs:    1000,
 		MetricsUpdateIntervalMs:   1000,
 	})
+	if err := dashboardServer.Start(); err != nil {
+		panic(err)
+	}
 	appWebsocketHttp.New()
 	appGameOfLife.New()
 	<-make(chan time.Time)

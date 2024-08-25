@@ -67,7 +67,7 @@ func New() *App {
 			connection.StopProcessingLoop()
 		},
 	)
-	Dashboard.NewClient(
+	if err := Dashboard.NewClient(
 		&Config.DashboardClient{
 			Name:             "appGameOfLife",
 			ConnectionConfig: &Config.SystemgeConnection{},
@@ -81,7 +81,9 @@ func New() *App {
 			"invert":         app.invertGrid,
 			"chess":          app.chessGrid,
 			"toggleToroidal": app.toggleToroidal,
-		})
+		}).Start(); err != nil {
+		panic(err)
+	}
 	return app
 }
 

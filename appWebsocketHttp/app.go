@@ -78,7 +78,8 @@ func New() *AppWebsocketHTTP {
 			"/": HTTPServer.SendDirectory("../frontend"),
 		},
 	)
-	Dashboard.NewClient(
+
+	err := Dashboard.NewClient(
 		&Config.DashboardClient{
 			Name:             "appWebsocketHttp",
 			ConnectionConfig: &Config.SystemgeConnection{},
@@ -87,7 +88,10 @@ func New() *AppWebsocketHTTP {
 			},
 		}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus,
 		nil,
-	)
+	).Start()
+	if err != nil {
+		panic(err)
+	}
 	return app
 }
 
