@@ -38,7 +38,7 @@ func New() *App {
 	}
 	app.grid = grid
 
-	messageHandler := SystemgeConnection.NewConcurrentMessageHandler(
+	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
 		SystemgeConnection.AsyncMessageHandlers{
 			topics.GRID_CHANGE:     app.gridChange,
 			topics.NEXT_GENERATION: app.nextGeneration,
@@ -47,7 +47,7 @@ func New() *App {
 		SystemgeConnection.SyncMessageHandlers{
 			topics.GET_GRID: app.getGridSync,
 		},
-		nil, nil,
+		nil, nil, 100,
 	)
 	app.systemgeClient = SystemgeClient.New(
 		&Config.SystemgeClient{
