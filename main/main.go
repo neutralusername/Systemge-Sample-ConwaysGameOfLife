@@ -34,6 +34,7 @@ func main() {
 			},
 			ConnectionConfig: &Config.SystemgeConnection{},
 		},
+		MaxChartEntries:           100,
 		HeapUpdateIntervalMs:      1000,
 		GoroutineUpdateIntervalMs: 1000,
 		StatusUpdateIntervalMs:    1000,
