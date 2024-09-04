@@ -49,29 +49,27 @@ func New() *App {
 		},
 		nil, nil, 100,
 	)
-	app.systemgeClient = SystemgeClient.New(
+	app.systemgeClient = SystemgeClient.New("appGameOfLife_systemgeClient",
 		&Config.SystemgeClient{
-			Name: "systemgeClient",
-			EndpointConfigs: []*Config.TcpEndpoint{
+			ClientConfigs: []*Config.TcpClient{
 				{
 					Address: "localhost:60001",
 				},
 			},
-			ConnectionConfig: &Config.SystemgeConnection{},
+			ConnectionConfig: &Config.TcpConnection{},
 		},
-		func(connection *SystemgeConnection.SystemgeConnection) error {
+		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
 			return nil
 		},
-		func(connection *SystemgeConnection.SystemgeConnection) {
+		func(connection SystemgeConnection.SystemgeConnection) {
 			connection.StopProcessingLoop()
 		},
 	)
-	if err := Dashboard.NewClient(
+	if err := Dashboard.NewClient("appGameOfLife_dashboardClient",
 		&Config.DashboardClient{
-			Name:             "appGameOfLife",
-			ConnectionConfig: &Config.SystemgeConnection{},
-			EndpointConfig: &Config.TcpEndpoint{
+			ConnectionConfig: &Config.TcpConnection{},
+			ClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
 		},
@@ -87,13 +85,13 @@ func New() *App {
 	return app
 }
 
-func (app *App) getGridSync(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
+func (app *App) getGridSync(connection SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
 }
 
-func (app *App) gridChange(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
+func (app *App) gridChange(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -101,14 +99,14 @@ func (app *App) gridChange(connection *SystemgeConnection.SystemgeConnection, me
 	app.systemgeClient.AsyncMessage(topics.PROPAGATE_GRID_CHANGE, gridChange.Marshal())
 }
 
-func (app *App) nextGeneration(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
+func (app *App) nextGeneration(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	app.calcNextGeneration()
 	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 }
 
-func (app *App) setGrid(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
+func (app *App) setGrid(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	if len(message.GetPayload()) != app.gridCols*app.gridRows {

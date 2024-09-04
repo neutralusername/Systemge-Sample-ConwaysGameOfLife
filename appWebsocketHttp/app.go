@@ -35,29 +35,28 @@ func New() *AppWebsocketHTTP {
 		SystemgeConnection.SyncMessageHandlers{},
 		nil, nil, 100,
 	)
-	app.systemgeServer = SystemgeServer.New(
+	app.systemgeServer = SystemgeServer.New("systemgeServer",
 		&Config.SystemgeServer{
-			Name: "systemgeServer",
-			ListenerConfig: &Config.SystemgeListener{
-				TcpListenerConfig: &Config.TcpListener{
+			ListenerConfig: &Config.TcpListener{
+				TcpServerConfig: &Config.TcpServer{
 					Port: 60001,
 				},
 			},
-			ConnectionConfig: &Config.SystemgeConnection{},
+			ConnectionConfig: &Config.TcpConnection{},
 		},
-		func(connection *SystemgeConnection.SystemgeConnection) error {
+		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
 			return nil
 		},
-		func(connection *SystemgeConnection.SystemgeConnection) {
+		func(connection SystemgeConnection.SystemgeConnection) {
 			connection.StopProcessingLoop()
 		},
 	)
-	app.websocketServer = WebsocketServer.New(
+	app.websocketServer = WebsocketServer.New("websocketServer",
 		&Config.WebsocketServer{
 			ClientWatchdogTimeoutMs: 1000 * 60,
 			Pattern:                 "/ws",
-			TcpListenerConfig: &Config.TcpListener{
+			TcpServerConfig: &Config.TcpServer{
 				Port: 8443,
 			},
 		},
@@ -68,9 +67,9 @@ func New() *AppWebsocketHTTP {
 		},
 		app.OnConnectHandler, nil,
 	)
-	app.httpServer = HTTPServer.New(
+	app.httpServer = HTTPServer.New("httpServer",
 		&Config.HTTPServer{
-			TcpListenerConfig: &Config.TcpListener{
+			TcpServerConfig: &Config.TcpServer{
 				Port: 8080,
 			},
 		},
@@ -79,11 +78,10 @@ func New() *AppWebsocketHTTP {
 		},
 	)
 
-	err := Dashboard.NewClient(
+	err := Dashboard.NewClient("appWebsocketHttp_dashboardClient",
 		&Config.DashboardClient{
-			Name:             "appWebsocketHttp",
-			ConnectionConfig: &Config.SystemgeConnection{},
-			EndpointConfig: &Config.TcpEndpoint{
+			ConnectionConfig: &Config.TcpConnection{},
+			ClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
 		}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus,
@@ -134,7 +132,7 @@ func (app *AppWebsocketHTTP) stop() error {
 	return nil
 }
 
-func (app *AppWebsocketHTTP) websocketPropagate(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
+func (app *AppWebsocketHTTP) websocketPropagate(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
 	app.websocketServer.Broadcast(message)
 }
 

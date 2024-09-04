@@ -12,27 +12,26 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	dashboardServer := Dashboard.NewServer(&Config.DashboardServer{
+	dashboardServer := Dashboard.NewServer("dashboardServer", &Config.DashboardServer{
 		HTTPServerConfig: &Config.HTTPServer{
-			TcpListenerConfig: &Config.TcpListener{
+			TcpServerConfig: &Config.TcpServer{
 				Port: 8081,
 			},
 		},
 		WebsocketServerConfig: &Config.WebsocketServer{
 			Pattern:                 "/ws",
 			ClientWatchdogTimeoutMs: 1000 * 60,
-			TcpListenerConfig: &Config.TcpListener{
+			TcpServerConfig: &Config.TcpServer{
 				Port: 8444,
 			},
 		},
 		SystemgeServerConfig: &Config.SystemgeServer{
-			Name: "dashboardServer",
-			ListenerConfig: &Config.SystemgeListener{
-				TcpListenerConfig: &Config.TcpListener{
+			ListenerConfig: &Config.TcpListener{
+				TcpServerConfig: &Config.TcpServer{
 					Port: 60000,
 				},
 			},
-			ConnectionConfig: &Config.SystemgeConnection{},
+			ConnectionConfig: &Config.TcpConnection{},
 		},
 		MaxChartEntries:           100,
 		HeapUpdateIntervalMs:      1000,
