@@ -37,12 +37,12 @@ func New() *AppWebsocketHTTP {
 	)
 	app.systemgeServer = SystemgeServer.New("systemgeServer",
 		&Config.SystemgeServer{
-			ListenerConfig: &Config.TcpListener{
+			ListenerConfig: &Config.TcpSystemgeListener{
 				TcpServerConfig: &Config.TcpServer{
 					Port: 60001,
 				},
 			},
-			ConnectionConfig: &Config.TcpConnection{},
+			ConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
@@ -80,7 +80,7 @@ func New() *AppWebsocketHTTP {
 
 	err := Dashboard.NewClient("appWebsocketHttp_dashboardClient",
 		&Config.DashboardClient{
-			ConnectionConfig: &Config.TcpConnection{},
+			ConnectionConfig: &Config.TcpSystemgeConnection{},
 			ClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},

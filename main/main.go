@@ -26,12 +26,12 @@ func main() {
 			},
 		},
 		SystemgeServerConfig: &Config.SystemgeServer{
-			ListenerConfig: &Config.TcpListener{
+			ListenerConfig: &Config.TcpSystemgeListener{
 				TcpServerConfig: &Config.TcpServer{
 					Port: 60000,
 				},
 			},
-			ConnectionConfig: &Config.TcpConnection{},
+			ConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		MaxChartEntries:           100,
 		HeapUpdateIntervalMs:      1000,
