@@ -12,33 +12,36 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	dashboardServer := Dashboard.NewServer("dashboardServer", &Config.DashboardServer{
-		HTTPServerConfig: &Config.HTTPServer{
-			TcpServerConfig: &Config.TcpServer{
-				Port: 8081,
-			},
-		},
-		WebsocketServerConfig: &Config.WebsocketServer{
-			Pattern:                 "/ws",
-			ClientWatchdogTimeoutMs: 1000 * 60,
-			TcpServerConfig: &Config.TcpServer{
-				Port: 8444,
-			},
-		},
-		SystemgeServerConfig: &Config.SystemgeServer{
-			ListenerConfig: &Config.TcpSystemgeListener{
+	dashboardServer := Dashboard.NewServer("dashboardServer",
+		&Config.DashboardServer{
+			HTTPServerConfig: &Config.HTTPServer{
 				TcpServerConfig: &Config.TcpServer{
-					Port: 60000,
+					Port: 8081,
 				},
 			},
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
+			WebsocketServerConfig: &Config.WebsocketServer{
+				Pattern:                 "/ws",
+				ClientWatchdogTimeoutMs: 1000 * 60,
+				TcpServerConfig: &Config.TcpServer{
+					Port: 8444,
+				},
+			},
+			SystemgeServerConfig: &Config.SystemgeServer{
+				ListenerConfig: &Config.TcpSystemgeListener{
+					TcpServerConfig: &Config.TcpServer{
+						Port: 60000,
+					},
+				},
+				ConnectionConfig: &Config.TcpSystemgeConnection{},
+			},
+			MaxChartEntries:           100,
+			HeapUpdateIntervalMs:      1000,
+			GoroutineUpdateIntervalMs: 1000,
+			StatusUpdateIntervalMs:    1000,
+			MetricsUpdateIntervalMs:   1000,
 		},
-		MaxChartEntries:           100,
-		HeapUpdateIntervalMs:      1000,
-		GoroutineUpdateIntervalMs: 1000,
-		StatusUpdateIntervalMs:    1000,
-		MetricsUpdateIntervalMs:   1000,
-	})
+		nil, nil,
+	)
 	if err := dashboardServer.Start(); err != nil {
 		panic(err)
 	}

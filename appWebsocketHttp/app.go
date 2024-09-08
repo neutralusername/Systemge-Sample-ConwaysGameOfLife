@@ -44,6 +44,7 @@ func New() *AppWebsocketHTTP {
 			},
 			ConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
+		nil, nil,
 		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
 			return nil
@@ -60,6 +61,7 @@ func New() *AppWebsocketHTTP {
 				Port: 8443,
 			},
 		},
+		nil, nil,
 		WebsocketServer.MessageHandlers{
 			topics.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
 			topics.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
@@ -73,6 +75,7 @@ func New() *AppWebsocketHTTP {
 				Port: 8080,
 			},
 		},
+		nil, nil,
 		HTTPServer.Handlers{
 			"/": HTTPServer.SendDirectory("../frontend"),
 		},
