@@ -56,6 +56,7 @@ func New() *App {
 					Address: "localhost:60001",
 				},
 			},
+			Reconnect:        true,
 			ConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
