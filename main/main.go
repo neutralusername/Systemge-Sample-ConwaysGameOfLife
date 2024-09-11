@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/Dashboard"
+	"github.com/neutralusername/Systemge/DashboardServer"
 )
 
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	dashboardServer := Dashboard.NewServer("dashboardServer",
+	dashboardServer := DashboardServer.New("dashboardServer",
 		&Config.DashboardServer{
 			HTTPServerConfig: &Config.HTTPServer{
 				TcpServerConfig: &Config.TcpServer{

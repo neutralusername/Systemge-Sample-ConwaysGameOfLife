@@ -7,7 +7,7 @@ import (
 
 	"github.com/neutralusername/Systemge/Commands"
 	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/Dashboard"
+	"github.com/neutralusername/Systemge/DashboardClientCustomService"
 	"github.com/neutralusername/Systemge/Helpers"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
@@ -67,14 +67,14 @@ func New() *App {
 			connection.StopProcessingLoop()
 		},
 	)
-	if err := Dashboard.NewClient("appGameOfLife_dashboardClient",
+	if err := DashboardClientCustomService.New("appGameOfLife_dashboardClient",
 		&Config.DashboardClient{
 			ConnectionConfig: &Config.TcpSystemgeConnection{},
 			ClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
 		},
-		app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus,
+		app.systemgeClient,
 		Commands.Handlers{
 			"randomize":      app.randomizeGrid,
 			"invert":         app.invertGrid,

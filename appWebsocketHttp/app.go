@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/Dashboard"
+	"github.com/neutralusername/Systemge/DashboardClientCustomService"
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/HTTPServer"
 	"github.com/neutralusername/Systemge/Message"
@@ -81,13 +81,13 @@ func New() *AppWebsocketHTTP {
 		},
 	)
 
-	err := Dashboard.NewClient("appWebsocketHttp_dashboardClient",
+	err := DashboardClientCustomService.New("appWebsocketHttp_dashboardClient",
 		&Config.DashboardClient{
 			ConnectionConfig: &Config.TcpSystemgeConnection{},
 			ClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
-		}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus,
+		}, app,
 		nil,
 	).Start()
 	if err != nil {
@@ -96,11 +96,15 @@ func New() *AppWebsocketHTTP {
 	return app
 }
 
-func (app *AppWebsocketHTTP) getStatus() int {
+func (app *AppWebsocketHTTP) GetMetrics() map[string]uint64 {
+	return map[string]uint64{}
+}
+
+func (app *AppWebsocketHTTP) GetStatus() int {
 	return app.status
 }
 
-func (app *AppWebsocketHTTP) start() error {
+func (app *AppWebsocketHTTP) Start() error {
 	app.statusMutex.Lock()
 	defer app.statusMutex.Unlock()
 	if app.status != Status.STOPPED {
@@ -122,7 +126,7 @@ func (app *AppWebsocketHTTP) start() error {
 	return nil
 }
 
-func (app *AppWebsocketHTTP) stop() error {
+func (app *AppWebsocketHTTP) Stop() error {
 	app.statusMutex.Lock()
 	defer app.statusMutex.Unlock()
 	if app.status != Status.STARTED {
