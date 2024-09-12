@@ -51,13 +51,13 @@ func New() *App {
 	)
 	app.systemgeClient = SystemgeClient.New("appGameOfLife_systemgeClient",
 		&Config.SystemgeClient{
-			ClientConfigs: []*Config.TcpClient{
+			TcpClientConfigs: []*Config.TcpClient{
 				{
 					Address: "localhost:60001",
 				},
 			},
-			Reconnect:        true,
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
+			Reconnect:                   true,
+			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
@@ -69,8 +69,8 @@ func New() *App {
 	)
 	if err := DashboardClientCustomService.New("appGameOfLife_dashboardClient",
 		&Config.DashboardClient{
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
-			ClientConfig: &Config.TcpClient{
+			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
+			TcpClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
 		},
