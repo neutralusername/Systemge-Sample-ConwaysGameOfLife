@@ -9,8 +9,10 @@ import (
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/HTTPServer"
 	"github.com/neutralusername/Systemge/Message"
+	"github.com/neutralusername/Systemge/Metrics"
 	"github.com/neutralusername/Systemge/Status"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
+	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/SystemgeServer"
 	"github.com/neutralusername/Systemge/WebsocketServer"
 )
@@ -18,6 +20,8 @@ import (
 type AppWebsocketHTTP struct {
 	status      int
 	statusMutex sync.Mutex
+
+	messageHandlerStopChannel chan<- bool
 
 	systemgeServer  *SystemgeServer.SystemgeServer
 	websocketServer *WebsocketServer.WebsocketServer
@@ -27,12 +31,12 @@ type AppWebsocketHTTP struct {
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
 
-	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
-		SystemgeConnection.AsyncMessageHandlers{
+	messageHandler := SystemgeMessageHandler.NewTopicExclusiveMessageHandler(
+		SystemgeMessageHandler.AsyncMessageHandlers{
 			topics.PROPGATE_GRID:         app.websocketPropagate,
 			topics.PROPAGATE_GRID_CHANGE: app.websocketPropagate,
 		},
-		SystemgeConnection.SyncMessageHandlers{},
+		SystemgeMessageHandler.SyncMessageHandlers{},
 		nil, nil, 100,
 	)
 	app.systemgeServer = SystemgeServer.New("systemgeServer",
@@ -46,11 +50,12 @@ func New() *AppWebsocketHTTP {
 		},
 		nil, nil,
 		func(connection SystemgeConnection.SystemgeConnection) error {
-			connection.StartProcessingLoopSequentially(messageHandler)
+			stopChannel, _ := SystemgeMessageHandler.StartProcessingLoopSequentially(connection, messageHandler)
+			app.messageHandlerStopChannel = stopChannel
 			return nil
 		},
 		func(connection SystemgeConnection.SystemgeConnection) {
-			connection.StopProcessingLoop()
+			close(app.messageHandlerStopChannel)
 		},
 	)
 	app.websocketServer = WebsocketServer.New("websocketServer",
@@ -96,8 +101,8 @@ func New() *AppWebsocketHTTP {
 	return app
 }
 
-func (app *AppWebsocketHTTP) GetMetrics() map[string]uint64 {
-	return map[string]uint64{}
+func (app *AppWebsocketHTTP) GetMetrics() map[string]*Metrics.Metrics {
+	return map[string]*Metrics.Metrics{}
 }
 
 func (app *AppWebsocketHTTP) GetStatus() int {
