@@ -12,7 +12,6 @@ import (
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/Tools"
 )
 
@@ -22,8 +21,6 @@ type App struct {
 	gridRows int
 	gridCols int
 	toroidal bool
-
-	messageHandlerStopChannel chan<- bool
 
 	systemgeClient *SystemgeClient.SystemgeClient
 }
@@ -41,13 +38,13 @@ func New() *App {
 	}
 	app.grid = grid
 
-	messageHandler := SystemgeMessageHandler.NewTopicExclusiveMessageHandler(
-		SystemgeMessageHandler.AsyncMessageHandlers{
+	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
+		SystemgeConnection.AsyncMessageHandlers{
 			topics.GRID_CHANGE:     app.gridChange,
 			topics.NEXT_GENERATION: app.nextGeneration,
 			topics.SET_GRID:        app.setGrid,
 		},
-		SystemgeMessageHandler.SyncMessageHandlers{
+		SystemgeConnection.SyncMessageHandlers{
 			topics.GET_GRID: app.getGridSync,
 		},
 		nil, nil, 100,
@@ -63,12 +60,11 @@ func New() *App {
 			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
-			stopChannel, _ := SystemgeMessageHandler.StartMessageHandlingLoop_Sequentially(connection, messageHandler)
-			app.messageHandlerStopChannel = stopChannel
+			connection.StartMessageHandlingLoop_Sequentially(messageHandler)
 			return nil
 		},
 		func(connection SystemgeConnection.SystemgeConnection) {
-			close(app.messageHandlerStopChannel)
+			connection.StopMessageHandlingLoop()
 		},
 	)
 	if err := DashboardClientCustomService.New("appGameOfLife_dashboardClient",
