@@ -39,7 +39,7 @@ func main() {
 			DashboardWebsocketCommands:  true,
 			FrontendHeartbeatIntervalMs: 1000 * 60,
 			UpdateIntervalMs:            1000,
-			MaxMetricEntries:            100,
+			MaxEntriesPerMetrics:        100,
 		},
 		nil, nil,
 	)
