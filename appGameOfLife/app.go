@@ -63,7 +63,7 @@ func New() *App {
 			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
-			stopChannel, _ := SystemgeMessageHandler.StartProcessingLoopSequentially(connection, messageHandler)
+			stopChannel, _ := SystemgeMessageHandler.StartMessageHandlingLoop_Sequentially(connection, messageHandler)
 			app.messageHandlerStopChannel = stopChannel
 			return nil
 		},
