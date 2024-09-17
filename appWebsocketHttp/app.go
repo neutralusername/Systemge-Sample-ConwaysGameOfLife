@@ -103,7 +103,11 @@ func New() *AppWebsocketHTTP {
 }
 
 func (app *AppWebsocketHTTP) GetMetrics() Metrics.MetricsTypes {
-	return map[string]*Metrics.Metrics{}
+	metricsTypes := Metrics.NewMetricsTypes()
+	metricsTypes.Merge(app.systemgeServer.GetMetrics())
+	metricsTypes.Merge(app.websocketServer.GetMetrics())
+	metricsTypes.Merge(app.httpServer.GetMetrics())
+	return metricsTypes
 }
 
 func (app *AppWebsocketHTTP) GetStatus() int {
