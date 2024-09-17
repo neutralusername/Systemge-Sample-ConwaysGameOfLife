@@ -92,7 +92,8 @@ func New() *AppWebsocketHTTP {
 			TcpClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
-		}, app,
+		},
+		app,
 		nil,
 	).Start()
 	if err != nil {
@@ -101,7 +102,7 @@ func New() *AppWebsocketHTTP {
 	return app
 }
 
-func (app *AppWebsocketHTTP) GetMetrics() map[string]*Metrics.Metrics {
+func (app *AppWebsocketHTTP) GetMetrics() Metrics.MetricsTypes {
 	return map[string]*Metrics.Metrics{}
 }
 
