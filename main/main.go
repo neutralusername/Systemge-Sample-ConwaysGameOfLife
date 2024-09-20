@@ -21,7 +21,7 @@ func main() {
 			},
 			WebsocketServerConfig: &Config.WebsocketServer{
 				Pattern:                 "/ws",
-				ClientWatchdogTimeoutMs: 1000 * 60,
+				ClientWatchdogTimeoutMs: 1000 * 60 * 3,
 				TcpServerConfig: &Config.TcpServer{
 					Port: 8444,
 				},
@@ -37,7 +37,7 @@ func main() {
 			DashboardSystemgeCommands:   true,
 			DashboardHttpCommands:       true,
 			DashboardWebsocketCommands:  true,
-			FrontendHeartbeatIntervalMs: 1000 * 60,
+			FrontendHeartbeatIntervalMs: 1000 * 60 * 1,
 			UpdateIntervalMs:            1000,
 			MaxEntriesPerMetrics:        100,
 		},
