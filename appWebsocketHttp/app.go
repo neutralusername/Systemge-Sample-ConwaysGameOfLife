@@ -2,154 +2,142 @@ package appWebsocketHttp
 
 import (
 	"SystemgeSampleConwaysGameOfLife/topics"
+	"errors"
 	"sync"
 
-	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/DashboardClientCustomService"
-	"github.com/neutralusername/Systemge/Error"
-	"github.com/neutralusername/Systemge/HTTPServer"
-	"github.com/neutralusername/Systemge/Message"
-	"github.com/neutralusername/Systemge/Metrics"
-	"github.com/neutralusername/Systemge/Status"
-	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/SystemgeServer"
-	"github.com/neutralusername/Systemge/WebsocketServer"
+	"github.com/neutralusername/systemge/configs"
+	"github.com/neutralusername/systemge/httpServer"
+	"github.com/neutralusername/systemge/listenerChannel"
+	"github.com/neutralusername/systemge/listenerWebsocket"
+	"github.com/neutralusername/systemge/serviceAccepter"
+	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/systemge"
+	"github.com/neutralusername/systemge/tools"
 )
 
 type AppWebsocketHTTP struct {
-	status      int
-	statusMutex sync.Mutex
+	channelAccepter   *serviceAccepter.Accepter[*tools.Message]
+	websocketAccepter *serviceAccepter.Accepter[[]byte]
 
-	systemgeServer  *SystemgeServer.SystemgeServer
-	websocketServer *WebsocketServer.WebsocketServer
-	httpServer      *HTTPServer.HTTPServer
+	websocketConnections map[systemge.Connection[[]byte]]struct{}
+	mutex                sync.Mutex
+
+	listenerWebsocket systemge.Listener[[]byte, systemge.Connection[[]byte]]
+	httpServer        *httpServer.HTTPServer
+	internalListener  systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
 }
 
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
 
-	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
-		SystemgeConnection.AsyncMessageHandlers{
-			topics.PROPGATE_GRID:         app.websocketPropagate,
-			topics.PROPAGATE_GRID_CHANGE: app.websocketPropagate,
-		},
-		SystemgeConnection.SyncMessageHandlers{},
-		nil, nil, 100,
-	)
-	app.systemgeServer = SystemgeServer.New("systemgeServer",
-		&Config.SystemgeServer{
-			TcpSystemgeListenerConfig: &Config.TcpSystemgeListener{
-				TcpServerConfig: &Config.TcpServer{
-					Port: 60001,
-				},
-			},
-			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
-		},
-		nil, nil,
-		func(connection SystemgeConnection.SystemgeConnection) error {
-			connection.StartMessageHandlingLoop_Sequentially(messageHandler)
-			return nil
-		},
-		func(connection SystemgeConnection.SystemgeConnection) {
-			connection.StopMessageHandlingLoop()
-		},
-	)
-	app.websocketServer = WebsocketServer.New("websocketServer",
-		&Config.WebsocketServer{
-			ClientWatchdogTimeoutMs: 1000 * 60,
-			Pattern:                 "/ws",
-			TcpServerConfig: &Config.TcpServer{
-				Port: 8443,
-			},
-		},
-		nil, nil,
-		WebsocketServer.MessageHandlers{
-			topics.GRID_CHANGE:     app.propagateWebsocketAsyncMessage,
-			topics.NEXT_GENERATION: app.propagateWebsocketAsyncMessage,
-			topics.SET_GRID:        app.propagateWebsocketAsyncMessage,
-		},
-		app.OnConnectHandler, nil,
-	)
-	app.httpServer = HTTPServer.New("httpServer",
-		&Config.HTTPServer{
-			TcpServerConfig: &Config.TcpServer{
-				Port: 8080,
-			},
-		},
-		nil, nil,
-		HTTPServer.Handlers{
-			"/": HTTPServer.SendDirectory("../frontend"),
-		},
-	)
-
-	err := DashboardClientCustomService.New("appWebsocketHttp_dashboardClient",
-		&Config.DashboardClient{
-			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
-			TcpClientConfig: &Config.TcpClient{
-				Address: "localhost:60000",
-			},
-		},
-		app,
-		nil,
-	).Start()
+	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
 	if err != nil {
 		panic(err)
 	}
+	app.internalListener = channelListener
+
+	channelAccepter, err := serviceAccepter.New(
+		channelListener,
+		&configs.Accepter{},
+		&configs.Routine{},
+		func(connection systemge.Connection[*tools.Message]) error {
+			_, err := serviceReader.NewSync(
+				connection,
+				&configs.ReaderSync{},
+				&configs.Routine{},
+				func(message *tools.Message, connection systemge.Connection[*tools.Message]) (*tools.Message, error) {
+					switch message.GetTopic() {
+					case topics.PROPAGATE_GRID:
+						app.websocketPropagate(connection, message)
+						return nil, nil
+					case topics.PROPAGATE_GRID_CHANGE:
+						app.websocketPropagate(connection, message)
+						return nil, nil
+					}
+					return nil, errors.New("unknown topic")
+				},
+			)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.channelAccepter = channelAccepter
+
+	app.httpServer = httpServer.New(
+		"httpServer",
+		&configs.HTTPServer{
+			TcpServerConfig: &configs.TcpServer{
+				Port: 8080,
+			},
+		},
+		nil,
+		httpServer.HandlerFuncs{
+			"/": httpServer.SendDirectory("../frontend"),
+		},
+	)
+	listenerWebsocket, err := listenerWebsocket.New(
+		"listenerWebsocket",
+		nil,
+		&configs.WebsocketListener{
+			TcpServerConfig: &configs.TcpServer{
+				Port: 8443,
+			},
+			Pattern: "/ws",
+		},
+		0,
+		0,
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.listenerWebsocket = listenerWebsocket
+
+	websocketAccepter, err := serviceAccepter.New(
+		listenerWebsocket,
+		&configs.Accepter{},
+		&configs.Routine{},
+		func(connection systemge.Connection[[]byte]) error {
+			app.mutex.Lock()
+			app.websocketConnections[connection] = struct{}{}
+			app.mutex.Unlock()
+
+			_, err := serviceReader.NewSync(
+				connection,
+				&configs.ReaderSync{},
+				&configs.Routine{},
+				func(bytes []byte, connection systemge.Connection[[]byte]) ([]byte, error) {
+
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			// propagate grid to new websocket connection
+
+			return nil
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.websocketAccepter = websocketAccepter
+
 	return app
 }
 
-func (app *AppWebsocketHTTP) GetMetrics() Metrics.MetricsTypes {
-	metricsTypes := Metrics.NewMetricsTypes()
-	metricsTypes.Merge(app.systemgeServer.GetMetrics())
-	metricsTypes.Merge(app.websocketServer.GetMetrics())
-	metricsTypes.Merge(app.httpServer.GetMetrics())
-	return metricsTypes
+func (app *AppWebsocketHTTP) websocketPropagate(connection systemge.Connection[*tools.Message], message *tools.Message) {
+	for websocketConnection := range app.websocketConnections {
+		websocketConnection.Write(message.Serialize(), 0)
+	}
 }
 
-func (app *AppWebsocketHTTP) GetStatus() int {
-	return app.status
-}
-
-func (app *AppWebsocketHTTP) Start() error {
-	app.statusMutex.Lock()
-	defer app.statusMutex.Unlock()
-	if app.status != Status.STOPPED {
-		return Error.New("App already started", nil)
-	}
-	if err := app.systemgeServer.Start(); err != nil {
-		return Error.New("Failed to start systemgeServer", err)
-	}
-	if err := app.websocketServer.Start(); err != nil {
-		app.systemgeServer.Stop()
-		return Error.New("Failed to start websocketServer", err)
-	}
-	if err := app.httpServer.Start(); err != nil {
-		app.systemgeServer.Stop()
-		app.websocketServer.Stop()
-		return Error.New("Failed to start httpServer", err)
-	}
-	app.status = Status.STARTED
-	return nil
-}
-
-func (app *AppWebsocketHTTP) Stop() error {
-	app.statusMutex.Lock()
-	defer app.statusMutex.Unlock()
-	if app.status != Status.STARTED {
-		return Error.New("App not started", nil)
-	}
-	app.httpServer.Stop()
-	app.websocketServer.Stop()
-	app.systemgeServer.Stop()
-	app.status = Status.STOPPED
-	return nil
-}
-
-func (app *AppWebsocketHTTP) websocketPropagate(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
-	app.websocketServer.Broadcast(message)
-}
-
-func (app *AppWebsocketHTTP) OnConnectHandler(websocketClient *WebsocketServer.WebsocketClient) error {
+/* func (app *AppWebsocketHTTP) OnConnectHandler(websocketClient *WebsocketServer.WebsocketClient) error {
 	responseChannel, err := app.systemgeServer.SyncRequest(topics.GET_GRID, websocketClient.GetId())
 	if err != nil {
 		return Error.New("Failed to get grid", err)
@@ -166,3 +154,4 @@ func (app *AppWebsocketHTTP) OnConnectHandler(websocketClient *WebsocketServer.W
 func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(websocketClient *WebsocketServer.WebsocketClient, message *Message.Message) error {
 	return app.systemgeServer.AsyncMessage(message.GetTopic(), message.GetPayload())
 }
+*/

@@ -1,21 +1,6 @@
 package appGameOfLife
 
-import (
-	"SystemgeSampleConwaysGameOfLife/dto"
-	"SystemgeSampleConwaysGameOfLife/topics"
-	"sync"
-
-	"github.com/neutralusername/Systemge/Commands"
-	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/DashboardClientCustomService"
-	"github.com/neutralusername/Systemge/Helpers"
-	"github.com/neutralusername/Systemge/Message"
-	"github.com/neutralusername/Systemge/SystemgeClient"
-	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/Tools"
-)
-
-type App struct {
+/* type App struct {
 	grid     [][]int
 	mutex    sync.Mutex
 	gridRows int
@@ -207,3 +192,4 @@ func (app *App) chessGrid(args []string) (string, error) {
 	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
 	return "success", nil
 }
+*/
