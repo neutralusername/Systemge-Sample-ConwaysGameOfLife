@@ -27,23 +27,24 @@ type App struct {
 var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
 
 func New() *App {
+	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
+	if err != nil {
+		panic(err)
+	}
+
 	app := &App{
 		grid:     nil,
 		gridRows: 90,
 		gridCols: 140,
 		toroidal: true,
+
+		listener: channelListener,
 	}
 	grid := make([][]int, app.gridRows)
 	for i := range grid {
 		grid[i] = make([]int, app.gridCols)
 	}
 	app.grid = grid
-
-	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
-	if err != nil {
-		panic(err)
-	}
-	app.listener = channelListener
 
 	channelAccepter, err := serviceAccepter.New(
 		channelListener,
