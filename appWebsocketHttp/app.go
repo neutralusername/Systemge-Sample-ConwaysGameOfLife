@@ -178,7 +178,7 @@ func New() *AppWebsocketHTTP {
 				panic(err)
 			}
 
-			if err = app.internalConnection.Write(tools.NewMessage(topics.GET_GRID, "", request.GetToken()), 0); err != nil {
+			if err = app.internalConnection.Write(tools.NewMessage(topics.GET_GRID, "", request.GetToken(), false), 0); err != nil {
 				panic(err)
 			}
 
