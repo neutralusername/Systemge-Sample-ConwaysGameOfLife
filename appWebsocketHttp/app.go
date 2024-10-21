@@ -100,7 +100,7 @@ func New() *AppWebsocketHTTP {
 	}
 	app.channelAccepter = channelAccepter
 
-	app.httpServer = httpServer.New(
+	httpServer, err := httpServer.New(
 		"httpServer",
 		&configs.HTTPServer{
 			TcpServerConfig: &configs.TcpServer{
@@ -112,6 +112,11 @@ func New() *AppWebsocketHTTP {
 			"/": httpServer.SendDirectory("../frontend"),
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
+	app.httpServer = httpServer
+
 	listenerWebsocket, err := listenerWebsocket.New(
 		"listenerWebsocket",
 		nil,
