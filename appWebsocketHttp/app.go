@@ -60,7 +60,6 @@ func New() *AppWebsocketHTTP {
 						if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
 							return
 						}
-						return
 					} else {
 						switch message.GetTopic() {
 						case topics.PROPAGATE_GRID:
@@ -70,7 +69,6 @@ func New() *AppWebsocketHTTP {
 							app.websocketPropagate(connection, message)
 							return
 						}
-						return
 					}
 				},
 			)
