@@ -43,6 +43,7 @@ func New() *AppWebsocketHTTP {
 		&configs.Accepter{},
 		&configs.Routine{},
 		func(connection systemge.Connection[*tools.Message]) error {
+
 			_, err := serviceReader.NewSync(
 				connection,
 				&configs.ReaderSync{},
@@ -66,6 +67,13 @@ func New() *AppWebsocketHTTP {
 			app.mutex.Lock()
 			app.internalConnections[connection] = struct{}{}
 			app.mutex.Unlock()
+
+			go func() { // abstract on close handler
+				<-connection.GetCloseChannel()
+				app.mutex.Lock()
+				delete(app.internalConnections, connection)
+				app.mutex.Unlock()
+			}()
 
 			return nil
 		},
