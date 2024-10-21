@@ -59,7 +59,7 @@ func New() *App {
 		},
 		func(connection systemge.Connection[*tools.Message]) error {
 
-			_, err := serviceReader.NewAsync(
+			reader, err := serviceReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
@@ -133,6 +133,7 @@ func New() *App {
 			if err != nil {
 				return err
 			}
+			reader.GetRoutine().Start()
 
 			app.mutex.Lock()
 			app.connections[connection] = struct{}{}

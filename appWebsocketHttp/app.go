@@ -198,6 +198,8 @@ func New() *AppWebsocketHTTP {
 				panic(err)
 			}
 
+			println("test123")
+
 			if err = connection.Write(response.Serialize(), 0); err != nil {
 				panic(err)
 			}
