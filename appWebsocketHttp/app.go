@@ -34,9 +34,6 @@ type AppWebsocketHTTP struct {
 }
 
 func New() *AppWebsocketHTTP {
-	app := &AppWebsocketHTTP{
-		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
-	}
 
 	connChan := appGameOfLife.ConnectionChannel
 	if connChan == nil {
@@ -50,7 +47,10 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	app.internalConnection = internalConnection
+	app := &AppWebsocketHTTP{
+		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
+		internalConnection:     internalConnection,
+	}
 
 	reader, err := serviceReader.NewAsync(
 		internalConnection,
