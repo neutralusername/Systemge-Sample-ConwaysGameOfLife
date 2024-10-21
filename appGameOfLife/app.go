@@ -34,7 +34,6 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-
 	ConnectionChannel = channelListener.(*listenerChannel.ChannelListener[*tools.Message]).GetConnectionChannel() // this should be less complicated (make a function that takes systemgeListener and returns either err or this channel)
 
 	app := &App{
@@ -43,7 +42,8 @@ func New() *App {
 		gridCols: 140,
 		toroidal: true,
 
-		listener: channelListener,
+		connections: make(map[systemge.Connection[*tools.Message]]struct{}),
+		listener:    channelListener,
 	}
 	grid := make([][]int, app.gridRows)
 	for i := range grid {
@@ -54,13 +54,17 @@ func New() *App {
 	channelAccepter, err := serviceAccepter.New(
 		channelListener,
 		&configs.Accepter{},
-		&configs.Routine{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 1,
+		},
 		func(connection systemge.Connection[*tools.Message]) error {
 
 			_, err := serviceReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
-				&configs.Routine{},
+				&configs.Routine{
+					MaxConcurrentHandlers: 1,
+				},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 
 					switch message.GetTopic() {
@@ -150,6 +154,7 @@ func New() *App {
 		panic(err)
 	}
 	app.accepter = channelAccepter
+	app.accepter.GetRoutine().Start()
 
 	return app
 }

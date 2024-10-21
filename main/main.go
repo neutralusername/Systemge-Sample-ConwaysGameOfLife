@@ -43,7 +43,7 @@ func main() {
 	if err := dashboardServer.Start(); err != nil {
 		panic(err)
 	} */
-	appWebsocketHttp.New()
 	appGameOfLife.New()
+	appWebsocketHttp.New()
 	<-make(chan time.Time)
 }

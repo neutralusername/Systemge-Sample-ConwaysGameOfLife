@@ -19,12 +19,10 @@ import (
 type AppWebsocketHTTP struct {
 	requestResponseManager *tools.RequestResponseManager[*tools.Message]
 
-	channelAccepter   *serviceAccepter.Accepter[*tools.Message]
 	websocketAccepter *serviceAccepter.Accepter[[]byte]
 
 	listenerWebsocket systemge.Listener[[]byte, systemge.Connection[[]byte]]
 	httpServer        *httpServer.HTTPServer
-	internalListener  systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
 
 	internalConnection       systemge.Connection[*tools.Message]
 	internalConnectionReader *serviceReader.ReaderAsync[*tools.Message]
@@ -40,7 +38,7 @@ func New() *AppWebsocketHTTP {
 		panic("connection channel is nil")
 	}
 
-	internalConnection, err := connectionChannel.EstablishConnection[*tools.Message](
+	internalConnection, err := connectionChannel.EstablishConnection(
 		connChan,
 		0,
 	)
@@ -55,7 +53,9 @@ func New() *AppWebsocketHTTP {
 	reader, err := serviceReader.NewAsync(
 		internalConnection,
 		&configs.ReaderAsync{},
-		&configs.Routine{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 1,
+		},
 		func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 
 			if message.GetSyncToken() != "" {
@@ -124,7 +124,9 @@ func New() *AppWebsocketHTTP {
 	websocketAccepter, err := serviceAccepter.New(
 		listenerWebsocket,
 		&configs.Accepter{},
-		&configs.Routine{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 1,
+		},
 		func(connection systemge.Connection[[]byte]) error {
 
 			_, err := serviceTypedReader.NewAsync(
