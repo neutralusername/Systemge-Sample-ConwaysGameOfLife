@@ -140,6 +140,13 @@ func New() *AppWebsocketHTTP {
 			app.websocketConnections[connection] = struct{}{}
 			app.mutex.Unlock()
 
+			go func() { // abstract on close handler
+				<-connection.GetCloseChannel()
+				app.mutex.Lock()
+				delete(app.websocketConnections, connection)
+				app.mutex.Unlock()
+			}()
+
 			// propagate grid to new websocket connection
 
 			return nil
