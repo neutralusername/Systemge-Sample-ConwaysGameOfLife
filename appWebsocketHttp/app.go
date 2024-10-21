@@ -55,7 +55,15 @@ func New() *AppWebsocketHTTP {
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) (*tools.Message, error) {
 
 					if message.GetSyncToken() != "" {
-
+						if message.IsResponse() {
+							err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message)
+							if err != nil {
+								return nil, err
+							}
+							return nil, nil
+						} else {
+							return nil, errors.New("this server does not support sync requests")
+						}
 					} else {
 						switch message.GetTopic() {
 						case topics.PROPAGATE_GRID:
