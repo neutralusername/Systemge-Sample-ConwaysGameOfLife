@@ -21,13 +21,13 @@ type AppWebsocketHTTP struct {
 	channelAccepter   *serviceAccepter.Accepter[*tools.Message]
 	websocketAccepter *serviceAccepter.Accepter[[]byte]
 
-	websocketConnections map[systemge.Connection[[]byte]]struct{}
-	internalConnections  map[systemge.Connection[*tools.Message]]struct{}
-	mutex                sync.RWMutex
-
 	listenerWebsocket systemge.Listener[[]byte, systemge.Connection[[]byte]]
 	httpServer        *httpServer.HTTPServer
 	internalListener  systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
+
+	internalConnection   systemge.Connection[*tools.Message]
+	websocketConnections map[systemge.Connection[[]byte]]struct{}
+	mutex                sync.RWMutex
 }
 
 func New() *AppWebsocketHTTP {
@@ -47,6 +47,10 @@ func New() *AppWebsocketHTTP {
 		&configs.Routine{},
 		func(connection systemge.Connection[*tools.Message]) error {
 
+			if app.internalConnection != nil {
+				panic("Internal connection already exists")
+			}
+
 			_, err := serviceReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
@@ -61,7 +65,6 @@ func New() *AppWebsocketHTTP {
 							return
 						}
 					} else {
-
 						switch message.GetTopic() {
 						case topics.PROPAGATE_GRID:
 						case topics.PROPAGATE_GRID_CHANGE:
@@ -82,15 +85,11 @@ func New() *AppWebsocketHTTP {
 				return err
 			}
 
-			app.mutex.Lock()
-			app.internalConnections[connection] = struct{}{}
-			app.mutex.Unlock()
+			app.internalConnection = connection
 
 			go func() { // abstract on close handler
 				<-connection.GetCloseChannel()
-				app.mutex.Lock()
-				delete(app.internalConnections, connection)
-				app.mutex.Unlock()
+				app.internalConnection = nil
 			}()
 
 			return nil
@@ -153,9 +152,7 @@ func New() *AppWebsocketHTTP {
 					app.mutex.RLock()
 					defer app.mutex.RUnlock()
 
-					for internalConnection := range app.internalConnections {
-						go internalConnection.Write(message, 0)
-					}
+					go app.internalConnection.Write(message, 0)
 				},
 				func(data []byte) (*tools.Message, error) {
 					return tools.DeserializeMessage(data)
@@ -176,7 +173,24 @@ func New() *AppWebsocketHTTP {
 				app.mutex.Unlock()
 			}()
 
-			// propagate grid to new websocket connection
+			request, err := app.requestResponseManager.NewRequest(tools.GenerateRandomString(32, tools.ALPHA_NUMERIC), 1, 0, nil)
+			if err != nil {
+				panic(err)
+			}
+			err = app.internalConnection.Write(tools.NewMessage(topics.GET_GRID, "", request.GetToken()), 0)
+			if err != nil {
+				panic(err)
+			}
+
+			response, err := request.GetNextResponse()
+			if err != nil {
+				panic(err)
+			}
+
+			err = connection.Write(response.Serialize(), 0)
+			if err != nil {
+				panic(err)
+			}
 
 			return nil
 		},
