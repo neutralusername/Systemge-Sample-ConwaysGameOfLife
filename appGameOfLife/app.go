@@ -93,6 +93,7 @@ func New() *App {
 					case topics.SET_GRID:
 						app.mutex.Lock()
 						defer app.mutex.Unlock()
+
 						if len(message.GetPayload()) != app.gridCols*app.gridRows {
 							return
 						}
