@@ -1,18 +1,5 @@
-package appGameOfLife
 
-import (
-	"SystemgeSampleConwaysGameOfLife/dto"
-	"SystemgeSampleConwaysGameOfLife/topics"
-	"sync"
 
-	"github.com/neutralusername/systemge/configs"
-	"github.com/neutralusername/systemge/helpers"
-	"github.com/neutralusername/systemge/listenerTcp"
-	"github.com/neutralusername/systemge/serviceAccepter"
-	"github.com/neutralusername/systemge/serviceTypedReader"
-	"github.com/neutralusername/systemge/systemge"
-	"github.com/neutralusername/systemge/tools"
-)
 
 type App struct {
 	grid     [][]int
@@ -22,20 +9,17 @@ type App struct {
 	toroidal bool
 }
 
+var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
+
 func New() *App {
-	tcpListener, err := listenerTcp.New(
-		"listenerTcp",
-		&configs.TcpListener{
-			TcpServerConfig: &configs.TcpServer{
-				Port: 60001,
-			},
-		},
-		&configs.TcpBufferedReader{},
-	)
+	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
 	if err != nil {
 		panic(err)
 	}
-	tcpListener.Start()
+	if err := channelListener.Start(); err != nil {
+		panic(err)
+	}
+	ConnectionChannel = channelListener.(*listenerChannel.ChannelListener[*tools.Message]).GetConnectionChannel() // this should be less complicated (make a function that takes systemgeListener and returns either err or this channel)
 
 	app := &App{
 		grid:     nil,
@@ -49,20 +33,20 @@ func New() *App {
 	}
 	app.grid = grid
 
-	accepter, err := serviceAccepter.New(
-		tcpListener,
+	channelAccepter, err := serviceAccepter.New(
+		channelListener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
-		func(connection systemge.Connection[[]byte]) error {
-			reader, err := serviceTypedReader.NewAsync(
+		func(connection systemge.Connection[*tools.Message]) error {
+			reader, err := serviceReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
 					MaxConcurrentHandlers: 10,
 				},
-				func(message *tools.Message, connection systemge.Connection[[]byte]) {
+				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 					switch message.GetTopic() {
 					case topics.GRID_CHANGE:
 						gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -73,7 +57,7 @@ func New() *App {
 								message.GetPayload(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
@@ -88,7 +72,7 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
@@ -113,7 +97,7 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
@@ -127,16 +111,13 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								message.GetSyncToken(),
 								true,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
 							panic(err)
 						}
 					}
-				},
-				func(data []byte) (*tools.Message, error) {
-					return tools.DeserializeMessage(data)
 				},
 			)
 			if err != nil {
@@ -152,7 +133,7 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-	if err := accepter.GetRoutine().Start(); err != nil {
+	if err := channelAccepter.GetRoutine().Start(); err != nil {
 		panic(err)
 	}
 
@@ -197,56 +178,3 @@ func (app *App) calcNextGeneration() {
 	}
 	app.grid = nextGrid
 }
-
-/*
-func (app *App) toggleToroidal(args []string) (string, error) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	app.toroidal = !app.toroidal
-	return "sucess", nil
-}
-
-func (app *App) randomizeGrid(args []string) (string, error) {
-	percentageOfAliveCells := int64(50)
-	if len(args) > 0 {
-		percentageOfAliveCells = Helpers.StringToInt64(args[0])
-	}
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	for row := 0; row < app.gridRows; row++ {
-		for col := 0; col < app.gridCols; col++ {
-			if Tools.GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
-				app.grid[row][col] = 1
-			} else {
-				app.grid[row][col] = 0
-			}
-		}
-	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
-	return "success", nil
-}
-
-func (app *App) invertGrid(args []string) (string, error) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	for row := 0; row < app.gridRows; row++ {
-		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = 1 - app.grid[row][col]
-		}
-	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
-	return "success", nil
-}
-
-func (app *App) chessGrid(args []string) (string, error) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	for row := 0; row < app.gridRows; row++ {
-		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = (row + col) % 2
-		}
-	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
-	return "success", nil
-}
-*/
