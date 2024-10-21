@@ -32,7 +32,7 @@ func New() *App {
 		panic(err)
 	}
 
-	ConnectionChannel = channelListener.(*listenerChannel.ChannelListener[*tools.Message]).GetConnectionChannel()
+	ConnectionChannel = channelListener.(*listenerChannel.ChannelListener[*tools.Message]).GetConnectionChannel() // this should be less complicated
 
 	app := &App{
 		grid:     nil,
