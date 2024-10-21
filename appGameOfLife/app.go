@@ -38,8 +38,8 @@ func New() *App {
 
 	app := &App{
 		grid:     nil,
-		gridRows: 90,
-		gridCols: 140,
+		gridRows: 50,
+		gridCols: 100,
 		toroidal: true,
 
 		connections: make(map[systemge.Connection[*tools.Message]]struct{}),
