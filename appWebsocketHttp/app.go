@@ -38,8 +38,13 @@ func New() *AppWebsocketHTTP {
 		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
 	}
 
+	connChan := appGameOfLife.ConnectionChannel
+	if connChan == nil {
+		panic("connection channel is nil")
+	}
+
 	internalConnection, err := connectionChannel.EstablishConnection[*tools.Message](
-		appGameOfLife.ConnectionChannel,
+		connChan,
 		0,
 	)
 	if err != nil {
