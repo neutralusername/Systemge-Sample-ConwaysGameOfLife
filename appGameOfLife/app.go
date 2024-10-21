@@ -1,5 +1,16 @@
 package appGameOfLife
 
+import (
+	"SystemgeSampleConwaysGameOfLife/topics"
+
+	"github.com/neutralusername/systemge/configs"
+	"github.com/neutralusername/systemge/listenerChannel"
+	"github.com/neutralusername/systemge/serviceAccepter"
+	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/systemge"
+	"github.com/neutralusername/systemge/tools"
+)
+
 type App struct {
 	/* grid     [][]int
 	mutex    sync.Mutex
@@ -11,85 +22,82 @@ type App struct {
 }
 
 func New() *App {
-	/* 	app := &App{
-	   		grid:     nil,
-	   		gridRows: 90,
-	   		gridCols: 140,
-	   		toroidal: true,
-	   	}
-	   	grid := make([][]int, app.gridRows)
-	   	for i := range grid {
-	   		grid[i] = make([]int, app.gridCols)
-	   	}
-	   	app.grid = grid */
+	app := &App{
+		grid:     nil,
+		gridRows: 90,
+		gridCols: 140,
+		toroidal: true,
+	}
+	grid := make([][]int, app.gridRows)
+	for i := range grid {
+		grid[i] = make([]int, app.gridCols)
+	}
+	app.grid = grid
 
-	/*
+	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
+	if err != nil {
+		panic(err)
+	}
+	app.internalListener = channelListener
 
-			channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
-		if err != nil {
-			panic(err)
-		}
-		app.internalListener = channelListener
+	channelAccepter, err := serviceAccepter.New(
+		channelListener,
+		&configs.Accepter{},
+		&configs.Routine{},
+		func(connection systemge.Connection[*tools.Message]) error {
 
-		channelAccepter, err := serviceAccepter.New(
-			channelListener,
-			&configs.Accepter{},
-			&configs.Routine{},
-			func(connection systemge.Connection[*tools.Message]) error {
+			if app.internalConnection != nil {
+				panic("Internal connection already exists")
+			}
 
-				if app.internalConnection != nil {
-					panic("Internal connection already exists")
-				}
+			_, err := serviceReader.NewAsync(
+				connection,
+				&configs.ReaderAsync{},
+				&configs.Routine{},
+				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 
-				_, err := serviceReader.NewAsync(
-					connection,
-					&configs.ReaderAsync{},
-					&configs.Routine{},
-					func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-
-						if message.GetSyncToken() != "" {
-							if !message.IsResponse() {
-								return
-							}
-							if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
-								return
-							}
-						} else {
-							switch message.GetTopic() {
-							case topics.PROPAGATE_GRID:
-							case topics.PROPAGATE_GRID_CHANGE:
-							default:
-								return
-							}
-
-							app.mutex.RLock()
-							defer app.mutex.RUnlock()
-
-							for websocketConnection := range app.websocketConnections {
-								go websocketConnection.Write(message.Serialize(), 0)
-							}
+					if message.GetSyncToken() != "" {
+						if !message.IsResponse() {
+							return
 						}
-					},
-				)
-				if err != nil {
-					return err
-				}
+						if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
+							return
+						}
+					} else {
+						switch message.GetTopic() {
+						case topics.PROPAGATE_GRID:
+						case topics.PROPAGATE_GRID_CHANGE:
+						default:
+							return
+						}
 
-				app.internalConnection = connection
+						app.mutex.RLock()
+						defer app.mutex.RUnlock()
 
-				go func() { // abstract on close handler
-					<-connection.GetCloseChannel()
-					app.internalConnection = nil
-				}()
+						for websocketConnection := range app.websocketConnections {
+							go websocketConnection.Write(message.Serialize(), 0)
+						}
+					}
+				},
+			)
+			if err != nil {
+				return err
+			}
 
-				return nil
-			},
-		)
-		if err != nil {
-			panic(err)
-		}
-		app.channelAccepter = channelAccepter
-	*/
+			app.internalConnection = connection
+
+			go func() { // abstract on close handler
+				<-connection.GetCloseChannel()
+				app.internalConnection = nil
+			}()
+
+			return nil
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.channelAccepter = channelAccepter
 
 	/*
 		 	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
