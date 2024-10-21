@@ -1,7 +1,6 @@
 package appGameOfLife
 
 import (
-	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
 	"github.com/neutralusername/systemge/configs"
@@ -21,6 +20,7 @@ type App struct {
 	toroidal bool
 
 	listener    systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
+	accepter    *serviceAccepter.Accepter[*tools.Message]
 	connections map[systemge.Connection[*tools.Message]]struct{}
 }
 
@@ -57,39 +57,21 @@ func New() *App {
 				&configs.Routine{},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 
-					if message.GetSyncToken() != "" {
-						if !message.IsResponse() {
-							return
-						}
-						if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
-							return
-						}
-					} else {
-						switch message.GetTopic() {
-						case topics.PROPAGATE_GRID:
-						case topics.PROPAGATE_GRID_CHANGE:
-						default:
-							return
-						}
-
-						app.mutex.RLock()
-						defer app.mutex.RUnlock()
-
-						for websocketConnection := range app.websocketConnections {
-							go websocketConnection.Write(message.Serialize(), 0)
-						}
-					}
 				},
 			)
 			if err != nil {
 				return err
 			}
 
-			app.internalConnection = connection
+			app.mutex.Lock()
+			app.connections[connection] = struct{}{}
+			app.mutex.Unlock()
 
 			go func() { // abstract on close handler
 				<-connection.GetCloseChannel()
-				app.internalConnection = nil
+				app.mutex.Lock()
+				delete(app.connections, connection)
+				app.mutex.Unlock()
 			}()
 
 			return nil
@@ -98,7 +80,7 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-	app.channelAccepter = channelAccepter
+	app.accepter = channelAccepter
 
 	/*
 		 	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
