@@ -32,6 +32,8 @@ func New() *App {
 		panic(err)
 	}
 
+	ConnectionChannel = channelListener.(*listenerChannel.ChannelListener[*tools.Message]).GetConnectionChannel()
+
 	app := &App{
 		grid:     nil,
 		gridRows: 90,
