@@ -86,6 +86,10 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 	app.internalConnectionReader = reader
+	err = app.internalConnectionReader.GetRoutine().Start()
+	if err != nil {
+		panic(err)
+	}
 
 	httpServer, err := httpServer.New(
 		"httpServer",
@@ -103,6 +107,10 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 	app.httpServer = httpServer
+	err = app.httpServer.Start()
+	if err != nil {
+		panic(err)
+	}
 
 	listenerWebsocket, err := listenerWebsocket.New(
 		"listenerWebsocket",
@@ -120,6 +128,10 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 	app.listenerWebsocket = listenerWebsocket
+	err = app.listenerWebsocket.Start()
+	if err != nil {
+		panic(err)
+	}
 
 	websocketAccepter, err := serviceAccepter.New(
 		listenerWebsocket,
@@ -193,6 +205,10 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 	app.websocketAccepter = websocketAccepter
+	err = app.websocketAccepter.GetRoutine().Start()
+	if err != nil {
+		panic(err)
+	}
 
 	return app
 }
