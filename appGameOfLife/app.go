@@ -71,7 +71,7 @@ func New() *App {
 					case topics.GRID_CHANGE:
 						gridChange := dto.UnmarshalGridChange(message.GetPayload())
 						app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-						connection.Write(
+						err := connection.Write(
 							tools.NewMessage(
 								topics.PROPAGATE_GRID_CHANGE,
 								message.GetPayload(),
@@ -80,10 +80,13 @@ func New() *App {
 							),
 							0,
 						)
+						if err != nil {
+							panic(err)
+						}
 
 					case topics.NEXT_GENERATION:
 						app.calcNextGeneration()
-						connection.Write(
+						err := connection.Write(
 							tools.NewMessage(
 								topics.PROPAGATE_GRID,
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
@@ -92,6 +95,9 @@ func New() *App {
 							),
 							0,
 						)
+						if err != nil {
+							panic(err)
+						}
 
 					case topics.SET_GRID:
 						app.mutex.Lock()
@@ -104,7 +110,7 @@ func New() *App {
 								app.grid[row][col] = helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 							}
 						}
-						connection.Write(
+						err := connection.Write(
 							tools.NewMessage(
 								topics.PROPAGATE_GRID,
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
@@ -113,6 +119,9 @@ func New() *App {
 							),
 							0,
 						)
+						if err != nil {
+							panic(err)
+						}
 
 					case topics.GET_GRID:
 						err := connection.Write(
