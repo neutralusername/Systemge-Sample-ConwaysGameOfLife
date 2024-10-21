@@ -22,7 +22,7 @@ type AppWebsocketHTTP struct {
 
 	websocketConnections map[systemge.Connection[[]byte]]struct{}
 	internalConnections  map[systemge.Connection[*tools.Message]]struct{}
-	mutex                sync.Mutex
+	mutex                sync.RWMutex
 
 	listenerWebsocket systemge.Listener[[]byte, systemge.Connection[[]byte]]
 	httpServer        *httpServer.HTTPServer
@@ -123,7 +123,13 @@ func New() *AppWebsocketHTTP {
 				&configs.ReaderSync{},
 				&configs.Routine{},
 				func(message *tools.Message, connection systemge.Connection[[]byte]) (*tools.Message, error) {
+					app.mutex.RLock()
+					defer app.mutex.RUnlock()
 
+					for internalConnection := range app.internalConnections {
+						go internalConnection.Write(message, 0)
+					}
+					return nil, nil
 				},
 				func(data []byte) (*tools.Message, error) {
 					return tools.DeserializeMessage(data)
