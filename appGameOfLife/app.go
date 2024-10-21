@@ -6,10 +6,11 @@ import (
 	"sync"
 
 	"github.com/neutralusername/systemge/configs"
+	"github.com/neutralusername/systemge/connectionChannel"
 	"github.com/neutralusername/systemge/helpers"
-	"github.com/neutralusername/systemge/listenerTcp"
+	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/serviceAccepter"
-	"github.com/neutralusername/systemge/serviceTypedReader"
+	"github.com/neutralusername/systemge/serviceReader"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -22,20 +23,17 @@ type App struct {
 	toroidal bool
 }
 
+var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
+
 func New() *App {
-	tcpListener, err := listenerTcp.New(
-		"listenerTcp",
-		&configs.TcpListener{
-			TcpServerConfig: &configs.TcpServer{
-				Port: 60001,
-			},
-		},
-		&configs.TcpBufferedReader{},
-	)
+	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
 	if err != nil {
 		panic(err)
 	}
-	tcpListener.Start()
+	if err := channelListener.Start(); err != nil {
+		panic(err)
+	}
+	ConnectionChannel = channelListener.(*listenerChannel.ChannelListener[*tools.Message]).GetConnectionChannel() // this should be less complicated (make a function that takes systemgeListener and returns either err or this channel)
 
 	app := &App{
 		grid:     nil,
@@ -49,20 +47,20 @@ func New() *App {
 	}
 	app.grid = grid
 
-	accepter, err := serviceAccepter.New(
-		tcpListener,
+	channelAccepter, err := serviceAccepter.New(
+		channelListener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
-		func(connection systemge.Connection[[]byte]) error {
-			reader, err := serviceTypedReader.NewAsync(
+		func(connection systemge.Connection[*tools.Message]) error {
+			reader, err := serviceReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
 					MaxConcurrentHandlers: 10,
 				},
-				func(message *tools.Message, connection systemge.Connection[[]byte]) {
+				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 					switch message.GetTopic() {
 					case topics.GRID_CHANGE:
 						gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -73,7 +71,7 @@ func New() *App {
 								message.GetPayload(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
@@ -88,7 +86,7 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
@@ -113,7 +111,7 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
@@ -127,16 +125,13 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								message.GetSyncToken(),
 								true,
-							).Serialize(),
+							),
 							0,
 						)
 						if err != nil {
 							panic(err)
 						}
 					}
-				},
-				func(data []byte) (*tools.Message, error) {
-					return tools.DeserializeMessage(data)
 				},
 			)
 			if err != nil {
@@ -152,7 +147,7 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-	if err := accepter.GetRoutine().Start(); err != nil {
+	if err := channelAccepter.GetRoutine().Start(); err != nil {
 		panic(err)
 	}
 
