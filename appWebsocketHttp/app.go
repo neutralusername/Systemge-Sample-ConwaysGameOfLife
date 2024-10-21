@@ -61,6 +61,7 @@ func New() *AppWebsocketHTTP {
 							return
 						}
 					} else {
+
 						switch message.GetTopic() {
 						case topics.PROPAGATE_GRID:
 						case topics.PROPAGATE_GRID_CHANGE:
@@ -140,8 +141,6 @@ func New() *AppWebsocketHTTP {
 				&configs.ReaderAsync{},
 				&configs.Routine{},
 				func(message *tools.Message, connection systemge.Connection[[]byte]) {
-					app.mutex.RLock()
-					defer app.mutex.RUnlock()
 
 					switch message.GetTopic() {
 					case topics.GRID_CHANGE:
@@ -150,6 +149,9 @@ func New() *AppWebsocketHTTP {
 					default:
 						return
 					}
+
+					app.mutex.RLock()
+					defer app.mutex.RUnlock()
 
 					for internalConnection := range app.internalConnections {
 						go internalConnection.Write(message, 0)
