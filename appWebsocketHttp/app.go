@@ -161,8 +161,9 @@ func New() *AppWebsocketHTTP {
 			go func() { // abstract on close handler
 				<-connection.GetCloseChannel()
 				app.mutex.Lock()
+				defer app.mutex.Unlock()
+
 				delete(app.websocketConnections, connection)
-				app.mutex.Unlock()
 			}()
 
 			request, err := app.requestResponseManager.NewRequest(tools.GenerateRandomString(32, tools.ALPHA_NUMERIC), 1, 0, nil)

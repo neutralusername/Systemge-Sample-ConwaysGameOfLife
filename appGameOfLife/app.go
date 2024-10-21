@@ -59,7 +59,7 @@ func New() *App {
 				&configs.ReaderAsync{},
 				&configs.Routine{},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-
+					// todo
 				},
 			)
 			if err != nil {
@@ -72,9 +72,11 @@ func New() *App {
 
 			go func() { // abstract on close handler
 				<-connection.GetCloseChannel()
+
 				app.mutex.Lock()
+				defer app.mutex.Unlock()
+
 				delete(app.connections, connection)
-				app.mutex.Unlock()
 			}()
 
 			return nil
