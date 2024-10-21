@@ -135,24 +135,28 @@ func New() *AppWebsocketHTTP {
 		&configs.Routine{},
 		func(connection systemge.Connection[[]byte]) error {
 
-			_, err := serviceTypedReader.NewSync(
+			_, err := serviceTypedReader.NewAsync(
 				connection,
-				&configs.ReaderSync{},
+				&configs.ReaderAsync{},
 				&configs.Routine{},
-				func(message *tools.Message, connection systemge.Connection[[]byte]) (*tools.Message, error) {
+				func(message *tools.Message, connection systemge.Connection[[]byte]) {
 					app.mutex.RLock()
 					defer app.mutex.RUnlock()
+
+					switch message.GetTopic() {
+					case topics.GRID_CHANGE:
+					case topics.NEXT_GENERATION:
+					case topics.SET_GRID:
+					default:
+						return
+					}
 
 					for internalConnection := range app.internalConnections {
 						go internalConnection.Write(message, 0)
 					}
-					return nil, nil
 				},
 				func(data []byte) (*tools.Message, error) {
 					return tools.DeserializeMessage(data)
-				},
-				func(message *tools.Message) ([]byte, error) {
-					return message.Serialize(), nil
 				},
 			)
 			if err != nil {
