@@ -2,6 +2,7 @@ package appGameOfLife
 
 import (
 	"SystemgeSampleConwaysGameOfLife/topics"
+	"sync"
 
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/connectionChannel"
@@ -13,13 +14,14 @@ import (
 )
 
 type App struct {
-	/* grid     [][]int
-	mutex    sync.Mutex
+	grid     [][]int
+	mutex    sync.RWMutex
 	gridRows int
 	gridCols int
 	toroidal bool
 
-	systemgeClient *SystemgeClient.SystemgeClient */
+	listener    systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
+	connections map[systemge.Connection[*tools.Message]]struct{}
 }
 
 var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
@@ -41,17 +43,13 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-	app.internalListener = channelListener
+	app.listener = channelListener
 
 	channelAccepter, err := serviceAccepter.New(
 		channelListener,
 		&configs.Accepter{},
 		&configs.Routine{},
 		func(connection systemge.Connection[*tools.Message]) error {
-
-			if app.internalConnection != nil {
-				panic("Internal connection already exists")
-			}
 
 			_, err := serviceReader.NewAsync(
 				connection,

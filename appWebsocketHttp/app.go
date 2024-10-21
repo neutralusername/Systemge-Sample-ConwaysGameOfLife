@@ -10,6 +10,7 @@ import (
 	"github.com/neutralusername/systemge/httpServer"
 	"github.com/neutralusername/systemge/listenerWebsocket"
 	"github.com/neutralusername/systemge/serviceAccepter"
+	"github.com/neutralusername/systemge/serviceReader"
 	"github.com/neutralusername/systemge/serviceTypedReader"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
@@ -25,7 +26,9 @@ type AppWebsocketHTTP struct {
 	httpServer        *httpServer.HTTPServer
 	internalListener  systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
 
-	internalConnection   systemge.Connection[*tools.Message]
+	internalConnection       systemge.Connection[*tools.Message]
+	internalConnectionReader *serviceReader.ReaderAsync[*tools.Message]
+
 	websocketConnections map[systemge.Connection[[]byte]]struct{}
 	mutex                sync.RWMutex
 }
@@ -43,6 +46,41 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 	app.internalConnection = internalConnection
+
+	reader, err := serviceReader.NewAsync(
+		internalConnection,
+		&configs.ReaderAsync{},
+		&configs.Routine{},
+		func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
+
+			if message.GetSyncToken() != "" {
+				if !message.IsResponse() {
+					return
+				}
+				if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
+					return
+				}
+			} else {
+				switch message.GetTopic() {
+				case topics.PROPAGATE_GRID:
+				case topics.PROPAGATE_GRID_CHANGE:
+				default:
+					return
+				}
+
+				app.mutex.RLock()
+				defer app.mutex.RUnlock()
+
+				for websocketConnection := range app.websocketConnections {
+					go websocketConnection.Write(message.Serialize(), 0)
+				}
+			}
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.internalConnectionReader = reader
 
 	httpServer, err := httpServer.New(
 		"httpServer",
