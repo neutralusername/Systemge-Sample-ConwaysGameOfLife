@@ -202,22 +202,3 @@ func New() *AppWebsocketHTTP {
 
 	return app
 }
-
-/* func (app *AppWebsocketHTTP) OnConnectHandler(websocketClient *WebsocketServer.WebsocketClient) error {
-	responseChannel, err := app.systemgeServer.SyncRequest(topics.GET_GRID, websocketClient.GetId())
-	if err != nil {
-		return Error.New("Failed to get grid", err)
-	}
-	response := <-responseChannel
-	if response == nil {
-		return Error.New("Failed to receive response", err)
-	}
-	getGridMessage := Message.NewAsync(topics.GET_GRID, response.GetPayload())
-	websocketClient.Send([]byte(getGridMessage.Serialize()))
-	return nil
-}
-
-func (app *AppWebsocketHTTP) propagateWebsocketAsyncMessage(websocketClient *WebsocketServer.WebsocketClient, message *Message.Message) error {
-	return app.systemgeServer.AsyncMessage(message.GetTopic(), message.GetPayload())
-}
-*/
