@@ -1,15 +1,15 @@
 package appWebsocketHttp
 
 import (
+	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
 	"github.com/neutralusername/systemge/configs"
+	"github.com/neutralusername/systemge/connectionChannel"
 	"github.com/neutralusername/systemge/httpServer"
-	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/listenerWebsocket"
 	"github.com/neutralusername/systemge/serviceAccepter"
-	"github.com/neutralusername/systemge/serviceReader"
 	"github.com/neutralusername/systemge/serviceTypedReader"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
@@ -35,70 +35,14 @@ func New() *AppWebsocketHTTP {
 		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
 	}
 
-	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
-	if err != nil {
-		panic(err)
-	}
-	app.internalListener = channelListener
-
-	channelAccepter, err := serviceAccepter.New(
-		channelListener,
-		&configs.Accepter{},
-		&configs.Routine{},
-		func(connection systemge.Connection[*tools.Message]) error {
-
-			if app.internalConnection != nil {
-				panic("Internal connection already exists")
-			}
-
-			_, err := serviceReader.NewAsync(
-				connection,
-				&configs.ReaderAsync{},
-				&configs.Routine{},
-				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-
-					if message.GetSyncToken() != "" {
-						if !message.IsResponse() {
-							return
-						}
-						if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
-							return
-						}
-					} else {
-						switch message.GetTopic() {
-						case topics.PROPAGATE_GRID:
-						case topics.PROPAGATE_GRID_CHANGE:
-						default:
-							return
-						}
-
-						app.mutex.RLock()
-						defer app.mutex.RUnlock()
-
-						for websocketConnection := range app.websocketConnections {
-							go websocketConnection.Write(message.Serialize(), 0)
-						}
-					}
-				},
-			)
-			if err != nil {
-				return err
-			}
-
-			app.internalConnection = connection
-
-			go func() { // abstract on close handler
-				<-connection.GetCloseChannel()
-				app.internalConnection = nil
-			}()
-
-			return nil
-		},
+	internalConnection, err := connectionChannel.EstablishConnection[*tools.Message](
+		appGameOfLife.ConnectionChannel,
+		0,
 	)
 	if err != nil {
 		panic(err)
 	}
-	app.channelAccepter = channelAccepter
+	app.internalConnection = internalConnection
 
 	httpServer, err := httpServer.New(
 		"httpServer",

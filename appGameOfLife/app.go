@@ -1,76 +1,148 @@
 package appGameOfLife
 
-/* type App struct {
-	grid     [][]int
+type App struct {
+	/* grid     [][]int
 	mutex    sync.Mutex
 	gridRows int
 	gridCols int
 	toroidal bool
 
-	systemgeClient *SystemgeClient.SystemgeClient
+	systemgeClient *SystemgeClient.SystemgeClient */
 }
 
 func New() *App {
-	app := &App{
-		grid:     nil,
-		gridRows: 90,
-		gridCols: 140,
-		toroidal: true,
-	}
-	grid := make([][]int, app.gridRows)
-	for i := range grid {
-		grid[i] = make([]int, app.gridCols)
-	}
-	app.grid = grid
+	/* 	app := &App{
+	   		grid:     nil,
+	   		gridRows: 90,
+	   		gridCols: 140,
+	   		toroidal: true,
+	   	}
+	   	grid := make([][]int, app.gridRows)
+	   	for i := range grid {
+	   		grid[i] = make([]int, app.gridCols)
+	   	}
+	   	app.grid = grid */
 
-	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
-		SystemgeConnection.AsyncMessageHandlers{
-			topics.GRID_CHANGE:     app.gridChange,
-			topics.NEXT_GENERATION: app.nextGeneration,
-			topics.SET_GRID:        app.setGrid,
-		},
-		SystemgeConnection.SyncMessageHandlers{
-			topics.GET_GRID: app.getGridSync,
-		},
-		nil, nil, 100,
-	)
-	app.systemgeClient = SystemgeClient.New("appGameOfLife_systemgeClient",
-		&Config.SystemgeClient{
-			TcpClientConfigs: []*Config.TcpClient{
-				{
-					Address: "localhost:60001",
+	/*
+
+			channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
+		if err != nil {
+			panic(err)
+		}
+		app.internalListener = channelListener
+
+		channelAccepter, err := serviceAccepter.New(
+			channelListener,
+			&configs.Accepter{},
+			&configs.Routine{},
+			func(connection systemge.Connection[*tools.Message]) error {
+
+				if app.internalConnection != nil {
+					panic("Internal connection already exists")
+				}
+
+				_, err := serviceReader.NewAsync(
+					connection,
+					&configs.ReaderAsync{},
+					&configs.Routine{},
+					func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
+
+						if message.GetSyncToken() != "" {
+							if !message.IsResponse() {
+								return
+							}
+							if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
+								return
+							}
+						} else {
+							switch message.GetTopic() {
+							case topics.PROPAGATE_GRID:
+							case topics.PROPAGATE_GRID_CHANGE:
+							default:
+								return
+							}
+
+							app.mutex.RLock()
+							defer app.mutex.RUnlock()
+
+							for websocketConnection := range app.websocketConnections {
+								go websocketConnection.Write(message.Serialize(), 0)
+							}
+						}
+					},
+				)
+				if err != nil {
+					return err
+				}
+
+				app.internalConnection = connection
+
+				go func() { // abstract on close handler
+					<-connection.GetCloseChannel()
+					app.internalConnection = nil
+				}()
+
+				return nil
+			},
+		)
+		if err != nil {
+			panic(err)
+		}
+		app.channelAccepter = channelAccepter
+	*/
+
+	/*
+		 	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
+				SystemgeConnection.AsyncMessageHandlers{
+					topics.GRID_CHANGE:     app.gridChange,
+					topics.NEXT_GENERATION: app.nextGeneration,
+					topics.SET_GRID:        app.setGrid,
 				},
-			},
-			Reconnect:                   true,
-			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
-		},
-		func(connection SystemgeConnection.SystemgeConnection) error {
-			connection.StartMessageHandlingLoop_Sequentially(messageHandler)
-			return nil
-		},
-		func(connection SystemgeConnection.SystemgeConnection) {
-			connection.StopMessageHandlingLoop()
-		},
-	)
-	if err := DashboardClientCustomService.New("appGameOfLife_dashboardClient",
-		&Config.DashboardClient{
-			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
-			TcpClientConfig: &Config.TcpClient{
-				Address: "localhost:60000",
-			},
-		},
-		app.systemgeClient,
-		Commands.Handlers{
-			"randomize":      app.randomizeGrid,
-			"invert":         app.invertGrid,
-			"chess":          app.chessGrid,
-			"toggleToroidal": app.toggleToroidal,
-		}).Start(); err != nil {
-		panic(err)
-	}
-	return app
+				SystemgeConnection.SyncMessageHandlers{
+					topics.GET_GRID: app.getGridSync,
+				},
+				nil, nil, 100,
+			)
+			app.systemgeClient = SystemgeClient.New("appGameOfLife_systemgeClient",
+				&Config.SystemgeClient{
+					TcpClientConfigs: []*Config.TcpClient{
+						{
+							Address: "localhost:60001",
+						},
+					},
+					Reconnect:                   true,
+					TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
+				},
+				func(connection SystemgeConnection.SystemgeConnection) error {
+					connection.StartMessageHandlingLoop_Sequentially(messageHandler)
+					return nil
+				},
+				func(connection SystemgeConnection.SystemgeConnection) {
+					connection.StopMessageHandlingLoop()
+				},
+			)
+			if err := DashboardClientCustomService.New("appGameOfLife_dashboardClient",
+				&Config.DashboardClient{
+					TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
+					TcpClientConfig: &Config.TcpClient{
+						Address: "localhost:60000",
+					},
+				},
+				app.systemgeClient,
+				Commands.Handlers{
+					"randomize":      app.randomizeGrid,
+					"invert":         app.invertGrid,
+					"chess":          app.chessGrid,
+					"toggleToroidal": app.toggleToroidal,
+				}).Start(); err != nil {
+				panic(err)
+			}
+			return app
+	*/
+	return nil
 }
 
+/*
 func (app *App) getGridSync(connection SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
