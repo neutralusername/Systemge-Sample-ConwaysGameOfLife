@@ -11,6 +11,7 @@ import (
 	"github.com/neutralusername/systemge/listenerWebsocket"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/serviceTypedReader"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -20,6 +21,7 @@ type AppWebsocketHTTP struct {
 	websocketAccepter *serviceAccepter.Accepter[[]byte]
 
 	websocketConnections map[systemge.Connection[[]byte]]struct{}
+	internalConnections  map[systemge.Connection[*tools.Message]]struct{}
 	mutex                sync.Mutex
 
 	listenerWebsocket systemge.Listener[[]byte, systemge.Connection[[]byte]]
@@ -60,6 +62,11 @@ func New() *AppWebsocketHTTP {
 			if err != nil {
 				return err
 			}
+
+			app.mutex.Lock()
+			app.internalConnections[connection] = struct{}{}
+			app.mutex.Unlock()
+
 			return nil
 		},
 	)
@@ -102,21 +109,28 @@ func New() *AppWebsocketHTTP {
 		&configs.Accepter{},
 		&configs.Routine{},
 		func(connection systemge.Connection[[]byte]) error {
-			app.mutex.Lock()
-			app.websocketConnections[connection] = struct{}{}
-			app.mutex.Unlock()
 
-			_, err := serviceReader.NewSync(
+			_, err := serviceTypedReader.NewSync(
 				connection,
 				&configs.ReaderSync{},
 				&configs.Routine{},
-				func(bytes []byte, connection systemge.Connection[[]byte]) ([]byte, error) {
+				func(message *tools.Message, connection systemge.Connection[[]byte]) (*tools.Message, error) {
 
+				},
+				func(data []byte) (*tools.Message, error) {
+					return tools.DeserializeMessage(data)
+				},
+				func(message *tools.Message) ([]byte, error) {
+					return message.Serialize(), nil
 				},
 			)
 			if err != nil {
 				return err
 			}
+
+			app.mutex.Lock()
+			app.websocketConnections[connection] = struct{}{}
+			app.mutex.Unlock()
 
 			// propagate grid to new websocket connection
 

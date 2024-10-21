@@ -2,7 +2,7 @@ module SystemgeSampleConwaysGameOfLife
 
 go 1.23
 
-//replace github.com/neutralusername/Systemge => ../Systemge
+replace github.com/neutralusername/systemge => ../Systemge
 
 require github.com/neutralusername/systemge v0.0.0-20241020191521-507742b74750
 
