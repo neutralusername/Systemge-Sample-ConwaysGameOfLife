@@ -2,7 +2,6 @@ package appWebsocketHttp
 
 import (
 	"SystemgeSampleConwaysGameOfLife/topics"
-	"errors"
 	"sync"
 
 	"github.com/neutralusername/systemge/configs"
@@ -48,30 +47,30 @@ func New() *AppWebsocketHTTP {
 		&configs.Routine{},
 		func(connection systemge.Connection[*tools.Message]) error {
 
-			_, err := serviceReader.NewSync(
+			_, err := serviceReader.NewAsync(
 				connection,
-				&configs.ReaderSync{},
+				&configs.ReaderAsync{},
 				&configs.Routine{},
-				func(message *tools.Message, connection systemge.Connection[*tools.Message]) (*tools.Message, error) {
+				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 
 					if message.GetSyncToken() != "" {
 						if !message.IsResponse() {
-							return nil, errors.New("this server does not support sync requests")
+							return
 						}
 						if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
-							return nil, err
+							return
 						}
-						return nil, nil
+						return
 					} else {
 						switch message.GetTopic() {
 						case topics.PROPAGATE_GRID:
 							app.websocketPropagate(connection, message)
-							return nil, nil
+							return
 						case topics.PROPAGATE_GRID_CHANGE:
 							app.websocketPropagate(connection, message)
-							return nil, nil
+							return
 						}
-						return nil, errors.New("unknown topic")
+						return
 					}
 				},
 			)
