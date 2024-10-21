@@ -18,21 +18,12 @@ import (
 
 type AppWebsocketHTTP struct {
 	requestResponseManager *tools.RequestResponseManager[*tools.Message]
-
-	websocketAccepter *serviceAccepter.Accepter[[]byte]
-
-	listenerWebsocket systemge.Listener[[]byte, systemge.Connection[[]byte]]
-	httpServer        *httpServer.HTTPServer
-
-	internalConnection       systemge.Connection[*tools.Message]
-	internalConnectionReader *serviceReader.ReaderAsync[*tools.Message]
-
-	websocketConnections map[systemge.Connection[[]byte]]struct{}
-	mutex                sync.RWMutex
+	internalConnection     systemge.Connection[*tools.Message]
+	websocketConnections   map[systemge.Connection[[]byte]]struct{}
+	mutex                  sync.RWMutex
 }
 
 func New() *AppWebsocketHTTP {
-
 	connChan := appGameOfLife.ConnectionChannel
 	if connChan == nil {
 		panic("connection channel is nil")
@@ -58,20 +49,19 @@ func New() *AppWebsocketHTTP {
 			MaxConcurrentHandlers: 10,
 		},
 		func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-
 			if message.GetSyncToken() != "" {
 				if !message.IsResponse() {
-					return
+					panic("message is not a response")
 				}
 				if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
-					return
+					panic(err)
 				}
 			} else {
 				switch message.GetTopic() {
 				case topics.PROPAGATE_GRID:
 				case topics.PROPAGATE_GRID_CHANGE:
 				default:
-					return
+					panic("unknown topic")
 				}
 
 				for websocketConnection := range app.websocketConnections {
@@ -83,9 +73,7 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	app.internalConnectionReader = reader
-	err = app.internalConnectionReader.GetRoutine().Start()
-	if err != nil {
+	if err := reader.GetRoutine().Start(); err != nil {
 		panic(err)
 	}
 
@@ -104,9 +92,7 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	app.httpServer = httpServer
-	err = app.httpServer.Start()
-	if err != nil {
+	if err := httpServer.Start(); err != nil {
 		panic(err)
 	}
 
@@ -125,9 +111,7 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	app.listenerWebsocket = listenerWebsocket
-	err = app.listenerWebsocket.Start()
-	if err != nil {
+	if err := listenerWebsocket.Start(); err != nil {
 		panic(err)
 	}
 
@@ -138,7 +122,6 @@ func New() *AppWebsocketHTTP {
 			MaxConcurrentHandlers: 1,
 		},
 		func(connection systemge.Connection[[]byte]) error {
-
 			reader, err := serviceTypedReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
@@ -146,13 +129,12 @@ func New() *AppWebsocketHTTP {
 					MaxConcurrentHandlers: 10,
 				},
 				func(message *tools.Message, connection systemge.Connection[[]byte]) {
-
 					switch message.GetTopic() {
 					case topics.GRID_CHANGE:
 					case topics.NEXT_GENERATION:
 					case topics.SET_GRID:
 					default:
-						return
+						panic("unknown topic")
 					}
 
 					go app.internalConnection.Write(message, 0)
@@ -162,9 +144,11 @@ func New() *AppWebsocketHTTP {
 				},
 			)
 			if err != nil {
-				return err
+				panic(err)
 			}
-			reader.GetRoutine().Start()
+			if err := reader.GetRoutine().Start(); err != nil {
+				panic(err)
+			}
 
 			app.mutex.Lock()
 			app.websocketConnections[connection] = struct{}{}
@@ -172,26 +156,23 @@ func New() *AppWebsocketHTTP {
 
 			go func() { // abstract on close handler
 				<-connection.GetCloseChannel()
-				app.mutex.Lock()
-				defer app.mutex.Unlock()
 
+				app.mutex.Lock()
 				delete(app.websocketConnections, connection)
+				app.mutex.Unlock()
 			}()
 
 			request, err := app.requestResponseManager.NewRequest(tools.GenerateRandomString(32, tools.ALPHA_NUMERIC), 1, 0, nil)
 			if err != nil {
 				panic(err)
 			}
-
 			if err = app.internalConnection.Write(tools.NewMessage(topics.GET_GRID, "", request.GetToken(), false), 0); err != nil {
 				panic(err)
 			}
-
 			response, err := request.GetNextResponse()
 			if err != nil {
 				panic(err)
 			}
-
 			if err = connection.Write(response.Serialize(), 0); err != nil {
 				panic(err)
 			}
@@ -202,9 +183,7 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	app.websocketAccepter = websocketAccepter
-	err = app.websocketAccepter.GetRoutine().Start()
-	if err != nil {
+	if err = websocketAccepter.GetRoutine().Start(); err != nil {
 		panic(err)
 	}
 

@@ -22,9 +22,8 @@ type App struct {
 	gridCols int
 	toroidal bool
 
-	listener    systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
-	accepter    *serviceAccepter.Accepter[*tools.Message]
-	connections map[systemge.Connection[*tools.Message]]struct{}
+	listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
+	accepter *serviceAccepter.Accepter[*tools.Message]
 }
 
 var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
@@ -42,8 +41,7 @@ func New() *App {
 		gridCols: 100,
 		toroidal: true,
 
-		connections: make(map[systemge.Connection[*tools.Message]]struct{}),
-		listener:    channelListener,
+		listener: channelListener,
 	}
 	grid := make([][]int, app.gridRows)
 	for i := range grid {
@@ -143,19 +141,6 @@ func New() *App {
 				return err
 			}
 			reader.GetRoutine().Start()
-
-			app.mutex.Lock()
-			app.connections[connection] = struct{}{}
-			app.mutex.Unlock()
-
-			go func() { // abstract on close handler
-				<-connection.GetCloseChannel()
-
-				app.mutex.Lock()
-				defer app.mutex.Unlock()
-
-				delete(app.connections, connection)
-			}()
 
 			return nil
 		},
