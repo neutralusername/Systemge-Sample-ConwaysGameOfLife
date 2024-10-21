@@ -1,10 +1,13 @@
 package appGameOfLife
 
 import (
+	"SystemgeSampleConwaysGameOfLife/dto"
+	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/connectionChannel"
+	"github.com/neutralusername/systemge/helpers"
 	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
@@ -59,7 +62,68 @@ func New() *App {
 				&configs.ReaderAsync{},
 				&configs.Routine{},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-					// todo
+
+					switch message.GetTopic() {
+					case topics.GRID_CHANGE:
+						gridChange := dto.UnmarshalGridChange(message.GetPayload())
+						app.grid[gridChange.Row][gridChange.Column] = gridChange.State
+						connection.Write(
+							tools.NewMessage(
+								topics.PROPAGATE_GRID_CHANGE,
+								message.GetPayload(),
+								"",
+								false,
+							),
+							0,
+						)
+
+					case topics.NEXT_GENERATION:
+						app.calcNextGeneration()
+						connection.Write(
+							tools.NewMessage(
+								topics.PROPAGATE_GRID,
+								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+								"",
+								false,
+							),
+							0,
+						)
+
+					case topics.SET_GRID:
+						app.mutex.Lock()
+						defer app.mutex.Unlock()
+						if len(message.GetPayload()) != app.gridCols*app.gridRows {
+							return
+						}
+						for row := 0; row < app.gridRows; row++ {
+							for col := 0; col < app.gridCols; col++ {
+								app.grid[row][col] = helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
+							}
+						}
+						connection.Write(
+							tools.NewMessage(
+								topics.PROPAGATE_GRID,
+								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+								"",
+								false,
+							),
+							0,
+						)
+
+					case topics.GET_GRID:
+						err := connection.Write(
+							tools.NewMessage(
+								topics.GET_GRID,
+								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+								message.GetSyncToken(),
+								true,
+							),
+							0,
+						)
+						if err != nil {
+							panic(err)
+						}
+					}
 				},
 			)
 			if err != nil {
@@ -87,94 +151,13 @@ func New() *App {
 	}
 	app.accepter = channelAccepter
 
-	/*
-		 	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
-				SystemgeConnection.AsyncMessageHandlers{
-					topics.GRID_CHANGE:     app.gridChange,
-					topics.NEXT_GENERATION: app.nextGeneration,
-					topics.SET_GRID:        app.setGrid,
-				},
-				SystemgeConnection.SyncMessageHandlers{
-					topics.GET_GRID: app.getGridSync,
-				},
-				nil, nil, 100,
-			)
-			app.systemgeClient = SystemgeClient.New("appGameOfLife_systemgeClient",
-				&Config.SystemgeClient{
-					TcpClientConfigs: []*Config.TcpClient{
-						{
-							Address: "localhost:60001",
-						},
-					},
-					Reconnect:                   true,
-					TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
-				},
-				func(connection SystemgeConnection.SystemgeConnection) error {
-					connection.StartMessageHandlingLoop_Sequentially(messageHandler)
-					return nil
-				},
-				func(connection SystemgeConnection.SystemgeConnection) {
-					connection.StopMessageHandlingLoop()
-				},
-			)
-			if err := DashboardClientCustomService.New("appGameOfLife_dashboardClient",
-				&Config.DashboardClient{
-					TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
-					TcpClientConfig: &Config.TcpClient{
-						Address: "localhost:60000",
-					},
-				},
-				app.systemgeClient,
-				Commands.Handlers{
-					"randomize":      app.randomizeGrid,
-					"invert":         app.invertGrid,
-					"chess":          app.chessGrid,
-					"toggleToroidal": app.toggleToroidal,
-				}).Start(); err != nil {
-				panic(err)
-			}
-			return app
-	*/
-	return nil
-}
-
-/*
-func (app *App) getGridSync(connection SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	return dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(), nil
-}
-
-func (app *App) gridChange(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	gridChange := dto.UnmarshalGridChange(message.GetPayload())
-	app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-	app.systemgeClient.AsyncMessage(topics.PROPAGATE_GRID_CHANGE, gridChange.Marshal())
-}
-
-func (app *App) nextGeneration(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	app.calcNextGeneration()
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
-}
-
-func (app *App) setGrid(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
-	app.mutex.Lock()
-	defer app.mutex.Unlock()
-	if len(message.GetPayload()) != app.gridCols*app.gridRows {
-		return
-	}
-	for row := 0; row < app.gridRows; row++ {
-		for col := 0; col < app.gridCols; col++ {
-			app.grid[row][col] = Helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
-		}
-	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	return app
 }
 
 func (app *App) calcNextGeneration() {
+	app.mutex.Lock()
+	defer app.mutex.Unlock()
+
 	nextGrid := make([][]int, app.gridRows)
 	for i := range nextGrid {
 		nextGrid[i] = make([]int, app.gridCols)
@@ -210,6 +193,7 @@ func (app *App) calcNextGeneration() {
 	app.grid = nextGrid
 }
 
+/*
 func (app *App) toggleToroidal(args []string) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
