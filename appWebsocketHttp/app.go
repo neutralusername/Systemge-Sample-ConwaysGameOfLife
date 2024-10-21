@@ -17,6 +17,8 @@ import (
 )
 
 type AppWebsocketHTTP struct {
+	requestResponseManager *tools.RequestResponseManager[*tools.Message]
+
 	channelAccepter   *serviceAccepter.Accepter[*tools.Message]
 	websocketAccepter *serviceAccepter.Accepter[[]byte]
 
@@ -30,7 +32,9 @@ type AppWebsocketHTTP struct {
 }
 
 func New() *AppWebsocketHTTP {
-	app := &AppWebsocketHTTP{}
+	app := &AppWebsocketHTTP{
+		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
+	}
 
 	channelListener, err := listenerChannel.New[*tools.Message]("listenerChannel")
 	if err != nil {
@@ -49,15 +53,20 @@ func New() *AppWebsocketHTTP {
 				&configs.ReaderSync{},
 				&configs.Routine{},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) (*tools.Message, error) {
-					switch message.GetTopic() {
-					case topics.PROPAGATE_GRID:
-						app.websocketPropagate(connection, message)
-						return nil, nil
-					case topics.PROPAGATE_GRID_CHANGE:
-						app.websocketPropagate(connection, message)
-						return nil, nil
+
+					if message.GetSyncToken() != "" {
+
+					} else {
+						switch message.GetTopic() {
+						case topics.PROPAGATE_GRID:
+							app.websocketPropagate(connection, message)
+							return nil, nil
+						case topics.PROPAGATE_GRID_CHANGE:
+							app.websocketPropagate(connection, message)
+							return nil, nil
+						}
+						return nil, errors.New("unknown topic")
 					}
-					return nil, errors.New("unknown topic")
 				},
 			)
 			if err != nil {
