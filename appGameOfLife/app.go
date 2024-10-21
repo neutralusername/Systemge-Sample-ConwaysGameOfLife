@@ -4,6 +4,7 @@ import (
 	"SystemgeSampleConwaysGameOfLife/topics"
 
 	"github.com/neutralusername/systemge/configs"
+	"github.com/neutralusername/systemge/connectionChannel"
 	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
@@ -20,6 +21,8 @@ type App struct {
 
 	systemgeClient *SystemgeClient.SystemgeClient */
 }
+
+var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
 
 func New() *App {
 	app := &App{
