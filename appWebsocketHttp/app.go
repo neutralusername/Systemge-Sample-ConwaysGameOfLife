@@ -63,11 +63,16 @@ func New() *AppWebsocketHTTP {
 					} else {
 						switch message.GetTopic() {
 						case topics.PROPAGATE_GRID:
-							app.websocketPropagate(connection, message)
-							return
 						case topics.PROPAGATE_GRID_CHANGE:
-							app.websocketPropagate(connection, message)
+						default:
 							return
+						}
+
+						app.mutex.RLock()
+						defer app.mutex.RUnlock()
+
+						for websocketConnection := range app.websocketConnections {
+							go websocketConnection.Write(message.Serialize(), 0)
 						}
 					}
 				},
@@ -176,12 +181,6 @@ func New() *AppWebsocketHTTP {
 	app.websocketAccepter = websocketAccepter
 
 	return app
-}
-
-func (app *AppWebsocketHTTP) websocketPropagate(connection systemge.Connection[*tools.Message], message *tools.Message) {
-	for websocketConnection := range app.websocketConnections {
-		websocketConnection.Write(message.Serialize(), 0)
-	}
 }
 
 /* func (app *AppWebsocketHTTP) OnConnectHandler(websocketClient *WebsocketServer.WebsocketClient) error {
