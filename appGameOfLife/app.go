@@ -21,9 +21,6 @@ type App struct {
 	gridRows int
 	gridCols int
 	toroidal bool
-
-	listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
-	accepter *serviceAccepter.Accepter[*tools.Message]
 }
 
 var ConnectionChannel chan<- *connectionChannel.ConnectionRequest[*tools.Message]
@@ -40,8 +37,6 @@ func New() *App {
 		gridRows: 50,
 		gridCols: 100,
 		toroidal: true,
-
-		listener: channelListener,
 	}
 	grid := make([][]int, app.gridRows)
 	for i := range grid {
@@ -56,7 +51,6 @@ func New() *App {
 			MaxConcurrentHandlers: 1,
 		},
 		func(connection systemge.Connection[*tools.Message]) error {
-
 			reader, err := serviceReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
@@ -64,7 +58,6 @@ func New() *App {
 					MaxConcurrentHandlers: 10,
 				},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-
 					switch message.GetTopic() {
 					case topics.GRID_CHANGE:
 						gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -140,7 +133,9 @@ func New() *App {
 			if err != nil {
 				return err
 			}
-			reader.GetRoutine().Start()
+			if err := reader.GetRoutine().Start(); err != nil {
+				return err
+			}
 
 			return nil
 		},
@@ -148,8 +143,9 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-	app.accepter = channelAccepter
-	app.accepter.GetRoutine().Start()
+	if err := channelAccepter.GetRoutine().Start(); err != nil {
+		panic(err)
+	}
 
 	return app
 }
