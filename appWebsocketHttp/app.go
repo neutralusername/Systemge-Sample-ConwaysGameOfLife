@@ -48,6 +48,7 @@ func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{
 		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
 		internalConnection:     internalConnection,
+		websocketConnections:   make(map[systemge.Connection[[]byte]]struct{}),
 	}
 
 	reader, err := serviceReader.NewAsync(
@@ -141,10 +142,12 @@ func New() *AppWebsocketHTTP {
 		},
 		func(connection systemge.Connection[[]byte]) error {
 
-			_, err := serviceTypedReader.NewAsync(
+			reader, err := serviceTypedReader.NewAsync(
 				connection,
 				&configs.ReaderAsync{},
-				&configs.Routine{},
+				&configs.Routine{
+					MaxConcurrentHandlers: 1,
+				},
 				func(message *tools.Message, connection systemge.Connection[[]byte]) {
 
 					switch message.GetTopic() {
@@ -167,6 +170,7 @@ func New() *AppWebsocketHTTP {
 			if err != nil {
 				return err
 			}
+			reader.GetRoutine().Start()
 
 			app.mutex.Lock()
 			app.websocketConnections[connection] = struct{}{}
