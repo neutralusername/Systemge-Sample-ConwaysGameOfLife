@@ -63,7 +63,7 @@ func New() *App {
 				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
-					MaxConcurrentHandlers: 1,
+					MaxConcurrentHandlers: 10,
 				},
 				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 

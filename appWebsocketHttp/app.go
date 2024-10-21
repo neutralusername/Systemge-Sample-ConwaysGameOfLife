@@ -55,7 +55,7 @@ func New() *AppWebsocketHTTP {
 		internalConnection,
 		&configs.ReaderAsync{},
 		&configs.Routine{
-			MaxConcurrentHandlers: 1,
+			MaxConcurrentHandlers: 10,
 		},
 		func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 
@@ -73,9 +73,6 @@ func New() *AppWebsocketHTTP {
 				default:
 					return
 				}
-
-				app.mutex.RLock()
-				defer app.mutex.RUnlock()
 
 				for websocketConnection := range app.websocketConnections {
 					go websocketConnection.Write(message.Serialize(), 0)
@@ -146,7 +143,7 @@ func New() *AppWebsocketHTTP {
 				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
-					MaxConcurrentHandlers: 1,
+					MaxConcurrentHandlers: 10,
 				},
 				func(message *tools.Message, connection systemge.Connection[[]byte]) {
 
@@ -157,9 +154,6 @@ func New() *AppWebsocketHTTP {
 					default:
 						return
 					}
-
-					app.mutex.RLock()
-					defer app.mutex.RUnlock()
 
 					go app.internalConnection.Write(message, 0)
 				},
