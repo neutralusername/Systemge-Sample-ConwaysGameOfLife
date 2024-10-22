@@ -45,6 +45,9 @@ func New() *App {
 		tools.DeserializeMessage,
 		tools.SerializeMessage,
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	app := &App{
 		grid:     nil,
