@@ -8,8 +8,8 @@ import (
 	"github.com/neutralusername/systemge/connectionTcp"
 	"github.com/neutralusername/systemge/httpServer"
 	"github.com/neutralusername/systemge/listenerWebsocket"
-	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/serviceTypedAccepter"
 	"github.com/neutralusername/systemge/serviceTypedConnection"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
@@ -18,7 +18,7 @@ import (
 type AppWebsocketHTTP struct {
 	requestResponseManager *tools.RequestResponseManager[*tools.Message]
 	internalConnection     systemge.Connection[*tools.Message]
-	websocketConnections   map[systemge.Connection[[]byte]]struct{}
+	websocketConnections   map[systemge.Connection[*tools.Message]]struct{}
 	mutex                  sync.RWMutex
 }
 
@@ -34,12 +34,8 @@ func New() *AppWebsocketHTTP {
 	}
 	typedInternalConnection, err := serviceTypedConnection.New(
 		internalConnection,
-		func(data []byte) (*tools.Message, error) {
-			return tools.DeserializeMessage(data)
-		},
-		func(message *tools.Message) ([]byte, error) {
-			return message.Serialize(), nil
-		},
+		tools.DeserializeMessage,
+		tools.SerializeMessage,
 	)
 	if err != nil {
 		panic(err)
@@ -48,7 +44,7 @@ func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{
 		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
 		internalConnection:     typedInternalConnection,
-		websocketConnections:   make(map[systemge.Connection[[]byte]]struct{}),
+		websocketConnections:   make(map[systemge.Connection[*tools.Message]]struct{}),
 	}
 
 	reader, err := serviceReader.NewAsync(
@@ -79,7 +75,7 @@ func New() *AppWebsocketHTTP {
 				for websocketConnection := range app.websocketConnections {
 					go func() {
 						if err := websocketConnection.Write(
-							message.Serialize(),
+							message,
 							0,
 						); err != nil {
 							panic(err)
@@ -134,28 +130,15 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 
-	websocketAccepter, err := serviceAccepter.New(
+	websocketAccepter, err := serviceTypedAccepter.New(
 		listenerWebsocket,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
-		func(connection systemge.Connection[[]byte]) error {
-			typedConnection, err := serviceTypedConnection.New(
-				connection,
-				func(data []byte) (*tools.Message, error) {
-					return tools.DeserializeMessage(data)
-				},
-				func(message *tools.Message) ([]byte, error) {
-					return message.Serialize(), nil
-				},
-			)
-			if err != nil {
-				panic(err)
-			}
-
+		func(connection systemge.Connection[*tools.Message]) error {
 			reader, err := serviceReader.NewAsync(
-				typedConnection,
+				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
 					MaxConcurrentHandlers: 10,
@@ -228,13 +211,15 @@ func New() *AppWebsocketHTTP {
 			}
 
 			if err = connection.Write(
-				response.Serialize(),
+				response,
 				0,
 			); err != nil {
 				panic(err)
 			}
 			return nil
 		},
+		tools.DeserializeMessage,
+		tools.SerializeMessage,
 	)
 	if err != nil {
 		panic(err)
