@@ -7,6 +7,7 @@ import (
 
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/helpers"
+	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/listenerTcp"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
@@ -25,47 +26,47 @@ type App struct {
 
 var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
 
-func New() *App {
-
-	/*
-		listener, err := listenerChannel.New[*tools.Message](
+func NewChannel() *App {
+	listener, err := listenerChannel.New[*tools.Message](
 		"listenerTcp",
-		)
-		if err != nil {
-			panic(err)
-		}
-		listener.Start()
+	)
+	if err != nil {
+		panic(err)
+	}
+	listener.Start()
 
-		Connector = listener.GetConnector()
+	Connector = listener.GetConnector()
 
-		app := &App{
-			grid:     nil,
-			gridRows: 50,
-			gridCols: 100,
-			toroidal: true,
-		}
-		grid := make([][]int, app.gridRows)
-		for i := range grid {
-			grid[i] = make([]int, app.gridCols)
-		}
-		app.grid = grid
+	app := &App{
+		grid:     nil,
+		gridRows: 50,
+		gridCols: 100,
+		toroidal: true,
+	}
+	grid := make([][]int, app.gridRows)
+	for i := range grid {
+		grid[i] = make([]int, app.gridCols)
+	}
+	app.grid = grid
 
-		accepter, err := serviceAccepter.New(
-			listener,
-			&configs.Accepter{},
-			&configs.Routine{
-				MaxConcurrentHandlers: 1,
-			},
-			app.acceptHandler,
-		)
-		if err != nil {
-			panic(err)
-		}
-		if err := accepter.GetRoutine().Start(); err != nil {
-			panic(err)
-		}
-	*/
+	accepter, err := serviceAccepter.New(
+		listener,
+		&configs.Accepter{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 1,
+		},
+		app.acceptHandler,
+	)
+	if err != nil {
+		panic(err)
+	}
+	if err := accepter.GetRoutine().Start(); err != nil {
+		panic(err)
+	}
+	return app
+}
 
+func NewTcp() *App {
 	listener, err := listenerTcp.New(
 		"listenerTcp",
 		&configs.TcpListener{
