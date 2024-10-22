@@ -33,10 +33,9 @@ func NewChannel() systemge.Listener[*tools.Message, systemge.Connection[*tools.M
 	if err != nil {
 		panic(err)
 	}
-	listener.Start()
-
-	Connector = listener.GetConnector()
-
+	if err := listener.Start(); err != nil {
+		panic(err)
+	}
 	return listener
 }
 
@@ -52,7 +51,6 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 	if err != nil {
 		panic(err)
 	}
-	listener.Start()
 
 	typedListener, err := serviceTypedListener.New(
 		listener,
@@ -62,12 +60,14 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 	if err != nil {
 		panic(err)
 	}
-	Connector = typedListener.GetConnector()
-
+	if err := listener.Start(); err != nil {
+		panic(err)
+	}
 	return typedListener
 }
 
 func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]) *App {
+	Connector = listener.GetConnector()
 	app := &App{
 		grid:     nil,
 		gridRows: 50,
