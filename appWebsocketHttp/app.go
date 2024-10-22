@@ -42,7 +42,7 @@ func New() *AppWebsocketHTTP {
 		websocketConnections:   make(map[systemge.Connection[*tools.Message]]struct{}),
 	}
 
-	reader, err := serviceReader.NewAsync(
+	internalConnectionReader, err := serviceReader.NewAsync(
 		typedInternalConnection,
 		&configs.ReaderAsync{},
 		&configs.Routine{
@@ -53,7 +53,7 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	if err := reader.GetRoutine().Start(); err != nil {
+	if err := internalConnectionReader.GetRoutine().Start(); err != nil {
 		panic(err)
 	}
 
