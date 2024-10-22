@@ -22,7 +22,7 @@ type App struct {
 	toroidal bool
 }
 
-var Listener systemge.Listener[[]byte, systemge.Connection[[]byte]]
+var Connector systemge.Connector[[]byte, systemge.Connection[[]byte]]
 
 func New() *App {
 	tcpListener, err := listenerTcp.New(
@@ -37,7 +37,7 @@ func New() *App {
 		panic(err)
 	}
 	tcpListener.Start()
-	Listener = tcpListener
+	Connector = tcpListener.GetConnector()
 
 	app := &App{
 		grid:     nil,

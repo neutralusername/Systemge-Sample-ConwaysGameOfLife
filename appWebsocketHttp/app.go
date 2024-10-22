@@ -23,7 +23,7 @@ type AppWebsocketHTTP struct {
 }
 
 func New() *AppWebsocketHTTP {
-	internalConnection, err := appGameOfLife.Listener.GetConnector().Connect(0)
+	internalConnection, err := appGameOfLife.Connector.Connect(0)
 	if err != nil {
 		panic(err)
 	}
