@@ -140,10 +140,10 @@ func New() *App {
 				},
 			)
 			if err != nil {
-				return err
+				panic(err)
 			}
 			if err := reader.GetRoutine().Start(); err != nil {
-				return err
+				panic(err)
 			}
 
 			return nil
