@@ -7,10 +7,9 @@ import (
 
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/helpers"
-	"github.com/neutralusername/systemge/listenerTcp"
+	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -26,28 +25,15 @@ type App struct {
 var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
 
 func New() *App {
-	listener, err := listenerTcp.New(
+	listener, err := listenerChannel.New[*tools.Message](
 		"listenerTcp",
-		&configs.TcpListener{
-			Port:   60001,
-			Domain: "localhost",
-		},
-		&configs.TcpBufferedReader{},
 	)
 	if err != nil {
 		panic(err)
 	}
 	listener.Start()
 
-	typedListener, err := serviceTypedListener.New(
-		listener,
-		tools.DeserializeMessage,
-		tools.SerializeMessage,
-	)
-	if err != nil {
-		panic(err)
-	}
-	Connector = typedListener.GetConnector()
+	Connector = listener.GetConnector()
 
 	app := &App{
 		grid:     nil,
@@ -62,7 +48,7 @@ func New() *App {
 	app.grid = grid
 
 	accepter, err := serviceAccepter.New(
-		typedListener,
+		listener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
