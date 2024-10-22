@@ -60,7 +60,14 @@ func New() *AppWebsocketHTTP {
 				}
 
 				for websocketConnection := range app.websocketConnections {
-					go websocketConnection.Write(message.Serialize(), 0)
+					go func() {
+						if err := websocketConnection.Write(
+							message.Serialize(),
+							0,
+						); err != nil {
+							panic(err)
+						}
+					}()
 				}
 			}
 		},
@@ -137,7 +144,14 @@ func New() *AppWebsocketHTTP {
 						panic("unknown topic")
 					}
 
-					go app.internalConnection.Write(message.Serialize(), 0)
+					go func() {
+						if err := app.internalConnection.Write(
+							message.Serialize(),
+							0,
+						); err != nil {
+							panic(err)
+						}
+					}()
 				},
 				func(data []byte) (*tools.Message, error) {
 					return tools.DeserializeMessage(data)
@@ -167,7 +181,15 @@ func New() *AppWebsocketHTTP {
 				panic(err)
 			}
 
-			if err := app.internalConnection.Write(tools.NewMessage(topics.GET_GRID, "", request.GetToken(), false).Serialize(), 0); err != nil {
+			if err := app.internalConnection.Write(
+				tools.NewMessage(
+					topics.GET_GRID,
+					"",
+					request.GetToken(),
+					false,
+				).Serialize(),
+				0,
+			); err != nil {
 				panic(err)
 			}
 
@@ -176,7 +198,10 @@ func New() *AppWebsocketHTTP {
 				panic(err)
 			}
 
-			if err = connection.Write(response.Serialize(), 0); err != nil {
+			if err = connection.Write(
+				response.Serialize(),
+				0,
+			); err != nil {
 				panic(err)
 			}
 			return nil
