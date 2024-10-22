@@ -1,11 +1,11 @@
 package appWebsocketHttp
 
 import (
+	"SystemgeSampleConwaysGameOfLife/appGameOfLife"
 	"SystemgeSampleConwaysGameOfLife/topics"
 	"sync"
 
 	"github.com/neutralusername/systemge/configs"
-	"github.com/neutralusername/systemge/connectionTcp"
 	"github.com/neutralusername/systemge/httpServer"
 	"github.com/neutralusername/systemge/listenerWebsocket"
 	"github.com/neutralusername/systemge/serviceReader"
@@ -23,12 +23,7 @@ type AppWebsocketHTTP struct {
 }
 
 func New() *AppWebsocketHTTP {
-	internalConnection, err := connectionTcp.EstablishConnection(
-		&configs.TcpBufferedReader{},
-		&configs.TcpClient{
-			Address: "localhost:60001",
-		},
-	)
+	internalConnection, err := appGameOfLife.Listener.GetConnector().Connect(0)
 	if err != nil {
 		panic(err)
 	}
@@ -95,8 +90,9 @@ func New() *AppWebsocketHTTP {
 	httpServer, err := httpServer.New(
 		"httpServer",
 		&configs.HTTPServer{
-			TcpServerConfig: &configs.TcpServer{
-				Port: 8080,
+			TcpListenerConfig: &configs.TcpListener{
+				Port:   8080,
+				Domain: "localhost",
 			},
 		},
 		nil,
@@ -115,7 +111,7 @@ func New() *AppWebsocketHTTP {
 		"listenerWebsocket",
 		nil,
 		&configs.WebsocketListener{
-			TcpServerConfig: &configs.TcpServer{
+			TcpListenerConfig: &configs.TcpListener{
 				Port: 8443,
 			},
 			Pattern: "/ws",

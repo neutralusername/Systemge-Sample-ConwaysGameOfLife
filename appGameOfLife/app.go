@@ -22,13 +22,14 @@ type App struct {
 	toroidal bool
 }
 
+var Listener systemge.Listener[[]byte, systemge.Connection[[]byte]]
+
 func New() *App {
 	tcpListener, err := listenerTcp.New(
 		"listenerTcp",
 		&configs.TcpListener{
-			TcpServerConfig: &configs.TcpServer{
-				Port: 60001,
-			},
+			Port:   60001,
+			Domain: "localhost",
 		},
 		&configs.TcpBufferedReader{},
 	)
@@ -36,6 +37,7 @@ func New() *App {
 		panic(err)
 	}
 	tcpListener.Start()
+	Listener = tcpListener
 
 	app := &App{
 		grid:     nil,
