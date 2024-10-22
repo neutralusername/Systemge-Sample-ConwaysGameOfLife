@@ -57,92 +57,7 @@ func New() *App {
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
-		func(connection systemge.Connection[*tools.Message]) error {
-			reader, err := serviceReader.NewAsync(
-				connection,
-				&configs.ReaderAsync{},
-				&configs.Routine{
-					MaxConcurrentHandlers: 10,
-				},
-				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-					switch message.GetTopic() {
-					case topics.GRID_CHANGE:
-						gridChange := dto.UnmarshalGridChange(message.GetPayload())
-						app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-						if err := connection.Write(
-							tools.NewMessage(
-								topics.PROPAGATE_GRID_CHANGE,
-								message.GetPayload(),
-								"",
-								false,
-							),
-							0,
-						); err != nil {
-							panic(err)
-						}
-
-					case topics.NEXT_GENERATION:
-						app.calcNextGeneration()
-						if err := connection.Write(
-							tools.NewMessage(
-								topics.PROPAGATE_GRID,
-								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-								"",
-								false,
-							),
-							0,
-						); err != nil {
-							panic(err)
-						}
-
-					case topics.SET_GRID:
-						app.mutex.Lock()
-						defer app.mutex.Unlock()
-
-						if len(message.GetPayload()) != app.gridCols*app.gridRows {
-							return
-						}
-						for row := 0; row < app.gridRows; row++ {
-							for col := 0; col < app.gridCols; col++ {
-								app.grid[row][col] = helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
-							}
-						}
-						if err := connection.Write(
-							tools.NewMessage(
-								topics.PROPAGATE_GRID,
-								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-								"",
-								false,
-							),
-							0,
-						); err != nil {
-							panic(err)
-						}
-
-					case topics.GET_GRID:
-						if err := connection.Write(
-							tools.NewMessage(
-								topics.GET_GRID,
-								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-								message.GetSyncToken(),
-								true,
-							),
-							0,
-						); err != nil {
-							panic(err)
-						}
-					}
-				},
-			)
-			if err != nil {
-				panic(err)
-			}
-			if err := reader.GetRoutine().Start(); err != nil {
-				panic(err)
-			}
-
-			return nil
-		},
+		app.acceptHandler,
 		tools.DeserializeMessage,
 		tools.SerializeMessage,
 	)
@@ -193,6 +108,95 @@ func (app *App) calcNextGeneration() {
 		}
 	}
 	app.grid = nextGrid
+}
+
+func (app *App) acceptHandler(connection systemge.Connection[*tools.Message]) error {
+	reader, err := serviceReader.NewAsync(
+		connection,
+		&configs.ReaderAsync{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 10,
+		},
+		app.readHandler,
+	)
+	if err != nil {
+		panic(err)
+	}
+	if err := reader.GetRoutine().Start(); err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
+func (app *App) readHandler(message *tools.Message, connection systemge.Connection[*tools.Message]) {
+	switch message.GetTopic() {
+	case topics.GRID_CHANGE:
+		gridChange := dto.UnmarshalGridChange(message.GetPayload())
+		app.grid[gridChange.Row][gridChange.Column] = gridChange.State
+		if err := connection.Write(
+			tools.NewMessage(
+				topics.PROPAGATE_GRID_CHANGE,
+				message.GetPayload(),
+				"",
+				false,
+			),
+			0,
+		); err != nil {
+			panic(err)
+		}
+
+	case topics.NEXT_GENERATION:
+		app.calcNextGeneration()
+		if err := connection.Write(
+			tools.NewMessage(
+				topics.PROPAGATE_GRID,
+				dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+				"",
+				false,
+			),
+			0,
+		); err != nil {
+			panic(err)
+		}
+
+	case topics.SET_GRID:
+		app.mutex.Lock()
+		defer app.mutex.Unlock()
+
+		if len(message.GetPayload()) != app.gridCols*app.gridRows {
+			return
+		}
+		for row := 0; row < app.gridRows; row++ {
+			for col := 0; col < app.gridCols; col++ {
+				app.grid[row][col] = helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
+			}
+		}
+		if err := connection.Write(
+			tools.NewMessage(
+				topics.PROPAGATE_GRID,
+				dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+				"",
+				false,
+			),
+			0,
+		); err != nil {
+			panic(err)
+		}
+
+	case topics.GET_GRID:
+		if err := connection.Write(
+			tools.NewMessage(
+				topics.GET_GRID,
+				dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+				message.GetSyncToken(),
+				true,
+			),
+			0,
+		); err != nil {
+			panic(err)
+		}
+	}
 }
 
 /*

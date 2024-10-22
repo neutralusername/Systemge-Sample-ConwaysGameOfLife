@@ -48,37 +48,7 @@ func New() *AppWebsocketHTTP {
 		&configs.Routine{
 			MaxConcurrentHandlers: 10,
 		},
-		func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-			if message.GetSyncToken() != "" {
-				if !message.IsResponse() {
-					panic("message is not a response")
-				}
-				if err := app.requestResponseManager.AddResponse(
-					message.GetSyncToken(),
-					message,
-				); err != nil {
-					panic(err)
-				}
-			} else {
-				switch message.GetTopic() {
-				case topics.PROPAGATE_GRID:
-				case topics.PROPAGATE_GRID_CHANGE:
-				default:
-					panic("unknown topic")
-				}
-
-				for websocketConnection := range app.websocketConnections {
-					go func() {
-						if err := websocketConnection.Write(
-							message,
-							0,
-						); err != nil {
-							panic(err)
-						}
-					}()
-				}
-			}
-		},
+		app.internalReadHandler,
 	)
 	if err != nil {
 		panic(err)
@@ -132,88 +102,7 @@ func New() *AppWebsocketHTTP {
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
-		func(connection systemge.Connection[*tools.Message]) error {
-			reader, err := serviceReader.NewAsync(
-				connection,
-				&configs.ReaderAsync{},
-				&configs.Routine{
-					MaxConcurrentHandlers: 10,
-				},
-				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
-					switch message.GetTopic() {
-					case topics.GRID_CHANGE:
-					case topics.NEXT_GENERATION:
-					case topics.SET_GRID:
-						/* 	case "heartbeat":
-						return */
-					default:
-						panic("unknown topic")
-					}
-
-					go func() {
-						if err := app.internalConnection.Write(
-							message,
-							0,
-						); err != nil {
-							panic(err)
-						}
-					}()
-				},
-			)
-			if err != nil {
-				panic(err)
-			}
-			if err := reader.GetRoutine().Start(); err != nil {
-				panic(err)
-			}
-
-			app.mutex.Lock()
-			app.websocketConnections[connection] = struct{}{}
-			app.mutex.Unlock()
-
-			go func() { // abstract on close handler
-				<-connection.GetCloseChannel()
-
-				app.mutex.Lock()
-				delete(app.websocketConnections, connection)
-				app.mutex.Unlock()
-			}()
-
-			request, err := app.requestResponseManager.NewRequest(
-				tools.GenerateRandomString(32, tools.ALPHA_NUMERIC),
-				1,
-				0,
-				nil,
-			)
-			if err != nil {
-				panic(err)
-			}
-
-			if err := app.internalConnection.Write(
-				tools.NewMessage(
-					topics.GET_GRID,
-					"",
-					request.GetToken(),
-					false,
-				),
-				0,
-			); err != nil {
-				panic(err)
-			}
-
-			response, err := request.GetNextResponse()
-			if err != nil {
-				panic(err)
-			}
-
-			if err = connection.Write(
-				response,
-				0,
-			); err != nil {
-				panic(err)
-			}
-			return nil
-		},
+		app.websocketAcceptHandler,
 		tools.DeserializeMessage,
 		tools.SerializeMessage,
 	)
@@ -225,4 +114,121 @@ func New() *AppWebsocketHTTP {
 	}
 
 	return app
+}
+
+func (app *AppWebsocketHTTP) internalReadHandler(message *tools.Message, connection systemge.Connection[*tools.Message]) {
+	if message.GetSyncToken() != "" {
+		if !message.IsResponse() {
+			panic("message is not a response")
+		}
+		if err := app.requestResponseManager.AddResponse(
+			message.GetSyncToken(),
+			message,
+		); err != nil {
+			panic(err)
+		}
+	} else {
+		switch message.GetTopic() {
+		case topics.PROPAGATE_GRID:
+		case topics.PROPAGATE_GRID_CHANGE:
+		default:
+			panic("unknown topic")
+		}
+
+		for websocketConnection := range app.websocketConnections {
+			go func() {
+				if err := websocketConnection.Write(
+					message,
+					0,
+				); err != nil {
+					panic(err)
+				}
+			}()
+		}
+	}
+}
+
+func (app *AppWebsocketHTTP) websocketAcceptHandler(connection systemge.Connection[*tools.Message]) error {
+	reader, err := serviceReader.NewAsync(
+		connection,
+		&configs.ReaderAsync{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 10,
+		},
+		app.websocketReadHandler,
+	)
+	if err != nil {
+		panic(err)
+	}
+	if err := reader.GetRoutine().Start(); err != nil {
+		panic(err)
+	}
+
+	app.mutex.Lock()
+	app.websocketConnections[connection] = struct{}{}
+	app.mutex.Unlock()
+
+	go func() { // abstract on close handler
+		<-connection.GetCloseChannel()
+
+		app.mutex.Lock()
+		delete(app.websocketConnections, connection)
+		app.mutex.Unlock()
+	}()
+
+	request, err := app.requestResponseManager.NewRequest(
+		tools.GenerateRandomString(32, tools.ALPHA_NUMERIC),
+		1,
+		0,
+		nil,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := app.internalConnection.Write(
+		tools.NewMessage(
+			topics.GET_GRID,
+			"",
+			request.GetToken(),
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
+
+	response, err := request.GetNextResponse()
+	if err != nil {
+		panic(err)
+	}
+
+	if err = connection.Write(
+		response,
+		0,
+	); err != nil {
+		panic(err)
+	}
+	return nil
+}
+
+func (app *AppWebsocketHTTP) websocketReadHandler(message *tools.Message, connection systemge.Connection[*tools.Message]) {
+	switch message.GetTopic() {
+	case topics.GRID_CHANGE:
+	case topics.NEXT_GENERATION:
+	case topics.SET_GRID:
+		/* 	case "heartbeat":
+		return */
+	default:
+		panic("unknown topic")
+	}
+
+	go func() {
+		if err := app.internalConnection.Write(
+			message,
+			0,
+		); err != nil {
+			panic(err)
+		}
+	}()
 }
