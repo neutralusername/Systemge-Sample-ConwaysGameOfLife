@@ -67,7 +67,7 @@ func New() *App {
 					case topics.GRID_CHANGE:
 						gridChange := dto.UnmarshalGridChange(message.GetPayload())
 						app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-						err := connection.Write(
+						if err := connection.Write(
 							tools.NewMessage(
 								topics.PROPAGATE_GRID_CHANGE,
 								message.GetPayload(),
@@ -75,14 +75,13 @@ func New() *App {
 								false,
 							).Serialize(),
 							0,
-						)
-						if err != nil {
+						); err != nil {
 							panic(err)
 						}
 
 					case topics.NEXT_GENERATION:
 						app.calcNextGeneration()
-						err := connection.Write(
+						if err := connection.Write(
 							tools.NewMessage(
 								topics.PROPAGATE_GRID,
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
@@ -90,8 +89,7 @@ func New() *App {
 								false,
 							).Serialize(),
 							0,
-						)
-						if err != nil {
+						); err != nil {
 							panic(err)
 						}
 
@@ -107,7 +105,7 @@ func New() *App {
 								app.grid[row][col] = helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 							}
 						}
-						err := connection.Write(
+						if err := connection.Write(
 							tools.NewMessage(
 								topics.PROPAGATE_GRID,
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
@@ -115,13 +113,12 @@ func New() *App {
 								false,
 							).Serialize(),
 							0,
-						)
-						if err != nil {
+						); err != nil {
 							panic(err)
 						}
 
 					case topics.GET_GRID:
-						err := connection.Write(
+						if err := connection.Write(
 							tools.NewMessage(
 								topics.GET_GRID,
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
@@ -129,8 +126,7 @@ func New() *App {
 								true,
 							).Serialize(),
 							0,
-						)
-						if err != nil {
+						); err != nil {
 							panic(err)
 						}
 					}
