@@ -8,7 +8,7 @@ import (
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/httpServer"
 	"github.com/neutralusername/systemge/listenerWebsocket"
-	"github.com/neutralusername/systemge/serviceAccepter"
+	"github.com/neutralusername/systemge/server"
 	"github.com/neutralusername/systemge/serviceReader"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
@@ -97,20 +97,20 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 
-	websocketAccepter, err := serviceAccepter.New(
+	server, err := server.New(
 		typedListenerWebsocket,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
 		app.websocketAcceptHandler,
+		&configs.ReaderAsync{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 1,
+		},
+		app.websocketReadHandler,
 	)
-	if err != nil {
-		panic(err)
-	}
-	if err = websocketAccepter.GetRoutine().Start(); err != nil {
-		panic(err)
-	}
+	server.GetAccepter().GetRoutine().Start()
 
 	return app
 }
@@ -148,21 +148,6 @@ func (app *AppWebsocketHTTP) internalReadHandler(message *tools.Message, connect
 }
 
 func (app *AppWebsocketHTTP) websocketAcceptHandler(connection systemge.Connection[*tools.Message]) error {
-	reader, err := serviceReader.NewAsync(
-		connection,
-		&configs.ReaderAsync{},
-		&configs.Routine{
-			MaxConcurrentHandlers: 10,
-		},
-		app.websocketReadHandler,
-	)
-	if err != nil {
-		panic(err)
-	}
-	if err := reader.GetRoutine().Start(); err != nil {
-		panic(err)
-	}
-
 	app.mutex.Lock()
 	app.websocketConnections[connection] = struct{}{}
 	app.mutex.Unlock()
