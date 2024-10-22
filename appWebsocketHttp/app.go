@@ -48,7 +48,10 @@ func New() *AppWebsocketHTTP {
 				if !message.IsResponse() {
 					panic("message is not a response")
 				}
-				if err := app.requestResponseManager.AddResponse(message.GetSyncToken(), message); err != nil {
+				if err := app.requestResponseManager.AddResponse(
+					message.GetSyncToken(),
+					message,
+				); err != nil {
 					panic(err)
 				}
 			} else {
@@ -176,7 +179,12 @@ func New() *AppWebsocketHTTP {
 				app.mutex.Unlock()
 			}()
 
-			request, err := app.requestResponseManager.NewRequest(tools.GenerateRandomString(32, tools.ALPHA_NUMERIC), 1, 0, nil)
+			request, err := app.requestResponseManager.NewRequest(
+				tools.GenerateRandomString(32, tools.ALPHA_NUMERIC),
+				1,
+				0,
+				nil,
+			)
 			if err != nil {
 				panic(err)
 			}
