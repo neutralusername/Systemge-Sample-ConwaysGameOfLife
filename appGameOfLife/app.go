@@ -7,9 +7,10 @@ import (
 
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/helpers"
-	"github.com/neutralusername/systemge/listenerChannel"
+	"github.com/neutralusername/systemge/listenerTcp"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -25,15 +26,68 @@ type App struct {
 var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
 
 func New() *App {
-	listener, err := listenerChannel.New[*tools.Message](
+
+	/*
+		listener, err := listenerChannel.New[*tools.Message](
 		"listenerTcp",
+		)
+		if err != nil {
+			panic(err)
+		}
+		listener.Start()
+
+		Connector = listener.GetConnector()
+
+		app := &App{
+			grid:     nil,
+			gridRows: 50,
+			gridCols: 100,
+			toroidal: true,
+		}
+		grid := make([][]int, app.gridRows)
+		for i := range grid {
+			grid[i] = make([]int, app.gridCols)
+		}
+		app.grid = grid
+
+		accepter, err := serviceAccepter.New(
+			listener,
+			&configs.Accepter{},
+			&configs.Routine{
+				MaxConcurrentHandlers: 1,
+			},
+			app.acceptHandler,
+		)
+		if err != nil {
+			panic(err)
+		}
+		if err := accepter.GetRoutine().Start(); err != nil {
+			panic(err)
+		}
+	*/
+
+	listener, err := listenerTcp.New(
+		"listenerTcp",
+		&configs.TcpListener{
+			Port:   60001,
+			Domain: "localhost",
+		},
+		&configs.TcpBufferedReader{},
 	)
 	if err != nil {
 		panic(err)
 	}
 	listener.Start()
 
-	Connector = listener.GetConnector()
+	typedListener, err := serviceTypedListener.New(
+		listener,
+		tools.DeserializeMessage,
+		tools.SerializeMessage,
+	)
+	if err != nil {
+		panic(err)
+	}
+	Connector = typedListener.GetConnector()
 
 	app := &App{
 		grid:     nil,
@@ -48,7 +102,7 @@ func New() *App {
 	app.grid = grid
 
 	accepter, err := serviceAccepter.New(
-		listener,
+		typedListener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
