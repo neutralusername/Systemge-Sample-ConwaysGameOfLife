@@ -26,7 +26,7 @@ type App struct {
 
 var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
 
-func NewChannel() *App {
+func NewChannel() systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]] {
 	listener, err := listenerChannel.New[*tools.Message](
 		"listenerTcp",
 	)
@@ -37,36 +37,10 @@ func NewChannel() *App {
 
 	Connector = listener.GetConnector()
 
-	app := &App{
-		grid:     nil,
-		gridRows: 50,
-		gridCols: 100,
-		toroidal: true,
-	}
-	grid := make([][]int, app.gridRows)
-	for i := range grid {
-		grid[i] = make([]int, app.gridCols)
-	}
-	app.grid = grid
-
-	accepter, err := serviceAccepter.New(
-		listener,
-		&configs.Accepter{},
-		&configs.Routine{
-			MaxConcurrentHandlers: 1,
-		},
-		app.acceptHandler,
-	)
-	if err != nil {
-		panic(err)
-	}
-	if err := accepter.GetRoutine().Start(); err != nil {
-		panic(err)
-	}
-	return app
+	return listener
 }
 
-func NewTcp() *App {
+func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]] {
 	listener, err := listenerTcp.New(
 		"listenerTcp",
 		&configs.TcpListener{
@@ -90,6 +64,10 @@ func NewTcp() *App {
 	}
 	Connector = typedListener.GetConnector()
 
+	return typedListener
+}
+
+func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]) *App {
 	app := &App{
 		grid:     nil,
 		gridRows: 50,
@@ -103,7 +81,7 @@ func NewTcp() *App {
 	app.grid = grid
 
 	accepter, err := serviceAccepter.New(
-		typedListener,
+		listener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
