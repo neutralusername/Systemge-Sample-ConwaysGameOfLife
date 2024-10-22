@@ -8,8 +8,9 @@ import (
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/helpers"
 	"github.com/neutralusername/systemge/listenerTcp"
+	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedAccepter"
+	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -39,6 +40,12 @@ func New() *App {
 	tcpListener.Start()
 	Connector = tcpListener.GetConnector()
 
+	typedListener, err := serviceTypedListener.New(
+		tcpListener,
+		tools.DeserializeMessage,
+		tools.SerializeMessage,
+	)
+
 	app := &App{
 		grid:     nil,
 		gridRows: 50,
@@ -51,15 +58,13 @@ func New() *App {
 	}
 	app.grid = grid
 
-	accepter, err := serviceTypedAccepter.New(
-		tcpListener,
+	accepter, err := serviceAccepter.New(
+		typedListener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
 		app.acceptHandler,
-		tools.DeserializeMessage,
-		tools.SerializeMessage,
 	)
 	if err != nil {
 		panic(err)

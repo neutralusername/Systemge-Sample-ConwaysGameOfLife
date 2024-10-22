@@ -8,9 +8,10 @@ import (
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/httpServer"
 	"github.com/neutralusername/systemge/listenerWebsocket"
+	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedAccepter"
 	"github.com/neutralusername/systemge/serviceTypedConnection"
+	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -96,15 +97,22 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 
-	websocketAccepter, err := serviceTypedAccepter.New(
+	typedListenerWebsocket, err := serviceTypedListener.New(
 		listenerWebsocket,
+		tools.DeserializeMessage,
+		tools.SerializeMessage,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	websocketAccepter, err := serviceAccepter.New(
+		typedListenerWebsocket,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
 		app.websocketAcceptHandler,
-		tools.DeserializeMessage,
-		tools.SerializeMessage,
 	)
 	if err != nil {
 		panic(err)
