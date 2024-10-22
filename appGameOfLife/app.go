@@ -11,9 +11,9 @@ import (
 	"github.com/neutralusername/systemge/listenerTcp"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
+	"github.com/neutralusername/systemge/typedListener"
 )
 
 type App struct {
@@ -53,7 +53,7 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 	if err != nil {
 		panic(err)
 	}
-	typedListener, err := serviceTypedListener.New(
+	typedListener, err := typedListener.New(
 		listener,
 		tools.DeserializeMessage,
 		tools.SerializeMessage,

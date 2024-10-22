@@ -10,9 +10,9 @@ import (
 	"github.com/neutralusername/systemge/listenerWebsocket"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
+	"github.com/neutralusername/systemge/typedListener"
 )
 
 type AppWebsocketHTTP struct {
@@ -88,7 +88,7 @@ func New() *AppWebsocketHTTP {
 		panic(err)
 	}
 
-	typedListenerWebsocket, err := serviceTypedListener.New(
+	typedListenerWebsocket, err := typedListener.New(
 		listenerWebsocket,
 		tools.DeserializeMessage,
 		tools.SerializeMessage,
