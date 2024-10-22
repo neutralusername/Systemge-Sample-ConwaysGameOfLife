@@ -8,9 +8,8 @@ import (
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/helpers"
 	"github.com/neutralusername/systemge/listenerTcp"
-	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedConnection"
+	"github.com/neutralusername/systemge/serviceTypedAccepter"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -50,28 +49,15 @@ func New() *App {
 	}
 	app.grid = grid
 
-	accepter, err := serviceAccepter.New(
+	accepter, err := serviceTypedAccepter.New(
 		tcpListener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
-		func(connection systemge.Connection[[]byte]) error {
-			typedConnection, err := serviceTypedConnection.New(
-				connection,
-				func(data []byte) (*tools.Message, error) {
-					return tools.DeserializeMessage(data)
-				},
-				func(message *tools.Message) ([]byte, error) {
-					return message.Serialize(), nil
-				},
-			)
-			if err != nil {
-				panic(err)
-			}
-
+		func(connection systemge.Connection[*tools.Message]) error {
 			reader, err := serviceReader.NewAsync(
-				typedConnection,
+				connection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
 					MaxConcurrentHandlers: 10,
@@ -155,6 +141,8 @@ func New() *App {
 
 			return nil
 		},
+		tools.DeserializeMessage,
+		tools.SerializeMessage,
 	)
 	if err != nil {
 		panic(err)
