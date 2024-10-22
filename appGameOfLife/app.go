@@ -22,6 +22,8 @@ type App struct {
 	gridRows int
 	gridCols int
 	toroidal bool
+
+	connection systemge.Connection[*tools.Message]
 }
 
 var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
@@ -98,6 +100,10 @@ func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tool
 }
 
 func (app *App) acceptHandler(connection systemge.Connection[*tools.Message]) error {
+	if app.connection != nil {
+		panic("Connection already exists")
+	}
+	app.connection = connection
 	reader, err := serviceReader.NewAsync(
 		connection,
 		&configs.ReaderAsync{},
@@ -225,10 +231,10 @@ func (app *App) calcNextGeneration() {
 	app.grid = nextGrid
 }
 
-/*
 func (app *App) toggleToroidal(args []string) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
+
 	app.toroidal = !app.toroidal
 	return "sucess", nil
 }
@@ -236,20 +242,30 @@ func (app *App) toggleToroidal(args []string) (string, error) {
 func (app *App) randomizeGrid(args []string) (string, error) {
 	percentageOfAliveCells := int64(50)
 	if len(args) > 0 {
-		percentageOfAliveCells = Helpers.StringToInt64(args[0])
+		percentageOfAliveCells = helpers.StringToInt64(args[0])
 	}
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
 	for row := 0; row < app.gridRows; row++ {
 		for col := 0; col < app.gridCols; col++ {
-			if Tools.GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
+			if tools.GenerateRandomNumber(1, 100) <= percentageOfAliveCells {
 				app.grid[row][col] = 1
 			} else {
 				app.grid[row][col] = 0
 			}
 		}
 	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	if err := app.connection.Write(
+		tools.NewMessage(
+			topics.PROPAGATE_GRID,
+			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+			"",
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
 	return "success", nil
 }
 
@@ -261,7 +277,17 @@ func (app *App) invertGrid(args []string) (string, error) {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	if err := app.connection.Write(
+		tools.NewMessage(
+			topics.PROPAGATE_GRID,
+			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+			"",
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
 	return "success", nil
 }
 
@@ -273,7 +299,16 @@ func (app *App) chessGrid(args []string) (string, error) {
 			app.grid[row][col] = (row + col) % 2
 		}
 	}
-	app.systemgeClient.AsyncMessage(topics.PROPGATE_GRID, dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal())
+	if err := app.connection.Write(
+		tools.NewMessage(
+			topics.PROPAGATE_GRID,
+			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+			"",
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
 	return "success", nil
 }
-*/
