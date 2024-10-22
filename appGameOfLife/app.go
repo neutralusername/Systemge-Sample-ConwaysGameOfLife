@@ -67,6 +67,7 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 
 func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]) *App {
 	Connector = listener.GetConnector()
+
 	app := &App{
 		grid:     nil,
 		gridRows: 50,
@@ -93,7 +94,6 @@ func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tool
 	if err := accepter.GetRoutine().Start(); err != nil {
 		panic(err)
 	}
-
 	return app
 }
 
