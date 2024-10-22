@@ -110,6 +110,9 @@ func New() *AppWebsocketHTTP {
 		},
 		app.websocketReadHandler,
 	)
+	if err != nil {
+		panic(err)
+	}
 	server.GetAccepter().GetRoutine().Start()
 
 	return app
