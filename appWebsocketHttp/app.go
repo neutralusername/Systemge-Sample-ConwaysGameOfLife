@@ -10,7 +10,6 @@ import (
 	"github.com/neutralusername/systemge/listenerWebsocket"
 	"github.com/neutralusername/systemge/serviceAccepter"
 	"github.com/neutralusername/systemge/serviceReader"
-	"github.com/neutralusername/systemge/serviceTypedConnection"
 	"github.com/neutralusername/systemge/serviceTypedListener"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
@@ -28,23 +27,15 @@ func New() *AppWebsocketHTTP {
 	if err != nil {
 		panic(err)
 	}
-	typedInternalConnection, err := serviceTypedConnection.New(
-		internalConnection,
-		tools.DeserializeMessage,
-		tools.SerializeMessage,
-	)
-	if err != nil {
-		panic(err)
-	}
 
 	app := &AppWebsocketHTTP{
 		requestResponseManager: tools.NewRequestResponseManager[*tools.Message](&configs.RequestResponseManager{}),
-		internalConnection:     typedInternalConnection,
+		internalConnection:     internalConnection,
 		websocketConnections:   make(map[systemge.Connection[*tools.Message]]struct{}),
 	}
 
 	internalConnectionReader, err := serviceReader.NewAsync(
-		typedInternalConnection,
+		app.internalConnection,
 		&configs.ReaderAsync{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 10,

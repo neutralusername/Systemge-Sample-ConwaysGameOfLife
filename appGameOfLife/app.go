@@ -23,10 +23,10 @@ type App struct {
 	toroidal bool
 }
 
-var Connector systemge.Connector[[]byte, systemge.Connection[[]byte]]
+var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
 
 func New() *App {
-	tcpListener, err := listenerTcp.New(
+	listener, err := listenerTcp.New(
 		"listenerTcp",
 		&configs.TcpListener{
 			Port:   60001,
@@ -37,17 +37,17 @@ func New() *App {
 	if err != nil {
 		panic(err)
 	}
-	tcpListener.Start()
-	Connector = tcpListener.GetConnector()
+	listener.Start()
 
 	typedListener, err := serviceTypedListener.New(
-		tcpListener,
+		listener,
 		tools.DeserializeMessage,
 		tools.SerializeMessage,
 	)
 	if err != nil {
 		panic(err)
 	}
+	Connector = typedListener.GetConnector()
 
 	app := &App{
 		grid:     nil,
