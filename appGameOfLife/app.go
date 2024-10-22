@@ -9,7 +9,8 @@ import (
 	"github.com/neutralusername/systemge/helpers"
 	"github.com/neutralusername/systemge/listenerTcp"
 	"github.com/neutralusername/systemge/serviceAccepter"
-	"github.com/neutralusername/systemge/serviceTypedReader"
+	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/serviceTypedConnection"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 )
@@ -56,13 +57,26 @@ func New() *App {
 			MaxConcurrentHandlers: 1,
 		},
 		func(connection systemge.Connection[[]byte]) error {
-			reader, err := serviceTypedReader.NewAsync(
+			typedConnection, err := serviceTypedConnection.New(
 				connection,
+				func(data []byte) (*tools.Message, error) {
+					return tools.DeserializeMessage(data)
+				},
+				func(message *tools.Message) ([]byte, error) {
+					return message.Serialize(), nil
+				},
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			reader, err := serviceReader.NewAsync(
+				typedConnection,
 				&configs.ReaderAsync{},
 				&configs.Routine{
 					MaxConcurrentHandlers: 10,
 				},
-				func(message *tools.Message, connection systemge.Connection[[]byte]) {
+				func(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 					switch message.GetTopic() {
 					case topics.GRID_CHANGE:
 						gridChange := dto.UnmarshalGridChange(message.GetPayload())
@@ -73,7 +87,7 @@ func New() *App {
 								message.GetPayload(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						); err != nil {
 							panic(err)
@@ -87,7 +101,7 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						); err != nil {
 							panic(err)
@@ -111,7 +125,7 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								"",
 								false,
-							).Serialize(),
+							),
 							0,
 						); err != nil {
 							panic(err)
@@ -124,15 +138,12 @@ func New() *App {
 								dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
 								message.GetSyncToken(),
 								true,
-							).Serialize(),
+							),
 							0,
 						); err != nil {
 							panic(err)
 						}
 					}
-				},
-				func(data []byte) (*tools.Message, error) {
-					return tools.DeserializeMessage(data)
 				},
 			)
 			if err != nil {
