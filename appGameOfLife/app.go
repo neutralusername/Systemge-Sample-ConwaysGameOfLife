@@ -23,10 +23,9 @@ type App struct {
 	gridCols int
 	toroidal bool
 
+	Listener   systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]
 	connection systemge.Connection[*tools.Message]
 }
-
-var Connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]
 
 func NewChannel() systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]] {
 	listener, err := listenerChannel.New[*tools.Message](
@@ -68,13 +67,14 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 }
 
 func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]) *App {
-	Connector = listener.GetConnector()
 
 	app := &App{
 		grid:     nil,
 		gridRows: 50,
 		gridCols: 100,
 		toroidal: true,
+
+		Listener: listener,
 	}
 	grid := make([][]int, app.gridRows)
 	for i := range grid {

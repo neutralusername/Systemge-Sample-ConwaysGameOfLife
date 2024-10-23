@@ -9,8 +9,8 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	appGameOfLife.NewApp(appGameOfLife.NewChannel())
-	appWebsocketHttp.New()
+	app := appGameOfLife.NewApp(appGameOfLife.NewChannel())
+	appWebsocketHttp.New(app.Listener.GetConnector())
 	<-make(chan time.Time)
 }
 
