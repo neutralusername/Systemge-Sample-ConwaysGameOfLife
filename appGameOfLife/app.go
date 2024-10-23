@@ -9,8 +9,7 @@ import (
 	"github.com/neutralusername/systemge/helpers"
 	"github.com/neutralusername/systemge/listenerChannel"
 	"github.com/neutralusername/systemge/listenerTcp"
-	"github.com/neutralusername/systemge/serviceAccepter"
-	"github.com/neutralusername/systemge/serviceReader"
+	"github.com/neutralusername/systemge/server"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 	"github.com/neutralusername/systemge/typedListener"
@@ -81,18 +80,23 @@ func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tool
 	}
 	app.grid = grid
 
-	accepter, err := serviceAccepter.New(
+	server, err := server.New(
 		listener,
 		&configs.Accepter{},
 		&configs.Routine{
 			MaxConcurrentHandlers: 1,
 		},
+		&configs.ReaderAsync{},
+		&configs.Routine{
+			MaxConcurrentHandlers: 1,
+		},
 		app.acceptHandler,
+		app.readHandler,
 	)
 	if err != nil {
 		panic(err)
 	}
-	if err := accepter.GetRoutine().Start(); err != nil {
+	if err := server.GetAccepter().GetRoutine().Start(); err != nil {
 		panic(err)
 	}
 	return app
@@ -103,21 +107,6 @@ func (app *App) acceptHandler(connection systemge.Connection[*tools.Message]) er
 		panic("Connection already exists")
 	}
 	app.connection = connection
-	reader, err := serviceReader.NewAsync(
-		connection,
-		&configs.ReaderAsync{},
-		&configs.Routine{
-			MaxConcurrentHandlers: 10,
-		},
-		app.readHandler,
-	)
-	if err != nil {
-		panic(err)
-	}
-	if err := reader.GetRoutine().Start(); err != nil {
-		panic(err)
-	}
-
 	return nil
 }
 
