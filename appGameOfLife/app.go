@@ -126,31 +126,11 @@ func (app *App) readHandler(message *tools.Message, connection systemge.Connecti
 	case topics.GRID_CHANGE:
 		gridChange := dto.UnmarshalGridChange(message.GetPayload())
 		app.grid[gridChange.Row][gridChange.Column] = gridChange.State
-		if err := connection.Write(
-			tools.NewMessage(
-				topics.PROPAGATE_GRID_CHANGE,
-				message.GetPayload(),
-				"",
-				false,
-			),
-			0,
-		); err != nil {
-			panic(err)
-		}
+		app.propagateBoard()
 
 	case topics.NEXT_GENERATION:
 		app.calcNextGeneration()
-		if err := connection.Write(
-			tools.NewMessage(
-				topics.PROPAGATE_GRID,
-				dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-				"",
-				false,
-			),
-			0,
-		); err != nil {
-			panic(err)
-		}
+		app.propagateBoard()
 
 	case topics.SET_GRID:
 		app.mutex.Lock()
@@ -164,17 +144,7 @@ func (app *App) readHandler(message *tools.Message, connection systemge.Connecti
 				app.grid[row][col] = helpers.StringToInt(string(message.GetPayload()[row*app.gridCols+col]))
 			}
 		}
-		if err := connection.Write(
-			tools.NewMessage(
-				topics.PROPAGATE_GRID,
-				dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-				"",
-				false,
-			),
-			0,
-		); err != nil {
-			panic(err)
-		}
+		app.propagateBoard()
 
 	case topics.GET_GRID:
 		if err := connection.Write(
@@ -230,6 +200,23 @@ func (app *App) calcNextGeneration() {
 	app.grid = nextGrid
 }
 
+func (app *App) propagateBoard() {
+	if app.connection == nil {
+		return
+	}
+	if err := app.connection.Write(
+		tools.NewMessage(
+			topics.PROPAGATE_GRID,
+			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+			"",
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
+}
+
 func (app *App) toggleToroidal(args []string) (string, error) {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
@@ -254,17 +241,6 @@ func (app *App) randomizeGrid(args []string) (string, error) {
 			}
 		}
 	}
-	if err := app.connection.Write(
-		tools.NewMessage(
-			topics.PROPAGATE_GRID,
-			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-			"",
-			false,
-		),
-		0,
-	); err != nil {
-		panic(err)
-	}
 	return "success", nil
 }
 
@@ -276,17 +252,6 @@ func (app *App) invertGrid(args []string) (string, error) {
 			app.grid[row][col] = 1 - app.grid[row][col]
 		}
 	}
-	if err := app.connection.Write(
-		tools.NewMessage(
-			topics.PROPAGATE_GRID,
-			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-			"",
-			false,
-		),
-		0,
-	); err != nil {
-		panic(err)
-	}
 	return "success", nil
 }
 
@@ -297,17 +262,6 @@ func (app *App) chessGrid(args []string) (string, error) {
 		for col := 0; col < app.gridCols; col++ {
 			app.grid[row][col] = (row + col) % 2
 		}
-	}
-	if err := app.connection.Write(
-		tools.NewMessage(
-			topics.PROPAGATE_GRID,
-			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-			"",
-			false,
-		),
-		0,
-	); err != nil {
-		panic(err)
 	}
 	return "success", nil
 }
