@@ -21,7 +21,7 @@ type AppWebsocketHTTP struct {
 	mutex                  sync.RWMutex
 }
 
-func New(connector systemge.Connector[*tools.Message, systemge.Connection[*tools.Message]]) *AppWebsocketHTTP {
+func New(connector systemge.Connector[*tools.Message]) *AppWebsocketHTTP {
 	internalConnection, err := connector.Connect(0)
 	if err != nil {
 		panic(err)
