@@ -67,7 +67,6 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 }
 
 func NewApp(listener systemge.Listener[*tools.Message, systemge.Connection[*tools.Message]]) *App {
-
 	app := &App{
 		grid:     nil,
 		gridRows: 50,

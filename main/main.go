@@ -11,7 +11,7 @@ const LOGGER_PATH = "logs.log"
 func main() {
 	app := appGameOfLife.NewApp(appGameOfLife.NewChannel())
 	appWebsocketHttp.New(app.Listener.GetConnector())
-	<-make(chan time.Time)
+	<-make(<-chan time.Time)
 }
 
 /* dashboardServer := DashboardServer.New("dashboardServer",
