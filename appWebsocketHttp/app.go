@@ -7,8 +7,8 @@ import (
 	"github.com/neutralusername/systemge/configs"
 	"github.com/neutralusername/systemge/httpServer"
 	"github.com/neutralusername/systemge/listenerWebsocket"
+	"github.com/neutralusername/systemge/reader"
 	"github.com/neutralusername/systemge/server"
-	"github.com/neutralusername/systemge/serviceReader"
 	"github.com/neutralusername/systemge/systemge"
 	"github.com/neutralusername/systemge/tools"
 	"github.com/neutralusername/systemge/typedListener"
@@ -33,7 +33,7 @@ func New(connector systemge.Connector[*tools.Message]) *AppWebsocketHTTP {
 		websocketConnections:   make(map[systemge.Connection[*tools.Message]]struct{}),
 	}
 
-	internalConnectionReader, err := serviceReader.NewAsync(
+	internalConnectionReader, err := reader.NewAsync(
 		app.internalConnection,
 		&configs.ReaderAsync{},
 		&configs.Routine{
