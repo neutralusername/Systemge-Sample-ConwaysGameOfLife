@@ -53,8 +53,8 @@ func NewTcpListener() systemge.Listener[*tools.Message, systemge.Connection[*too
 	}
 	typedListener, err := typedListener.New(
 		listener,
-		tools.DeserializeMessage,
 		tools.SerializeMessage,
+		tools.DeserializeMessage,
 	)
 	if err != nil {
 		panic(err)
