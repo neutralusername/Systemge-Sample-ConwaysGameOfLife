@@ -161,6 +161,23 @@ func (app *App) readHandler(message *tools.Message, connection systemge.Connecti
 	}
 }
 
+func (app *App) propagateBoard() {
+	if app.connection == nil {
+		return
+	}
+	if err := app.connection.Write(
+		tools.NewMessage(
+			topics.PROPAGATE_GRID,
+			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+			"",
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
+}
+
 func (app *App) calcNextGeneration() {
 	app.mutex.Lock()
 	defer app.mutex.Unlock()
@@ -198,23 +215,6 @@ func (app *App) calcNextGeneration() {
 		}
 	}
 	app.grid = nextGrid
-}
-
-func (app *App) propagateBoard() {
-	if app.connection == nil {
-		return
-	}
-	if err := app.connection.Write(
-		tools.NewMessage(
-			topics.PROPAGATE_GRID,
-			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-			"",
-			false,
-		),
-		0,
-	); err != nil {
-		panic(err)
-	}
 }
 
 func (app *App) toggleToroidal(args []string) (string, error) {
