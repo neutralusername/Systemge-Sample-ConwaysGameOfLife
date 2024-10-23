@@ -110,6 +110,23 @@ func (app *App) acceptHandler(connection systemge.Connection[*tools.Message]) er
 	return nil
 }
 
+func (app *App) propagateBoard() {
+	if app.connection == nil {
+		return
+	}
+	if err := app.connection.Write(
+		tools.NewMessage(
+			topics.PROPAGATE_GRID,
+			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
+			"",
+			false,
+		),
+		0,
+	); err != nil {
+		panic(err)
+	}
+}
+
 func (app *App) readHandler(message *tools.Message, connection systemge.Connection[*tools.Message]) {
 	switch message.GetTopic() {
 	case topics.GRID_CHANGE:
@@ -147,23 +164,6 @@ func (app *App) readHandler(message *tools.Message, connection systemge.Connecti
 		); err != nil {
 			panic(err)
 		}
-	}
-}
-
-func (app *App) propagateBoard() {
-	if app.connection == nil {
-		return
-	}
-	if err := app.connection.Write(
-		tools.NewMessage(
-			topics.PROPAGATE_GRID,
-			dto.NewGrid(app.grid, app.gridRows, app.gridCols).Marshal(),
-			"",
-			false,
-		),
-		0,
-	); err != nil {
-		panic(err)
 	}
 }
 
