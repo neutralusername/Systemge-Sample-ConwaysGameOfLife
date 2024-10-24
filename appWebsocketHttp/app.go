@@ -89,8 +89,8 @@ func New(connector systemge.Connector[*tools.Message]) *AppWebsocketHTTP {
 
 	typedListenerWebsocket, err := typedListener.New(
 		listenerWebsocket,
-		tools.SerializeMessage,
-		tools.DeserializeMessage,
+		tools.JsonMarshalMessage,
+		tools.JsonUnmarshalMessage,
 	)
 	if err != nil {
 		panic(err)
