@@ -26,7 +26,7 @@ type App struct {
 	connection systemge.Connection[*tools.Message]
 }
 
-func NewChannel() systemge.Listener[*tools.Message] {
+func NewChannelListener() systemge.Listener[*tools.Message] {
 	listener, err := listenerChannel.New[*tools.Message](
 		"listenerTcp",
 	)
