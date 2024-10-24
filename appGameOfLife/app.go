@@ -43,8 +43,10 @@ func NewTcpListener() systemge.Listener[*tools.Message] {
 	listener, err := listenerTcp.New(
 		"listenerTcp",
 		&configs.TcpListener{
-			Port:   60001,
-			Domain: "localhost",
+			Port:        60001,
+			Domain:      "localhost",
+			TlsCertPath: "../main/MyCertificate.crt",
+			TlsKeyPath:  "../main/MyKey.key",
 		},
 		&configs.TcpBufferedReader{},
 	)
