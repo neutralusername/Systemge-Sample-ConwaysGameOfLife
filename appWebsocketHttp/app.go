@@ -74,8 +74,9 @@ func New(connector systemge.Connector[*tools.Message]) *AppWebsocketHTTP {
 		"listenerWebsocket",
 		nil,
 		&configs.WebsocketListener{
-			TcpListenerConfig: &configs.TcpListener{
-				Port: 8443,
+			HttpTcpListenerConfig: &configs.TcpListener{
+				Port:   8443,
+				Domain: "localhost",
 			},
 			Pattern: "/ws",
 		},
